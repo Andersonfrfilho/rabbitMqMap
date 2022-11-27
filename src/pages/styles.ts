@@ -26,7 +26,7 @@ export const Title = styled.h1`
   color: red;
 `;
 
-export const Body = styled.div`
+export const Body = styled.main`
   display: flex;
 
   flex: 1;
@@ -54,3 +54,8 @@ export const Painel = styled.div`
   display: flex;
   flex: 1;
 `;
+
+export const Footer = styled.footer`
+  display: flex;
+  flex: 1;
+`
