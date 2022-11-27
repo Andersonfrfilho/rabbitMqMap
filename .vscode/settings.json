@@ -1,11 +1,8 @@
 {
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
-  },
-  "[typescript]": {
+  "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "[javascript]": {
+  "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[typescriptreact]": {
@@ -20,5 +17,8 @@
     "gitlens.codeLens.scopes": [
       "document"
     ]
-  }
+  },
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
 }

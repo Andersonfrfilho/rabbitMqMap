@@ -1,7 +1,7 @@
-import { createGlobalStyle } from "styled-components";
+import { createGlobalStyle } from 'styled-components'
 import theme from "./theme";
 
-export const GlobalStyles = createGlobalStyle<typeof theme>`
+const GlobalStyle = createGlobalStyle<typeof theme>`
   * {
     box-sizing: border-box;
   }
@@ -14,7 +14,7 @@ export const GlobalStyles = createGlobalStyle<typeof theme>`
   body {
     background: ${({ theme }) => theme.color.background};
     color: ${({ theme }) => theme.color.primary};
-    font-family: ${({ theme }) => theme.font};
+    font-family: ${({ theme }) => theme.font.small};
     transition: all 0.50s linear;
   }
 
@@ -44,4 +44,6 @@ export const GlobalStyles = createGlobalStyle<typeof theme>`
   h1{
      margin: 0;
   }
-`;
+`
+
+export default GlobalStyle
