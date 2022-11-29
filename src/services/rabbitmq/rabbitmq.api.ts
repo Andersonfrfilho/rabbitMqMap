@@ -1,8 +1,8 @@
 import axios from 'axios'
-import { config } from '../../config'
-import { Binding } from './interfaces/bindings.interface'
-import { Exchange } from './interfaces/exchange.interface'
-import { Queue, QueueBinding } from './interfaces/queue.interface'
+import { config } from '@config/index'
+import { Binding } from '@services/rabbitmq/interfaces/bindings.interface'
+import { Exchange } from '@services/rabbitmq/interfaces/exchange.interface'
+import { Queue, QueueBinding } from '@services/rabbitmq/interfaces/queue.interface'
 
 export const rabbitMqApiService = axios.create({
   baseURL: config.rabbitMq.baseUrl,

@@ -2,9 +2,9 @@ import React from "react";
 import { Canvas } from "@react-three/fiber";
 import { GetStaticPropsResult, InferGetStaticPropsType } from "next";
 
-import { Queue } from "../service/rabbitmq/interfaces/queue.interface";
-import { Exchange } from "../service/rabbitmq/interfaces/exchange.interface";
-import { getExchanges, getQueues } from "../service/rabbitmq/rabbitmq.api";
+import { Queue } from "@services/rabbitmq/interfaces/queue.interface";
+import { Exchange } from "@services/rabbitmq/interfaces/exchange.interface";
+import { getExchanges, getQueues } from "@services/rabbitmq/rabbitmq.api";
 import {
   Body,
   Config,
@@ -16,6 +16,7 @@ import {
   Painel,
   Title,
 } from "./styles";
+import RabbitLogoSvg from "@assets/svg/RabbitMQ_logo.svg";
 
 function MyBox({ position, color }: any) {
   return (
@@ -37,7 +38,12 @@ export default function App(
   return (
     <Container>
       <Header>
-        <Title>Hello World</Title>
+        <RabbitLogoSvg/>
+        {/* <AreaLogo>
+          <LogoSvg></LogoSvg>
+        </AreaLogo>
+        <AreaTitle>
+        </AreaTitle> */}
       </Header>
       <Body>
         <Config>

@@ -1,4 +1,4 @@
-import { dev } from './dev'
+import { dev } from '@config/dev'
 
 const configs = {
   DEV: dev
