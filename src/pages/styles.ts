@@ -4,6 +4,10 @@ export const Container = styled.div`
   display: flex;
 
   flex: 1;
+
+
+
+  
   flex-direction: column;
 
   background-color: coral;
@@ -58,4 +62,4 @@ export const Painel = styled.div`
 export const Footer = styled.footer`
   display: flex;
   flex: 1;
-`
+`;

@@ -1,10 +1,9 @@
-import React from "react";
+import RabbitLogoSvg from "@assets/svg/RabbitMQ_logo.svg";
 import { Canvas } from "@react-three/fiber";
-import { GetStaticPropsResult, InferGetStaticPropsType } from "next";
-
-import { Queue } from "@services/rabbitmq/interfaces/queue.interface";
 import { Exchange } from "@services/rabbitmq/interfaces/exchange.interface";
+import { Queue } from "@services/rabbitmq/interfaces/queue.interface";
 import { getExchanges, getQueues } from "@services/rabbitmq/rabbitmq.api";
+import { GetStaticPropsResult, InferGetStaticPropsType } from "next";
 import {
   Body,
   Config,
@@ -14,9 +13,8 @@ import {
   Header,
   Menu,
   Painel,
-  Title,
+  Title
 } from "./styles";
-import RabbitLogoSvg from "@assets/svg/RabbitMQ_logo.svg";
 
 function MyBox({ position, color }: any) {
   return (
@@ -29,7 +27,7 @@ function MyBox({ position, color }: any) {
 
 interface AppGetStaticInterface {
   queues: Queue[];
-  exchanges: Exchange[];
+                                                exchanges: Exchange[];
 }
 
 export default function App(
@@ -38,7 +36,7 @@ export default function App(
   return (
     <Container>
       <Header>
-        <RabbitLogoSvg/>
+        <RabbitLogoSvg />
         {/* <AreaLogo>
           <LogoSvg></LogoSvg>
         </AreaLogo>

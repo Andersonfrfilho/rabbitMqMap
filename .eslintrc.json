@@ -1,15 +1,17 @@
 {
-  "extends": ["next/core-web-vitals", "plugin:json/recommended"],
+  "extends": [
+    "next/core-web-vitals",
+    "plugin:json/recommended",
+    "eslint:recommended"
+  ],
   "rules": {
-    "sort-imports": [
+    "semi": [
       "error",
-      {
-        "ignoreCase": false,
-        "ignoreDeclarationSort": false,
-        "ignoreMemberSort": false,
-        "memberSyntaxSortOrder": ["none", "all", "multiple", "single"],
-        "allowSeparatedGroups": true
-      }
+      "always"
+    ],
+    "quotes": [
+      "error",
+      "double"
     ]
   }
 }
