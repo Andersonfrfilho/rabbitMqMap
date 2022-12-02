@@ -1,25 +1,19 @@
 {
-  "editor.codeActionsOnSave": [
-      "source.organizeImports",
-      "source.fixAll.eslint",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "eslint.alwaysShowStatus": true,
+  "eslint.codeActionsOnSave.rules": [
+    "*"
   ],
-  "[javascript]": {
-      "editor.defaultFormatter": "dbaeumer.vscode-eslint"
-  },
-  "[javascriptreact]": {
-      "editor.defaultFormatter": "dbaeumer.vscode-eslint"
-  },
-  "[typescript]": {
-      "editor.defaultFormatter": "dbaeumer.vscode-eslint"
-  },
-  "[typescriptreact]": {
-      "editor.defaultFormatter": "dbaeumer.vscode-eslint"
-  },
-  "eslint.validate": [
-      "javascript",
-      "javascriptreact",
-      "typescript",
-      "typescriptreact"
+  "eslint.debug": true,
+  "eslint.format.enable": true,
+  "eslint.lintTask.enable": true,
+  "eslint.run": "onSave",
+  "eslint.useESLintClass": true,
+  "cSpell.words": [
+    "rabbitmq",
+    "rabbitmqmapper",
+    "svgr"
   ],
-  "eslint.format.enable": true
 }
