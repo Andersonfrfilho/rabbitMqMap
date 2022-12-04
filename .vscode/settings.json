@@ -1,19 +1,25 @@
 {
+  "editor.formatOnSave": true,
+  "editor.formatOnType": true,
+  "eslint.enable": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
   },
-  "eslint.alwaysShowStatus": true,
-  "eslint.codeActionsOnSave.rules": [
-    "*"
-  ],
-  "eslint.debug": true,
-  "eslint.format.enable": true,
-  "eslint.lintTask.enable": true,
-  "eslint.run": "onSave",
-  "eslint.useESLintClass": true,
-  "cSpell.words": [
-    "rabbitmq",
-    "rabbitmqmapper",
-    "svgr"
-  ],
+  // "eslint.alwaysShowStatus": true,
+  // "eslint.codeActionsOnSave.rules": [
+  //   "*"
+  // ],
+  // "eslint.debug": true,
+  // "eslint.format.enable": true,
+  // "eslint.lintTask.enable": true,
+  // "eslint.run": "onSave",
+  // "eslint.useESLintClass": true,
+  // "cSpell.words": [
+  //   "rabbitmq",
+  //   "rabbitmqmapper",
+  //   "svgr"
+  // ],
+  // "[typescriptreact]": {
+  //   "editor.defaultFormatter": "vscode.typescript-language-features"
+  // },
 }
