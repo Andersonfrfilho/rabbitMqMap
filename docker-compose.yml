@@ -1,11 +1,12 @@
-version: "3.8"
+version: "3.9"
 services:
-  rabbitmq:
-    image: rabbitmq:3.8.25-management-alpine
-    container_name: 'rabbitmq-map'
+  my-rabbit:
+    image: rabbitmq:3-management-alpine
+    container_name: my-rabbit
+    hostname: my-rabbit-host
     ports:
-        - 5672:5672
-        - 15672:15672
+      - "15672:15672"
+      - "5672:5672"
     volumes:
-        - ./.docker/rabbitmq/data/:/var/lib/rabbitmq/
-        - ./.docker/rabbitmq/log/:/var/log/rabbitmq/
+      - ./.docker/rabbitmq/data/:/var/lib/rabbitmq/
+      - ./.docker/rabbitmq/log/:/var/log/rabbitmq/

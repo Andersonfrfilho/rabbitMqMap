@@ -1,20 +1,18 @@
-import React, { FC } from 'react'
+import React, { useState } from 'react'
 import { Exchange } from "@services/rabbitmq/interfaces/exchange.interface";
-import { Queue } from "@services/rabbitmq/interfaces/queue.interface";
 import { getExchanges, getQueues } from '@services/rabbitmq/rabbitmq.api'
 import { GetStaticPropsResult, InferGetStaticPropsType } from "next";
+import { Canvas } from '@react-three/fiber'
+import { OrbitControls } from '@react-three/drei'
 
-import { Box, Button, Grid, GridItem, Icon, Image, Input, InputGroup, InputLeftAddon, InputLeftElement, Text } from '@chakra-ui/react';
+import { Box, Button, Grid, GridItem, Image, Input, InputGroup, InputLeftAddon, InputLeftElement, Text, useMenuPositioner } from '@chakra-ui/react';
 import { PhoneIcon } from '@chakra-ui/icons';
-
-// function MyBox ({ position, color }: ):FC<{position:string,color:string}> {
-//   return (
-//     <mesh position={position}>
-//       <boxBufferGeometry />
-//       <meshBasicMaterial color={color} />
-//     </mesh>
-//   );
-// }
+import { Queue as QueueThree } from '@components/Queue';
+import { Queue } from '@services/rabbitmq/interfaces/queue.interface';
+import { usePosition } from '@contexts/position/Position.context';
+import { DefinePositionQueueDTO, Producer as ProducerPosition, Exchange as ExchangePosition, Consumer as ConsumerPosition } from '@contexts/position/functions/definePositionsComponents';
+import { POSITION_INITIAL } from '@constants/position.constant';
+import { componentQueueDTO } from '@dtos/component-queue.dto';
 
 interface AppGetStaticInterface {
   queues: Queue[]
@@ -22,8 +20,23 @@ interface AppGetStaticInterface {
 }
 
 export default function App(
-  data: InferGetStaticPropsType<typeof getStaticProps>
+  { queues }: InferGetStaticPropsType<typeof getStaticProps>
 ) {
+  const { definePositionsComponents } = usePosition()
+
+  useState(() => {
+    if (queues.length > 0) {
+      const components: DefinePositionQueueDTO = {
+        consumer: {} as ConsumerPosition,
+        exchange: {} as ExchangePosition,
+        producer: {} as ProducerPosition,
+        queue: componentQueueDTO(queues)
+
+      }
+      definePositionsComponents(components)
+    }
+  })
+
   return (
     <Grid
       templateAreas={`"header header"
@@ -70,9 +83,9 @@ export default function App(
               <Input type='tel' placeholder='phone number' />
             </InputGroup>
           </Box>
-          <Box boxSize='sm' display='flex' flex={1} backgroundColor={"yellow"} height={'100%'} alignItems={"center"}>
+          <Box boxSize='sm' display='flex' flex={1} backgroundColor={"yellow"} height={'100%'} justifyContent={"center"} alignItems={"center"}>
             <Button h='1.75rem' size='sm' onClick={() => { }}>
-              {'HideShow'}
+              {'Registrar'}
             </Button>
           </Box>
         </Box>
@@ -80,8 +93,14 @@ export default function App(
       <GridItem pl='2' bg='pink.300' area={'nav'}>
         Nav
       </GridItem>
-      <GridItem pl='2' bg='green.300' area={'main'}>
-        Main
+      <GridItem pl='2' bg='green.300' area={'main'} display={"flex"} height={'100vh'}>
+        <Canvas style={{ width: '100%', height: '100%' }}>
+          <ambientLight intensity={0.5} />
+          <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
+          <pointLight position={[-10, -10, -10]} />
+          <QueueThree position={POSITION_INITIAL} />
+          <OrbitControls />
+        </Canvas>
       </GridItem>
       <GridItem pl='2' bg='blue.300' area={'footer'}>
         Footer
@@ -93,9 +112,8 @@ export default function App(
 export async function getStaticProps(
   context: any
 ): Promise<GetStaticPropsResult<AppGetStaticInterface>> {
-  const queues = await getQueues();
-  const exchanges = await getExchanges();
-  console.log(context);
+  const queues = await getQueues() || [];
+  const exchanges = await getExchanges() || [];
 
   return {
     props: {
