@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react'
-import { DefinePositionQueueDTO, PositionComponents, definePositionsComponents } from './functions/definePositionsComponents';
+import { PositionComponents, definePositionsComponents, Components } from './functions/definePositionsComponents';
 
 type PositionStateProps = {
   children: React.ReactNode;
@@ -8,7 +8,7 @@ type PositionStateProps = {
 interface UsePosition {
   state: string;
   setState: React.Dispatch<React.SetStateAction<string>>;
-  definePositionsComponents: (data: DefinePositionQueueDTO) => PositionComponents
+  definePositionsComponents: (data: Components) => PositionComponents
 }
 
 export const PositionContext = React.createContext<UsePosition>({} as UsePosition);

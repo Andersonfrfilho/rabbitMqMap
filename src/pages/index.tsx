@@ -10,9 +10,13 @@ import { PhoneIcon } from '@chakra-ui/icons';
 import { Queue as QueueThree } from '@components/Queue';
 import { Queue } from '@services/rabbitmq/interfaces/queue.interface';
 import { usePosition } from '@contexts/position/Position.context';
-import { DefinePositionQueueDTO, Producer as ProducerPosition, Exchange as ExchangePosition, Consumer as ConsumerPosition } from '@contexts/position/functions/definePositionsComponents';
+import { componentDTO } from '@dtos/component.dto';
+import { Components } from '@contexts/position/functions/definePositionsComponents';
+import { DEPTH } from '@enums/positions.enum';
+import { CONSUMER_DIMENSION, EXCHANGE_DIMENSION, PRODUCER_DIMENSION, QUEUE_DIMENSION } from '@constants/components.constant';
+import { Producer } from '@services/rabbitmq/interfaces/producer.interface';
+import { Consumer } from '@services/rabbitmq/interfaces/consumer.interface';
 import { POSITION_INITIAL } from '@constants/position.constant';
-import { componentQueueDTO } from '@dtos/component-queue.dto';
 
 interface AppGetStaticInterface {
   queues: Queue[]
@@ -26,14 +30,15 @@ export default function App(
 
   useState(() => {
     if (queues.length > 0) {
-      const components: DefinePositionQueueDTO = {
-        consumer: {} as ConsumerPosition,
-        exchange: {} as ExchangePosition,
-        producer: {} as ProducerPosition,
-        queue: componentQueueDTO(queues)
+      const components: Components = {
+        consumer: componentDTO<Consumer>({ items: [] as Consumer[], depth: DEPTH.CONSUMER, dimensions: CONSUMER_DIMENSION }),
+        exchange: componentDTO<Exchange>({ items: [] as Exchange[], depth: DEPTH.EXCHANGE, dimensions: EXCHANGE_DIMENSION }),
+        producer: componentDTO<Producer>({ items: [] as Producer[], depth: DEPTH.PRODUCER, dimensions: PRODUCER_DIMENSION }),
+        queue: componentDTO<Queue>({ items: queues, depth: DEPTH.QUEUE, dimensions: QUEUE_DIMENSION })
 
       }
-      definePositionsComponents(components)
+      const data = definePositionsComponents(components)
+      console.log(data)
     }
   })
 

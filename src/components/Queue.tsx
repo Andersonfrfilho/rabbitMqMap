@@ -3,6 +3,7 @@ import * as THREE from 'three'
 import { useRef, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Html } from '@react-three/drei'
+import { QUEUE_DIMENSION } from '@constants/components.constant'
 
 export function Queue(props: JSX.IntrinsicElements['mesh']) {
   // This reference gives us direct access to the THREE.Mesh object
@@ -21,7 +22,7 @@ export function Queue(props: JSX.IntrinsicElements['mesh']) {
       onClick={(event) => click(!clicked)}
       onPointerOver={(event) => hover(true)}
       onPointerOut={(event) => hover(false)}>
-      <boxGeometry args={[1, 1, 1]} />
+      <boxGeometry args={QUEUE_DIMENSION} />
       <meshStandardMaterial color={hovered ? 'hotpink' : 'orange'} />
       <Html distanceFactor={20}>
         <div className="content">
