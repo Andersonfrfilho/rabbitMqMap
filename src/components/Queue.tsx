@@ -28,7 +28,6 @@ export function Queue(props: JSX.IntrinsicElements['mesh']) {
         <div className="content">
           hello <br />
           world
-          aklsjdhfçlajksdhfçlajsdhflkajsdnflkasbndflkjnBSDFKLJN
         </div>
       </Html>
     </mesh>

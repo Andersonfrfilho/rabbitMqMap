@@ -6,18 +6,14 @@ type PositionStateProps = {
 };
 
 interface UsePosition {
-  state: string;
-  setState: React.Dispatch<React.SetStateAction<string>>;
   definePositionsComponents: (data: Components) => PositionComponents
 }
 
 export const PositionContext = React.createContext<UsePosition>({} as UsePosition);
 
 export function PositionState({ children }: PositionStateProps) {
-  const [state, setState] = useState('whatever');
-
   return (
-    <PositionContext.Provider value={{ state, setState, definePositionsComponents }}>{children}</PositionContext.Provider>
+    <PositionContext.Provider value={{ definePositionsComponents }}>{children}</PositionContext.Provider>
   )
 }
 

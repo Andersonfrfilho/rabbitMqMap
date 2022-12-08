@@ -13,6 +13,7 @@ export function componentDTO<ParameterType>({ items, depth, dimensions }: Compon
   const dimension: Dimension = {
     width: widthDimension, height: heightDimension, depth: depthDimension
   }
+
   const quantity = items.length
 
   return { depth, dimension, quantity, items }

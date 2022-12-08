@@ -16,7 +16,7 @@ import { DEPTH } from '@enums/positions.enum';
 import { CONSUMER_DIMENSION, EXCHANGE_DIMENSION, PRODUCER_DIMENSION, QUEUE_DIMENSION } from '@constants/components.constant';
 import { Producer } from '@services/rabbitmq/interfaces/producer.interface';
 import { Consumer } from '@services/rabbitmq/interfaces/consumer.interface';
-import { POSITION_INITIAL } from '@constants/position.constant';
+import { Position, POSITION_INITIAL } from '@constants/position.constant';
 
 interface AppGetStaticInterface {
   queues: Queue[]
@@ -26,6 +26,7 @@ interface AppGetStaticInterface {
 export default function App(
   { queues }: InferGetStaticPropsType<typeof getStaticProps>
 ) {
+  const [queuePositions, setQueuePositions] = useState([] as Position[])
   const { definePositionsComponents } = usePosition()
 
   useState(() => {
@@ -37,8 +38,9 @@ export default function App(
         queue: componentDTO<Queue>({ items: queues, depth: DEPTH.QUEUE, dimensions: QUEUE_DIMENSION })
 
       }
+
       const data = definePositionsComponents(components)
-      console.log(data)
+      setQueuePositions(data.queue)
     }
   })
 
@@ -103,7 +105,9 @@ export default function App(
           <ambientLight intensity={0.5} />
           <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
           <pointLight position={[-10, -10, -10]} />
-          <QueueThree position={POSITION_INITIAL} />
+          {queuePositions.length > 0 && queuePositions.map(position => {
+            return <QueueThree key={`${position[0]}${position[1]}${position[2]}`} position={position} />
+          })}
           <OrbitControls />
         </Canvas>
       </GridItem>

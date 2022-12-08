@@ -1,11 +1,9 @@
-import { position } from "@chakra-ui/react";
 import { Position } from "@constants/position.constant";
 import { COMPONENTS, DEPTH } from "@enums/positions.enum";
 import { Consumer } from "@services/rabbitmq/interfaces/consumer.interface";
 import { Exchange } from "@services/rabbitmq/interfaces/exchange.interface";
 import { Producer } from "@services/rabbitmq/interfaces/producer.interface";
 import { Queue } from "@services/rabbitmq/interfaces/queue.interface";
-import { between } from "@utils/random-number";
 
 export interface Dimension {
   width: number;
@@ -28,10 +26,14 @@ export interface Components {
 }
 
 export interface PositionComponents {
-  producer: Position[][];
-  exchange: Position[][];
-  queue: Position[][];
-  consumer: Position[][];
+  producer: Position[];
+  exchange: Position[];
+  queue: Position[];
+  consumer: Position[];
+}
+
+function findColumn(length: number, indexFound: number) {
+  return new Array(length).findIndex((element, index) => (index * length) > indexFound && indexFound < ((index + 1) * length - 1))
 }
 
 export const definePositionsComponents = (components: Components): PositionComponents => {
@@ -44,45 +46,59 @@ export const definePositionsComponents = (components: Components): PositionCompo
     consumer: []
   }
   while (numberComponents - 1 >= indexComponent) {
-    const component = COMPONENTS[indexComponent] as keyof PositionComponents
+    const componentName: keyof PositionComponents = COMPONENTS[indexComponent] as keyof PositionComponents
     let indexPosition = 0;
-    const positions: number[] = [];
-    const positionsIndexes = component.length ** 2
+    const positions: Position[] = [];
+    const positionsIndexes: number[] = [];
+    const positionsQuantityIndexes = components[componentName].quantity ** 2
 
-    while (positions.length <= component.length && indexPosition < positionsIndexes - 1) {
+    while (positionsIndexes.length <= components[componentName].quantity - 1 && indexPosition < positionsQuantityIndexes - 1) {
 
-      const alreadyPosition = positions.some(indexCurrentPosition => indexCurrentPosition === indexPosition)
+      const alreadyPosition = positionsIndexes.some(indexCurrentPosition => indexCurrentPosition === indexPosition)
       if (alreadyPosition) {
-        console.log("entrou repetido")
         indexPosition += 1
         continue;
       }
-      const row = Math.floor(indexPosition / component.length)
-      const anteriorPositionHasElement = positions.some(indexCurrentPosition => indexPosition > 0 && indexPosition - 1 === indexCurrentPosition)
+      const row = Math.floor(indexPosition / components[componentName].quantity)
+      const anteriorPositionHasElement = positionsIndexes.some(indexCurrentPosition => indexPosition > 0 && indexPosition - 1 === indexCurrentPosition)
       if (anteriorPositionHasElement) {
         indexPosition += 1
         continue;
       }
-      const posteriorPositionHasElement = positions.some(indexCurrentPosition => indexPosition < positionsIndexes - 1 && (indexPosition + 1) === indexCurrentPosition)
+      const posteriorPositionHasElement = positionsIndexes.some(indexCurrentPosition => indexPosition < positionsQuantityIndexes - 1 && (indexPosition + 1) === indexCurrentPosition)
+
       if (posteriorPositionHasElement) {
         indexPosition += 1
         continue;
       }
-      const upPositionHasElement = positions.some(indexCurrentPosition => indexPosition >= component.length && (indexPosition - component.length) === indexCurrentPosition)
+
+      const upPositionHasElement = positionsIndexes.some(indexCurrentPosition => {
+        return indexPosition >= components[componentName].quantity && (indexPosition - components[componentName].quantity) === indexCurrentPosition
+      })
+
       if (upPositionHasElement) {
         indexPosition += 1
         continue;
       }
 
-      const downPositionHasElement = positions.some(indexCurrentPosition => row < component.length - 1 && (indexPosition + component.length) === indexCurrentPosition)
+      const downPositionHasElement = positionsIndexes.some(indexCurrentPosition => row < components[componentName].quantity - 1 && (indexPosition + components[componentName].quantity) === indexCurrentPosition)
       if (downPositionHasElement) {
         indexPosition += 1
         continue;
       }
-      positions.push(indexPosition)
+
+      positionsIndexes.push(indexPosition)
+
+      const x = row + indexPosition;
+      const y = findColumn(components[componentName].quantity, indexPosition)
+      const z = DEPTH[componentName.toUpperCase() as any] as unknown as number
+      const position: Position = [x, y, z]
+
+      positions.push(position)
     }
     indexComponent += 1;
-    componentsPosition[component].push(positions)
+    componentsPosition[componentName] = (positions)
   }
   return componentsPosition
 }
+
