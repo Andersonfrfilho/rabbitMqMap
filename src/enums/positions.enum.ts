@@ -6,8 +6,8 @@ export enum COMPONENTS {
 }
 
 export enum DEPTH {
-  PRODUCER,
-  EXCHANGE,
-  QUEUE,
-  CONSUMER
+  PRODUCER = 0,
+  EXCHANGE = 3,
+  QUEUE = 6,
+  CONSUMER = 9
 }

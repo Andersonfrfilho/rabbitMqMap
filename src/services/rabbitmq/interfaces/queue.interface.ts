@@ -1,4 +1,5 @@
-import { Binding } from "./bindings.interface"
+import { Binding } from "./binding.interface"
+import { Consumer } from "./consumer.interface"
 
 type ArgumentsQueue = {
   "x-queue-type": string
@@ -101,8 +102,7 @@ export type Queue = {
   vhost: string
 }
 
-type Bindings = {
-  bindings: Binding[]
+export interface QueueBindingConsumers extends Queue {
+  bindings: Binding[];
+  consumers_register: Consumer[];
 }
-
-export type QueueBinding = Queue & Bindings

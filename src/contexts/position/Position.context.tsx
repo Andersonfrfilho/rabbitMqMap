@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext } from 'react'
 import { PositionComponents, definePositionsComponents, Components } from './functions/definePositionsComponents';
 
 type PositionStateProps = {

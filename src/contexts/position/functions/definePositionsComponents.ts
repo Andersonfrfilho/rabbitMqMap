@@ -3,7 +3,7 @@ import { COMPONENTS, DEPTH } from "@enums/positions.enum";
 import { Consumer } from "@services/rabbitmq/interfaces/consumer.interface";
 import { Exchange } from "@services/rabbitmq/interfaces/exchange.interface";
 import { Producer } from "@services/rabbitmq/interfaces/producer.interface";
-import { Queue } from "@services/rabbitmq/interfaces/queue.interface";
+import { Queue, QueueBindingConsumers } from "@services/rabbitmq/interfaces/queue.interface";
 
 export interface Dimension {
   width: number;
@@ -102,3 +102,17 @@ export const definePositionsComponents = (components: Components): PositionCompo
   return componentsPosition
 }
 
+interface DefineComponentsDTO {
+  queues: QueueBindingConsumers[];
+  positions: PositionComponents;
+}
+
+export const defineComponents = ({ queues, positions }: DefineComponentsDTO): any => {
+  const queue = queues.map((queue, index) => ({ ...queue, positions: positions.queue[index] }))
+  const { bindings } = queue
+  return {
+    ...queue,
+
+  }
+})
+}
