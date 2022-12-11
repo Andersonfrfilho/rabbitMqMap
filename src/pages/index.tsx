@@ -33,7 +33,7 @@ export default function App(
   const [exchangePositions, setExchangePositions] = useState([] as Position[])
   const [consumerPositions, setConsumerPositions] = useState([] as Position[])
   const [producerPositions, setProducerPositions] = useState([] as Position[])
-  const { definePositionsComponents } = usePosition()
+  const { createPositionsComponents, definePositionsComponents } = usePosition()
 
   useState(() => {
     if (queues.length > 0) {
@@ -46,12 +46,16 @@ export default function App(
         queue: componentDTO<Queue>({ items: queues, depth: DEPTH.QUEUE, dimensions: QUEUE_DIMENSION }),
         producer: componentDTO<Producer>({ items: producers, depth: DEPTH.PRODUCER, dimensions: PRODUCER_DIMENSION }),
       }
-      const data = definePositionsComponents(components)
+      const positions = createPositionsComponents(components)
 
-      setQueuePositions(data.queue)
-      setExchangePositions(data.exchange)
-      setConsumerPositions(data.consumer)
-      setProducerPositions(data.producer)
+      setQueuePositions(positions.queue)
+      setExchangePositions(positions.exchange)
+      setConsumerPositions(positions.consumer)
+      setProducerPositions(positions.producer)
+
+      const componentPositions = definePositionsComponents({ positions, queues })
+
+
     }
   })
 
@@ -129,7 +133,7 @@ export default function App(
             return <QueueThree key={`${position[0]}${position[1]}${position[2]}`} position={position} />
           })}
           <LineThree />
-          <Sphere />
+          <Sphere visible={false} />
           <OrbitControls />
         </Canvas>
       </GridItem>

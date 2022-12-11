@@ -1,19 +1,20 @@
 import React, { useContext } from 'react'
-import { PositionComponents, definePositionsComponents, Components } from './functions/definePositionsComponents';
+import { PositionComponents, createPositionsComponents, definePositionsComponents, Components, DefineComponentsResult, DefineComponentsDTO } from './functions/definePositionsComponents';
 
 type PositionStateProps = {
   children: React.ReactNode;
 };
 
 interface UsePosition {
-  definePositionsComponents: (data: Components) => PositionComponents
+  createPositionsComponents: (data: Components) => PositionComponents
+  definePositionsComponents: (data: DefineComponentsDTO) => DefineComponentsResult[]
 }
 
 export const PositionContext = React.createContext<UsePosition>({} as UsePosition);
 
 export function PositionState({ children }: PositionStateProps) {
   return (
-    <PositionContext.Provider value={{ definePositionsComponents }}>{children}</PositionContext.Provider>
+    <PositionContext.Provider value={{ createPositionsComponents, definePositionsComponents }}>{children}</PositionContext.Provider>
   )
 }
 

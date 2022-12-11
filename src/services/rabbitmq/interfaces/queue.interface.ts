@@ -1,3 +1,4 @@
+import { Position } from "@constants/position.constant"
 import { Binding } from "./binding.interface"
 import { Consumer } from "./consumer.interface"
 
@@ -100,6 +101,14 @@ export type Queue = {
   state: string,
   type: string,
   vhost: string
+}
+
+export interface BindingWithPosition extends Binding {
+  position: Position
+}
+
+export interface ConsumerWithPosition extends Consumer {
+  position: Position
 }
 
 export interface QueueBindingConsumers extends Queue {
