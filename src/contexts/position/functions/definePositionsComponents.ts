@@ -52,7 +52,7 @@ export const createPositionsComponents = (components: Components): PositionCompo
     const positionsIndexes: number[] = [];
     const positionsQuantityIndexes = components[componentName].quantity ** 2
 
-    while (positionsIndexes.length <= components[componentName].quantity - 1 && indexPosition < positionsQuantityIndexes - 1) {
+    while (positionsIndexes.length <= components[componentName].quantity - 1 && indexPosition <= positionsQuantityIndexes - 1) {
 
       const alreadyPosition = positionsIndexes.some(indexCurrentPosition => indexCurrentPosition === indexPosition)
       if (alreadyPosition) {
@@ -113,26 +113,10 @@ export interface DefineComponentsResult extends QueueBindingConsumers {
   consumers_register: ConsumerWithPosition[];
 }
 
-interface DefineLinksBetweenComponentsDTO extends DefineComponentsResult { }
-
-interface LinkExchange {
-  queuePosition: Position;
-  exchangePosition: Position;
-}
-
-interface LinkConsumer {
-  queuePosition: Position;
-  consumerPosition: Position;
-}
-interface DefineLinksBetweenComponentsResult extends DefineLinksBetweenComponentsDTO {
-  linksExchange: LinkExchange[];
-  linksConsumers: LinkConsumer[];
-}
-
-
 export const definePositionsComponents = ({ queues, positions }: DefineComponentsDTO): DefineComponentsResult[] => {
   const exchangePositions = positions.exchange
   const consumerPositions = positions.consumer
+
   const queuesWithPositions = queues.map((queue, index) => ({
     ...queue,
     position: positions.queue[index],
@@ -146,7 +130,7 @@ export const definePositionsComponents = ({ queues, positions }: DefineComponent
     }),
     consumers_register: queue.consumers_register.map(consumer => {
       const position = consumerPositions[0]
-      exchangePositions.shift()
+      consumerPositions.shift()
       return {
         ...consumer,
         position
@@ -157,20 +141,23 @@ export const definePositionsComponents = ({ queues, positions }: DefineComponent
   return queuesWithPositions
 }
 
-interface Link {
+export interface DefineLinksBetweenComponentsDTO extends DefineComponentsResult { }
+
+export interface BindingWithLinks extends BindingWithPosition {
   links: Position[]
 }
-interface BindingWithLinks extends BindingWithPosition, Link { }
-interface ConsumerWithLinks extends ConsumerWithPosition, Link { }
 
-interface DefinePositionPointsLinksBetweenComponents extends DefineLinksBetweenComponentsResult {
+export interface ConsumerWithLinks extends ConsumerWithPosition {
+  links: Position[]
+}
+
+export interface DefineLinksBetweenComponentsResult extends DefineComponentsResult {
   bindings: BindingWithLinks[];
   consumers_register: ConsumerWithLinks[];
 }
 
-export function definePositionLinksBetweenComponents(queues: DefineLinksBetweenComponentsDTO[]): DefinePositionPointsLinksBetweenComponents[] {
-
-  const queuesWithPositions = queues.map((queue, index) => ({
+export function definePositionLinksBetweenComponents(queues: DefineLinksBetweenComponentsDTO[]): DefineLinksBetweenComponentsResult[] {
+  const queuesWithPositions = queues.map((queue) => ({
     ...queue,
     bindings: queue.bindings.map(binding => {
       const links = makePointsByNumberSeparation({
@@ -195,11 +182,13 @@ export function definePositionLinksBetweenComponents(queues: DefineLinksBetweenC
 
   return queuesWithPositions
 }
+
 interface MakePointsByNumberSeparation {
   initialPosition: Position;
   lastPosition: Position;
   numberPoints: number;
 }
+
 function makePointsByNumberSeparation({ initialPosition, lastPosition, numberPoints }: MakePointsByNumberSeparation): Position[] {
   const arrayLinks = new Array(numberPoints)
   const [x1, y1, z1] = initialPosition

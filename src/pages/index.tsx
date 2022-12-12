@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Exchange } from "@services/rabbitmq/interfaces/exchange.interface";
-import { getExchanges, getProducers, getQueues } from '@services/rabbitmq/rabbitmq.api'
+import { getConsumers, getExchanges, getProducers, getQueues } from '@services/rabbitmq/rabbitmq.api'
 import { GetStaticPropsResult, InferGetStaticPropsType } from "next";
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
@@ -11,7 +11,7 @@ import { Queue as QueueThree } from '@components/Queue.three';
 import { Queue, QueueBindingConsumers } from '@services/rabbitmq/interfaces/queue.interface';
 import { usePosition } from '@contexts/position/Position.context';
 import { componentDTO } from '@dtos/component.dto';
-import { Components } from '@contexts/position/functions/definePositionsComponents';
+import { Components, DefineLinksBetweenComponentsResult } from '@contexts/position/functions/definePositionsComponents';
 import { DEPTH } from '@enums/positions.enum';
 import { CONSUMER_DIMENSION, EXCHANGE_DIMENSION, PRODUCER_DIMENSION, QUEUE_DIMENSION } from '@constants/components.constant';
 import { Producer } from '@services/rabbitmq/interfaces/producer.interface';
@@ -33,7 +33,8 @@ export default function App(
   const [exchangePositions, setExchangePositions] = useState([] as Position[])
   const [consumerPositions, setConsumerPositions] = useState([] as Position[])
   const [producerPositions, setProducerPositions] = useState([] as Position[])
-  const { createPositionsComponents, definePositionsComponents } = usePosition()
+  const [components, setComponents] = useState([] as DefineLinksBetweenComponentsResult[])
+  const { createPositionsComponents, definePositionsComponents, definePositionLinksBetweenComponents } = usePosition()
 
   useState(() => {
     if (queues.length > 0) {
@@ -46,6 +47,7 @@ export default function App(
         queue: componentDTO<Queue>({ items: queues, depth: DEPTH.QUEUE, dimensions: QUEUE_DIMENSION }),
         producer: componentDTO<Producer>({ items: producers, depth: DEPTH.PRODUCER, dimensions: PRODUCER_DIMENSION }),
       }
+
       const positions = createPositionsComponents(components)
 
       setQueuePositions(positions.queue)
@@ -54,8 +56,8 @@ export default function App(
       setProducerPositions(positions.producer)
 
       const componentPositions = definePositionsComponents({ positions, queues })
-
-
+      const componentsLinks = definePositionLinksBetweenComponents(componentPositions)
+      setComponents(componentsLinks)
     }
   })
 
@@ -132,8 +134,11 @@ export default function App(
           {consumerPositions.length > 0 && consumerPositions.map(position => {
             return <QueueThree key={`${position[0]}${position[1]}${position[2]}`} position={position} />
           })}
-          <LineThree />
-          <Sphere visible={false} />
+          {/* {components.length > 0 && components.map(component => {
+            const positions = component.bindings.map(binding => binding.links).reduce((accumulator, currentValue) => [...accumulator, currentValue], [])
+            positions.map(<LineThree />
+          })}
+          <Sphere visible={false} /> */}
           <OrbitControls />
         </Canvas>
       </GridItem>

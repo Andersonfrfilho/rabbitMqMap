@@ -16,15 +16,18 @@ export const rabbitMqApiService = axios.create({
 
 export const getQueues = async (): Promise<QueueBindingConsumers[]> => {
   const { data: queues } = await rabbitMqApiService.get<Queue[]>('/api/queues');
+
   const queuesWithConsumersBindings = await Promise.all(queues.map(async queue => {
     const bindings = await getBindings(queue.name)
     const consumers = await getConsumers(queue.name)
+
     return {
       ...queue,
       bindings,
       consumers_register: consumers
     }
   }))
+
   return queuesWithConsumersBindings
 }
 

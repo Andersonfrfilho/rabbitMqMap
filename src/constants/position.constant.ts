@@ -1,4 +1,4 @@
-import { Vector3 } from "@react-three/fiber";
+import { Vector3 } from "three";
 
 export type Position = Vector3 | [x: number, y: number, z: number]
 
