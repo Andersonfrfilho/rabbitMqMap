@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   my-rabbit:
-    image: rabbitmq:3-management-alpine
+    build: ./.docker/rabbitmq/
     container_name: rabbitmq
     hostname: rabbit-mapper-host
     ports:
@@ -10,3 +10,4 @@ services:
     volumes:
       - "./docker/rabbitmq/data:/var/lib/rabbitmq"
       - "./docker/rabbitmq/log:/var/log/rabbitmq"
+      - "./.docker/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf"

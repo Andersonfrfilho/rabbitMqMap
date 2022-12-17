@@ -11,3 +11,13 @@ export enum DEPTH {
   QUEUE = 6,
   CONSUMER = 9
 }
+
+export enum COMPONENT_TYPE {
+  BINDING = "bindings",
+  CONSUMER = "consumers_register"
+}
+
+export enum LINK_TYPE {
+  LINES = "lines",
+  POINTS = "points"
+}
