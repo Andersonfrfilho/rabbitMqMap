@@ -1,33 +1,44 @@
 import { AmqpConnection } from '@golevelup/nestjs-rabbitmq/lib/amqp/connection';
+
 import { Controller, Get } from '@nestjs/common';
+
 import { AppService } from './app.service';
 
 @Controller()
 export class AppController {
   constructor(
     private readonly appService: AppService,
+
     private readonly amqpConnection: AmqpConnection,
   ) { }
 
   @Get()
-  async getHello(): Promise<string> {
+  async getHello(): Promise<any> {
     this.amqpConnection.publish(
-      'exchange-fila-1-direct',
+      'exchange-queue-1-topic',
       'routing-key-to-exchange-fila-1-topic',
       { hello: 'world' },
     );
-    return this.appService.getHello();
+
+    return {
+      queue: 'queue-1',
+      exchange: 'exchange-queue-1-topic',
+      'route-key': 'routing-key-to-exchange-fila-1-topic',
+    };
   }
 
   @Get('/queue/:id/topic')
   async sendMessageTopic(): Promise<any> {
     this.amqpConnection.publish(
-      'exchange-fila-1-topic',
-      'routing-key-to-exchange-fila-1-topic',
+      'exchange-queue-1-topic',
+      'routing-key-exchange-queue-2	',
       { hello: 'world' },
     );
+
     return {
-      queue: 'true',
+      queue: 'queue-2',
+      exchange: 'exchange-queue-1-topic',
+      'route-key': 'routing-key-exchange-queue-2',
     };
   }
 }

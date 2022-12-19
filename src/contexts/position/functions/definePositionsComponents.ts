@@ -4,6 +4,7 @@ import { Consumer } from "@services/rabbitmq/interfaces/consumer.interface";
 import { Exchange } from "@services/rabbitmq/interfaces/exchange.interface";
 import { Producer } from "@services/rabbitmq/interfaces/producer.interface";
 import { BindingWithPosition, ConsumerWithPosition, Queue, QueueBindingConsumers } from "@services/rabbitmq/interfaces/queue.interface";
+import { ComponentInfo, infoConsumer, infoExchange, infoProducer, infoQueue } from "../builder/info.builder";
 
 export interface Dimension {
   width: number;
@@ -25,16 +26,29 @@ export interface Components {
   consumer: Component<Consumer>;
 }
 
+export type ComponentWithPosition = {
+  position: Position,
+  info: ComponentInfo
+}
 export interface PositionComponents {
-  producer: Position[];
-  exchange: Position[];
-  queue: Position[];
-  consumer: Position[];
+  producer: ComponentWithPosition[];
+  exchange: ComponentWithPosition[];
+  queue: ComponentWithPosition[];
+  consumer: ComponentWithPosition[];
 }
 
 function findColumn(length: number, indexFound: number) {
   return new Array(length).findIndex((element, index) => (index * length) > indexFound && indexFound < ((index + 1) * length - 1))
 }
+
+const builder = {
+  producer: infoProducer,
+  exchange: infoExchange,
+  queue: infoQueue,
+  consumer: infoConsumer
+}
+
+
 
 export const createPositionsComponents = (components: Components): PositionComponents => {
   const numberComponents = Object.keys(components).length
@@ -45,13 +59,15 @@ export const createPositionsComponents = (components: Components): PositionCompo
     queue: [],
     consumer: []
   }
+
   while (numberComponents - 1 >= indexComponent) {
     const componentName: keyof PositionComponents = COMPONENTS[indexComponent] as keyof PositionComponents
     let indexPosition = 0;
-    const positions: Position[] = [];
+    const positions: ComponentWithPosition[] = [];
     const positionsIndexes: number[] = [];
     const positionsQuantityIndexes = components[componentName].quantity ** 2
-
+    const componentsItems = components[componentName].items;
+    let componentItemsIndex = 0;
     while (positionsIndexes.length <= components[componentName].quantity - 1 && indexPosition <= positionsQuantityIndexes - 1) {
 
       const alreadyPosition = positionsIndexes.some(indexCurrentPosition => indexCurrentPosition === indexPosition)
@@ -94,10 +110,12 @@ export const createPositionsComponents = (components: Components): PositionCompo
       const z = DEPTH[componentName.toUpperCase() as any] as unknown as number
       const position: Position = [x, y, z]
 
-      positions.push(position)
+      const info = builder[componentName](componentsItems[componentItemsIndex])
+
+      positions.push({ position, info })
     }
     indexComponent += 1;
-    componentsPosition[componentName] = (positions)
+    componentsPosition[componentName] = positions
   }
   return componentsPosition
 }
@@ -108,7 +126,7 @@ export interface DefineComponentsDTO {
 }
 
 export interface DefineComponentsResult extends QueueBindingConsumers {
-  position: Position;
+  position: ComponentWithPosition;
   bindings: BindingWithPosition[];
   consumers_register: ConsumerWithPosition[];
 }
@@ -163,10 +181,10 @@ export function definePositionLinksBetweenComponents(queues: DefineLinksBetweenC
     ...queue,
     bindings: queue.bindings.map(binding => {
       const lines = makeVerticesCoordinatesSeparation({
-        initialPosition: queue.position, lastPosition: binding.position,
+        initialPosition: queue.position.position, lastPosition: binding.position.position,
       })
       const points = makePointsByNumberSeparation({
-        initialPosition: queue.position, lastPosition: binding.position, numberPoints: NUMBER_SEPARATION_LINKS
+        initialPosition: queue.position.position, lastPosition: binding.position.position, numberPoints: NUMBER_SEPARATION_LINKS
       })
       return {
         ...binding,
@@ -176,10 +194,10 @@ export function definePositionLinksBetweenComponents(queues: DefineLinksBetweenC
     }),
     consumers_register: queue.consumers_register.map(consumer => {
       const lines = makeVerticesCoordinatesSeparation({
-        initialPosition: queue.position, lastPosition: consumer.position,
+        initialPosition: queue.position.position, lastPosition: consumer.position.position,
       })
       const points = makePointsByNumberSeparation({
-        initialPosition: queue.position, lastPosition: consumer.position, numberPoints: NUMBER_SEPARATION_LINKS
+        initialPosition: queue.position.position, lastPosition: consumer.position.position, numberPoints: NUMBER_SEPARATION_LINKS
       })
       return {
         ...consumer,

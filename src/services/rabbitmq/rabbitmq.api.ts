@@ -37,7 +37,7 @@ export const getQueues = async (): Promise<QueueBindingConsumers[]> => {
 }
 
 export const getExchanges = async (): Promise<Exchange[]> => {
-  const { data: exchanges } = await rabbitMqApiService.get<Exchange[]>('/api/exchanges');
+  const { data: exchanges } = await rabbitMqApiService.get<Exchange[]>(`/api/exchanges/${encodeURIComponent(config.rabbitMq.vhost)}`);
   return exchanges
 }
 
@@ -54,10 +54,11 @@ export const getConsumers = async (queueName: string): Promise<Consumer[]> => {
 }
 
 export const getProducers = async (): Promise<Producer[]> => {
-  const [{ data: consumers }, { data: connections }] = await Promise.all([rabbitMqApiService.get<Consumer[]>(`/api/consumers/${encodeURIComponent(config.rabbitMq.vhost)}`), rabbitMqApiService.get<Connection[]>(`/api/connections`)])
+  const [{ data: consumers }, { data: connections }] = await Promise.all([rabbitMqApiService.get<Consumer[]>(`/api/consumers/${encodeURIComponent(config.rabbitMq.vhost)}`), rabbitMqApiService.get<Connection[]>(`/api/vhosts/${encodeURIComponent(config.rabbitMq.vhost)}/connections`)])
   const consumerNames = consumers.map(consumer => consumer.channel_details.user)
   const connectionsFilterDiffConsumers = connections.filter(connection => !consumerNames.includes(connection.user))
-  return connectionsFilterDiffConsumers
+  const connectionsFormat = connectionsFilterDiffConsumers.map(({ host, name, node, client_properties, user, user_who_performed_action, vhost, port, type }) => ({ host, name, node, user, client_properties, user_who_performed_action, vhost, port, type }))
+  return connectionsFormat
 }
 
 export const getOverview = async (): Promise<Overview> => {
@@ -86,69 +87,4 @@ export interface CreateTraceDTO {
 export const getTraces = async () => {
   const { data: trace } = await rabbitMqApiService.get<Trace[]>(`/api/traces/${encodeURIComponent(config.rabbitMq.vhost)}`)
   return trace
-}
-
-export const createTracer = async ({ user, password, cluster, nameConnectionTrace, nameConnection, node, pattern = '#' }: CreateTraceDTO): Promise<void> => {
-  const data = {
-    vhost: config.rabbitMq.vhost,
-    name: nameConnection,
-    format: 'json',
-    tracer_connection_username: nameConnectionTrace,
-    user,
-    tracer_connection_password: password,
-    pattern,
-    node
-  }
-
-  try {
-    await axios.put(
-      'http://localhost:15672/api/traces/node/rabbit%40rabbit-mapper-host/%2F/project-nextjs-producer-trace',
-      {
-        'vhost': '/',
-        'name': 'project-nextjs-producer-trace',
-        'format': 'json',
-        'tracer_connection_username': 'project-nextjs-producer',
-        'tracer_connection_password': 'guest',
-        'pattern': '#',
-        'node': 'rabbit@rabbit-mapper-host'
-      },
-      {
-        headers: {
-          'Accept': '*/*',
-          'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
-          'Authorization': 'Basic Z3Vlc3Q6Z3Vlc3Q=',
-          'Connection': 'keep-alive',
-          'Cookie': '_ga=GA1.1.2090797514.1666754108; _gid=GA1.1.1033423893.1670903405; m=2258:Z3Vlc3Q6Z3Vlc3Q%253D',
-          'Origin': 'http://localhost:15672',
-          'Referer': 'http://localhost:15672/',
-          'Sec-Fetch-Dest': 'empty',
-          'Sec-Fetch-Mode': 'cors',
-          'Sec-Fetch-Site': 'same-origin',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
-          'content-type': 'application/json',
-          'sec-ch-ua': '"Not?A_Brand";v="8", "Chromium";v="108", "Google Chrome";v="108"',
-          'sec-ch-ua-mobile': '?0',
-          'sec-ch-ua-platform': '"Windows"'
-        }
-      }
-    );
-
-  } catch (error) {
-    console.log(error)
-  }
-}
-export interface LoginDTO {
-  username: string;
-  password: string;
-}
-
-export const login = async ({ username, password }: LoginDTO): Promise<boolean> => {
-
-  const { data } = await rabbitMqApiService.get(`/api/whoami`, {
-    auth: {
-      username,
-      password,
-    }
-  })
-  return !!data.name
 }

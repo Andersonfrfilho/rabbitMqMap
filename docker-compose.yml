@@ -1,6 +1,7 @@
 version: "3.9"
 services:
-  my-rabbit:
+  rabbitmq-management:
+    image: rabbitmq-with-plugins-tracing
     build: ./.docker/rabbitmq/
     container_name: rabbitmq
     hostname: rabbit-mapper-host
@@ -8,6 +9,6 @@ services:
       - "15672:15672"
       - "5672:5672"
     volumes:
-      - "./docker/rabbitmq/data:/var/lib/rabbitmq"
-      - "./docker/rabbitmq/log:/var/log/rabbitmq"
+      - "./.docker/rabbitmq/data:/var/lib/rabbitmq"
+      - "./.docker/rabbitmq/log:/var/log/rabbitmq"
       - "./.docker/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf"

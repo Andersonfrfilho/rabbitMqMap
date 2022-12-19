@@ -21,3 +21,10 @@ export enum LINK_TYPE {
   LINES = "lines",
   POINTS = "points"
 }
+
+export enum COMPONENT_INFO_TYPE {
+  producer = "producer",
+  exchange = "exchange",
+  queue = "queue",
+  consumer = "consumer"
+}

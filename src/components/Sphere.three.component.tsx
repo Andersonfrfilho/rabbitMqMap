@@ -4,8 +4,14 @@ import { useRef, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Html } from '@react-three/drei'
 import { QUEUE_DIMENSION } from '@constants/components.constant'
+import { Position } from '@constants/position.constant'
+import { ComponentInfo } from '@contexts/position/builder/info.builder'
 
-export function SphereThree(props: JSX.IntrinsicElements['mesh']) {
+type Props = JSX.IntrinsicElements['mesh'] & {
+  infoComponent: ComponentInfo
+}
+
+export function SphereThree(props: Props) {
   // This reference gives us direct access to the THREE.Mesh object
   const ref = useRef<THREE.Mesh>(null!)
   // Hold state for hovered and clicked events
@@ -26,12 +32,13 @@ export function SphereThree(props: JSX.IntrinsicElements['mesh']) {
 
       <sphereGeometry args={[1, 32]} />
       <meshStandardMaterial color={hovered ? 'hotpink' : 'orange'} />
-      {/* <Html distanceFactor={20}>
+      {(clicked || hovered) && <Html distanceFactor={10}>
         <div className="content">
-          hello <br />
-          world
+          {props.infoComponent.componentType} <br />
+          {props.infoComponent.name} <br />
+          {props.infoComponent.type}
         </div>
-      </Html> */}
+      </Html>}
     </mesh>
   )
 }

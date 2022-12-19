@@ -1,6 +1,7 @@
 import { Position } from "@constants/position.constant"
 import { Binding } from "./binding.interface"
 import { Consumer } from "./consumer.interface"
+import { ComponentWithPosition } from "@contexts/position/functions/definePositionsComponents"
 
 type ArgumentsQueue = {
   "x-queue-type": string
@@ -104,11 +105,11 @@ export type Queue = {
 }
 
 export interface BindingWithPosition extends Binding {
-  position: Position
+  position: ComponentWithPosition;
 }
 
 export interface ConsumerWithPosition extends Consumer {
-  position: Position
+  position: ComponentWithPosition;
 }
 
 export interface QueueBindingConsumers extends Queue {

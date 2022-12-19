@@ -4,14 +4,13 @@ import { getConnections, getExchanges, getProducers, getQueues, getTraces } from
 import { GetStaticProps, GetStaticPropsResult, InferGetStaticPropsType } from "next";
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
-
-import { Box, Button, Grid, GridItem, Image, Input, InputGroup, InputLeftAddon, InputLeftElement, Text } from '@chakra-ui/react';
+import { Box, Button, Grid, GridItem, IconButton, Image, Input, InputGroup, InputLeftAddon, InputLeftElement, InputRightAddon, InputRightElement, Text, Textarea } from '@chakra-ui/react';
 import { PhoneIcon } from '@chakra-ui/icons';
 import { QueueThree } from '@components/Queue.three.component';
 import { Queue, QueueBindingConsumers } from '@services/rabbitmq/interfaces/queue.interface';
 import { usePosition } from '@contexts/position/Position.context';
 import { componentDTO } from '@dtos/component.dto';
-import { Components, DefineLinksBetweenComponentsResult } from '@contexts/position/functions/definePositionsComponents';
+import { ComponentWithPosition, Components, DefineLinksBetweenComponentsResult } from '@contexts/position/functions/definePositionsComponents';
 import { COMPONENT_TYPE, DEPTH } from '@enums/positions.enum';
 import { CONSUMER_DIMENSION, EXCHANGE_DIMENSION, PRODUCER_DIMENSION, QUEUE_DIMENSION } from '@constants/components.constant';
 import { Producer } from '@services/rabbitmq/interfaces/producer.interface';
@@ -23,7 +22,9 @@ import { SphereThree } from '@components/Sphere.three.component';
 import { ProducerThree } from '@components/Producer.three.component';
 import { ExchangeThree } from '@components/Exchange.three.component';
 import { ConsumerThree } from '@components/Consumer.three.component';
-
+import { MdHttp } from 'react-icons/md'
+import { AiOutlineLock, AiOutlineUser } from 'react-icons/ai'
+import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa';
 interface AppGetStaticInterface {
   queues: QueueBindingConsumers[]
   exchanges: Exchange[]
@@ -37,16 +38,14 @@ interface AppGetStaticInterface {
 export default function App(
   { queues, exchanges, producers, connections, alreadyAllTracesExist }: InferGetStaticPropsType<typeof getStaticProps>
 ) {
-  const [queuePositions, setQueuePositions] = useState([] as Position[])
-  const [exchangePositions, setExchangePositions] = useState([] as Position[])
-  const [consumerPositions, setConsumerPositions] = useState([] as Position[])
-  const [producerPositions, setProducerPositions] = useState([] as Position[])
+  const [visibleFieldPassword, setVisibleFieldPassword] = useState<boolean>(false)
+  const [queuePositions, setQueuePositions] = useState([] as ComponentWithPosition[])
+  const [exchangePositions, setExchangePositions] = useState([] as ComponentWithPosition[])
+  const [consumerPositions, setConsumerPositions] = useState([] as ComponentWithPosition[])
+  const [producerPositions, setProducerPositions] = useState([] as ComponentWithPosition[])
   const [linesPositions, setLinesPositions] = useState([] as Position[])
   const [pointsPositions, setPointsPositions] = useState([] as Position[])
   const { createPositionsComponents, definePositionsComponents, definePositionLinksBetweenComponents, getLinksLines, getLinksPoints, getPositions } = usePosition()
-  const [modalOpen, setModalOpen] = useState(false)
-
-
 
   useState(() => {
 
@@ -67,8 +66,7 @@ export default function App(
       setQueuePositions(componentPositions.map(queue => queue.position))
       setExchangePositions(getPositions({ components: componentPositions, componentType: COMPONENT_TYPE.BINDING }))
       setConsumerPositions(getPositions({ components: componentPositions, componentType: COMPONENT_TYPE.CONSUMER }))
-      setProducerPositions(positions.producer)
-
+      setProducerPositions(positions.producer.map(produceParam => produceParam))
       const componentsLinks = definePositionLinksBetweenComponents(componentPositions)
       const linesConsumers = getLinksLines({ componentLinks: componentsLinks, componentType: COMPONENT_TYPE.CONSUMER })
       const linesBindings = getLinksLines({ componentLinks: componentsLinks, componentType: COMPONENT_TYPE.BINDING })
@@ -80,7 +78,9 @@ export default function App(
       setPointsPositions([...pointsConsumer, ...pointsBindings])
     }
   })
+  function alterVisiblePasswordField() {
 
+  }
   return (
     <>
       {/* <ModalBackdrop modalOpen={modalOpen} onClose={() => { setModalOpen(false) }} connections={connections} /> */}
@@ -96,8 +96,8 @@ export default function App(
         color='blackAlpha.700'
         fontWeight='bold'
       >
-        <GridItem pl='2' bg='orange.300' area={'header'} overflow={'hidden'} display='flex'>
-          <Box boxSize='sm' display='flex' flex={1} overflow={'hidden'} height={'100%'} flexDirection="row">
+        <GridItem pl='2' area={'header'} overflow={'hidden'} display='flex'>
+          <Box boxSize='sm' padding={'2px'} display='flex' flex={1} overflow={'hidden'} height={'100%'} flexDirection="row">
             <Box display='flex' flex={1} justifyContent={'flex-start'} alignItems={'center'}>
               <Image src='https://upload.wikimedia.org/wikipedia/commons/7/71/RabbitMQ_logo.svg' alt='Dan Abramov' height={'100%'} />
             </Box>
@@ -108,36 +108,45 @@ export default function App(
             </Box>
           </Box>
         </GridItem>
-        <GridItem pl='2' bg='pink.300' area={'configs'} display='flex'>
+        <GridItem pl='2' area={'configs'} display='flex'>
           <Box boxSize='sm' display='flex' flex={1} overflow={'hidden'} height={'100%'} justifyContent={"center"} alignItems={"center"} paddingInline={2}>
             <InputGroup>
               <InputLeftElement
                 pointerEvents='none'
-                children={<PhoneIcon color='gray.300' />}
+                children={<MdHttp color='gray.300' />}
               />
               <Input type='url' placeholder='base url' />
             </InputGroup>
           </Box>
           <Box boxSize='sm' display='flex' flex={3} overflow={'hidden'} height={'100%'} flexDirection={"row"} justifyContent={"space-around"} alignItems={"center"}>
-            <Box boxSize='sm' display='flex' flex={2} flexDirection={"row"} backgroundColor={"red"} height={'100%'} alignItems={"center"}>
+            <Box boxSize='sm' display='flex' flex={2} flexDirection={"row"} height={'100%'} alignItems={"center"}>
               <InputGroup marginInline={2}>
-                <InputLeftAddon children='url' />
-                <Input type='url' placeholder='base url' />
+                <InputLeftElement
+                  pointerEvents='none'
+                  children={<AiOutlineUser color='gray.300' />}
+                />
+                <Input type='text' placeholder='username' />
               </InputGroup>
               <InputGroup marginInline={2}>
-                <InputLeftAddon children='+234' />
-                <Input type='tel' placeholder='phone number' />
+                <InputLeftElement
+                  pointerEvents='none'
+                  children={<AiOutlineLock color='gray.300' />}
+                />
+                <Input type={true ? 'text' : 'password'} placeholder='password' />
+                <InputRightAddon>
+                  <IconButton onClick={() => setVisibleFieldPassword(data => !data)} aria-label='Visible password' icon={visibleFieldPassword ? <FaRegEyeSlash color='gray.300' /> : <FaRegEye color='gray.300' />} />
+                </InputRightAddon>
               </InputGroup>
             </Box>
-            <Box boxSize='sm' display='flex' flex={1} backgroundColor={"yellow"} height={'100%'} justifyContent={"center"} alignItems={"center"}>
-              <Button h='1.75rem' size='sm' onClick={() => { }}>
-                {'Registrar'}
+            <Box boxSize='sm' display='flex' flex={1} height={'100%'} justifyContent={"center"} alignItems={"center"} padding={'2px'}>
+              <Button height={'100%'} size='sm' onClick={() => { }}>
+                Enviar
               </Button>
             </Box>
           </Box>
         </GridItem>
         <GridItem pl='2' bg='pink.300' area={'nav'}>
-          Nav
+          <Textarea height={"100%"} isInvalid placeholder='Here is a sample placeholder' />
         </GridItem>
         <GridItem pl='2' bg='green.300' area={'main'} display={"flex"} height={'100vh'}>
           <Canvas style={{ width: '100%', height: '100%' }}>
@@ -147,21 +156,21 @@ export default function App(
               penumbra={1}
             />
             <pointLight position={[-10, -10, -10]} />
-            {console.log(producerPositions)}
             {producerPositions.length > 0 && producerPositions.map((position, index) => {
-              return <ProducerThree key={`${position[0]}${position[1]}${position[2]}`} position={position} />
+              return <ProducerThree key={`${position.position[0]}${position.position[1]}${position.position[2]}${position.info.name}${position.info.type}${position.info.componentType}`} infoComponent={position.info} position={position.position} />
             })}
             {exchangePositions.length > 0 && exchangePositions.map(position => {
-              return <ExchangeThree key={`${position[0]}${position[1]}${position[2]}`} position={position} />
+              return <ExchangeThree key={`${position.position[0]}${position.position[1]}${position.position[2]}${position.info.name}${position.info.type}${position.info.componentType}`} infoComponent={position.info} position={position.position} />
             })}
             {queuePositions.length > 0 && queuePositions.map(position => {
-              return <QueueThree key={`${position[0]}${position[1]}${position[2]}`} position={position} />
+              return <QueueThree key={`${position.position[0]}${position.position[1]}${position.position[2]}${position.info.name}${position.info.type}${position.info.componentType}`} infoComponent={position.info} position={position.position} />
             })}
             {consumerPositions.length > 0 && consumerPositions.map(position => {
-              return <ConsumerThree key={`${position[0]}${position[1]}${position[2]}`} position={position} />
+              return <ConsumerThree key={`${position.position[0]}${position.position[1]}${position.position[2]}${position.info.name}${position.info.type}${position.info.componentType}`} infoComponent={position.info} position={position.position} />
             })}
             {linesPositions.length > 0 && linesPositions.map((line) => <LineThree pointsCoordinate={line} />)}
             {pointsPositions.length > 0 && pointsPositions.map(position => <SphereThree key={`${position[0]}${position[1]}${position[2]}`} position={position} />)}
+            {/* <Bottles /> */}
             <OrbitControls />
           </Canvas>
         </GridItem>

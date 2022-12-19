@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import { PositionComponents, createPositionsComponents, definePositionsComponents, Components, DefineComponentsResult, DefineComponentsDTO, DefineLinksBetweenComponentsDTO, DefineLinksBetweenComponentsResult, definePositionLinksBetweenComponents, GetLinksLinesDTO, GetLinksPointsDTO, getLinksPoints, getPositions, GetPositionsDTO, getLinksLines } from './functions/definePositionsComponents';
+import { PositionComponents, createPositionsComponents, definePositionsComponents, Components, DefineComponentsResult, DefineComponentsDTO, DefineLinksBetweenComponentsDTO, DefineLinksBetweenComponentsResult, definePositionLinksBetweenComponents, GetLinksLinesDTO, GetLinksPointsDTO, getLinksPoints, getPositions, GetPositionsDTO, getLinksLines, ComponentWithPosition } from './functions/definePositionsComponents';
 import { Position } from '@constants/position.constant';
 
 type PositionStateProps = {
@@ -10,7 +10,7 @@ interface UsePosition {
   createPositionsComponents: (data: Components) => PositionComponents
   definePositionsComponents: (data: DefineComponentsDTO) => DefineComponentsResult[]
   definePositionLinksBetweenComponents(queues: DefineLinksBetweenComponentsDTO[]): DefineLinksBetweenComponentsResult[]
-  getPositions: (data: GetPositionsDTO) => Position[]
+  getPositions: (data: GetPositionsDTO) => ComponentWithPosition[]
   getLinksPoints: (data: GetLinksPointsDTO) => Position[]
   getLinksLines: (data: GetLinksLinesDTO) => Position[]
 }

@@ -1,11 +1,15 @@
 import * as React from 'react'
 import * as THREE from 'three'
 import { useRef, useState } from 'react'
-import { useFrame } from '@react-three/fiber'
 import { Html } from '@react-three/drei'
 import { QUEUE_DIMENSION } from '@constants/components.constant'
+import { ComponentInfo } from '@contexts/position/builder/info.builder'
 
-export function ExchangeThree(props: JSX.IntrinsicElements['mesh']) {
+type Props = JSX.IntrinsicElements['mesh'] & {
+  infoComponent: ComponentInfo
+}
+
+export function ExchangeThree(props: Props) {
   // This reference gives us direct access to the THREE.Mesh object
   const ref = useRef<THREE.Mesh>(null!)
   // Hold state for hovered and clicked events
@@ -23,13 +27,14 @@ export function ExchangeThree(props: JSX.IntrinsicElements['mesh']) {
       onPointerOver={(event) => hover(true)}
       onPointerOut={(event) => hover(false)}>
       <boxGeometry args={QUEUE_DIMENSION} />
-      <meshStandardMaterial color={hovered ? 'hotpink' : 'orange'} />
-      {/* <Html distanceFactor={10}>
+      <meshStandardMaterial color={hovered ? 'yellow' : 'blue'} />
+      {(clicked || hovered) && <Html distanceFactor={10}>
         <div className="content">
-          hello <br />
-          world
+          {props.infoComponent.componentType} <br />
+          {props.infoComponent.name} <br />
+          {props.infoComponent.type}
         </div>
-      </Html> */}
+      </Html>}
     </mesh>
   )
 }
