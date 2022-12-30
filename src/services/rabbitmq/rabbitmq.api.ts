@@ -8,6 +8,8 @@ import { Connection as ConnectionRabbit } from './interfaces/connection.interfac
 import { Overview } from './interfaces/overview.interfaces'
 import axios from 'axios'
 import { Trace } from './interfaces/trace.interface'
+import { v4 as uuidv4 } from 'uuid';
+import { exchange } from 'src/schemas/exchange.schema'
 
 export const rabbitMqApiService = function () {
   return axios.create({
@@ -20,9 +22,10 @@ export const rabbitMqApiService = function () {
 }();
 
 export const getQueues = async (): Promise<QueueBindingConsumers[]> => {
-  const { data: queues } = await rabbitMqApiService.get<Queue[]>('/api/queues');
+  const { data: queues } = await rabbitMqApiService.get<Queue[]>(`/api/queues/${encodeURIComponent(config.rabbitMq.vhost)}`);
 
-  const queuesWithConsumersBindings = await Promise.all(queues.map(async queue => {
+  const queuesFormat = queues.map(({ arguments: argumentsQueue, name, node, vhost, type }) => ({ arguments: argumentsQueue, name, node, vhost, type }))
+  const queuesWithConsumersBindings = await Promise.all(queuesFormat.map(async queue => {
     const bindings = await getBindings(queue.name)
     const consumers = await getConsumers(queue.name)
 
@@ -36,9 +39,14 @@ export const getQueues = async (): Promise<QueueBindingConsumers[]> => {
   return queuesWithConsumersBindings
 }
 
-export const getExchanges = async (): Promise<Exchange[]> => {
+export const getExchanges = async (queues: QueueBindingConsumers[]): Promise<Exchange[]> => {
   const { data: exchanges } = await rabbitMqApiService.get<Exchange[]>(`/api/exchanges/${encodeURIComponent(config.rabbitMq.vhost)}`);
-  return exchanges
+  const bindings = queues.reduce((accumulator: Binding[], current) => [...accumulator, ...current.bindings], [])
+  const exchangesWithRouteKeys = exchanges.map(exchange => ({
+    ...exchange,
+    bindings: bindings.filter(binding => binding.source === exchange.name) || []
+  }))
+  return exchangesWithRouteKeys
 }
 
 export const getBindings = async (queueName: string): Promise<Binding[]> => {
@@ -57,21 +65,13 @@ export const getProducers = async (): Promise<Producer[]> => {
   const [{ data: consumers }, { data: connections }] = await Promise.all([rabbitMqApiService.get<Consumer[]>(`/api/consumers/${encodeURIComponent(config.rabbitMq.vhost)}`), rabbitMqApiService.get<Connection[]>(`/api/vhosts/${encodeURIComponent(config.rabbitMq.vhost)}/connections`)])
   const consumerNames = consumers.map(consumer => consumer.channel_details.user)
   const connectionsFilterDiffConsumers = connections.filter(connection => !consumerNames.includes(connection.user))
-  const connectionsFormat = connectionsFilterDiffConsumers.map(({ host, name, node, client_properties, user, user_who_performed_action, vhost, port, type }) => ({ host, name, node, user, client_properties, user_who_performed_action, vhost, port, type }))
+  const connectionsFormat = connectionsFilterDiffConsumers.map(({ host, name, node, client_properties, user, user_who_performed_action, vhost, port, type }) => ({ id: uuidv4(), host, name, node, user, client_properties, user_who_performed_action, vhost, port, type, messages: [] }))
   return connectionsFormat
 }
 
 export const getOverview = async (): Promise<Overview> => {
   const { data } = await rabbitMqApiService.get<Overview>('/api/overview')
   return data
-}
-
-export const getConnections = async (): Promise<ConnectionRabbit[]> => {
-  const { cluster_name } = await getOverview()
-  const { data: connections } = await rabbitMqApiService.get<ConnectionRabbit[]>(`/api/vhosts/${encodeURIComponent(config.rabbitMq.vhost)}/connections`)
-  const regex = new RegExp(cluster_name)
-  const filterConnectionsWithoutTracing = connections.filter(connection => !regex.test(connection.name))
-  return filterConnectionsWithoutTracing
 }
 
 export interface CreateTraceDTO {

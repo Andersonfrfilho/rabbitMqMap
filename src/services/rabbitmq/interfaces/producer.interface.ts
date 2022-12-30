@@ -26,5 +26,19 @@ export interface Connection {
   type: string;
   port: number;
 }
+interface WithId {
+  id: string;
+}
 
-export interface Producer extends Connection { }
+interface Message {
+  exchange: string;
+  routeKey?: string;
+  messagePayload?: string;
+  time: number;
+  id: string;
+}
+
+interface WithMessage {
+  messages: Message[]
+}
+export interface Producer extends Connection, WithId, WithMessage { }

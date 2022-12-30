@@ -31,7 +31,7 @@ export class AppController {
   async sendMessageTopic(): Promise<any> {
     this.amqpConnection.publish(
       'exchange-queue-1-topic',
-      'routing-key-exchange-queue-2	',
+      'routing-key-exchange-queue-2',
       { hello: 'world' },
     );
 

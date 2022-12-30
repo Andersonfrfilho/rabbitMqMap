@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import { PositionComponents, createPositionsComponents, definePositionsComponents, Components, DefineComponentsResult, DefineComponentsDTO, DefineLinksBetweenComponentsDTO, DefineLinksBetweenComponentsResult, definePositionLinksBetweenComponents, GetLinksLinesDTO, GetLinksPointsDTO, getLinksPoints, getPositions, GetPositionsDTO, getLinksLines, ComponentWithPosition } from './functions/definePositionsComponents';
+import { PositionComponents, createPositionsComponents, definePositionsComponents, Components, DefineComponentsResult, DefineComponentsDTO, DefineLinksBetweenComponentsDTO, DefineLinksBetweenComponentsResult, definePositionLinksBetweenComponents, GetLinksLinesDTO, GetLinksPointsDTO, getLinksPoints, getPositions, GetPositionsDTO, getLinksLines, ComponentWithPosition, GetLinksLinesResult, GetPointsLinesResult } from './functions/definePositionsComponents';
 import { Position } from '@constants/position.constant';
 
 type PositionStateProps = {
@@ -8,11 +8,11 @@ type PositionStateProps = {
 
 interface UsePosition {
   createPositionsComponents: (data: Components) => PositionComponents
-  definePositionsComponents: (data: DefineComponentsDTO) => DefineComponentsResult[]
+  definePositionsComponents: (data: DefineComponentsDTO) => DefineComponentsResult
   definePositionLinksBetweenComponents(queues: DefineLinksBetweenComponentsDTO[]): DefineLinksBetweenComponentsResult[]
   getPositions: (data: GetPositionsDTO) => ComponentWithPosition[]
-  getLinksPoints: (data: GetLinksPointsDTO) => Position[]
-  getLinksLines: (data: GetLinksLinesDTO) => Position[]
+  getLinksPoints: (data: GetLinksPointsDTO) => GetPointsLinesResult[]
+  getLinksLines: (data: GetLinksLinesDTO) => GetLinksLinesResult[]
 }
 
 export const PositionContext = React.createContext<UsePosition>({} as UsePosition);

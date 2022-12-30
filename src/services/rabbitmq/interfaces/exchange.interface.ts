@@ -1,3 +1,5 @@
+import { Binding } from "./binding.interface"
+
 export enum Type {
   direct = "direct",
   fanout = "fanout",
@@ -12,5 +14,6 @@ export type Exchange = {
   name: string,
   type: Type,
   user_who_performed_action: string,
-  vhost: string
+  vhost: string,
+  bindings?: Binding[]
 }

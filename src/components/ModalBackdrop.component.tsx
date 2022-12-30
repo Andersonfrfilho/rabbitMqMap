@@ -33,7 +33,7 @@ interface ModalBackdrop {
   onClose: () => void;
 }
 
-export function ModalBackdrop({ connections = [], modalOpen, onClose }: ModalBackdrop) {
+export function ModalBackdrop({ connections = [], modalOpen, onClose }: ModalBackdrop): JSX.Element {
   const { createTracers } = useRabbitMq()
   const {
     register,

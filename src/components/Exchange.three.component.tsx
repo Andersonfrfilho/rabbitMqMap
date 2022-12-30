@@ -9,7 +9,7 @@ type Props = JSX.IntrinsicElements['mesh'] & {
   infoComponent: ComponentInfo
 }
 
-export function ExchangeThree(props: Props) {
+export function ExchangeThree(props: Props): JSX.Element {
   // This reference gives us direct access to the THREE.Mesh object
   const ref = useRef<THREE.Mesh>(null!)
   // Hold state for hovered and clicked events

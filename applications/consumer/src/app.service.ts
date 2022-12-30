@@ -5,7 +5,7 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class AppService {
   @RabbitSubscribe({
-    queue: 'fila-1',
+    queue: 'queue-1',
   })
   public async competingPubSubHandler(msg: any) {
     console.log(`Received message: ${JSON.stringify(msg)}`);
