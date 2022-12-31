@@ -4,7 +4,7 @@ import { getExchanges, getProducers, getQueues, getTraces } from '@services/rabb
 import { GetStaticProps, GetStaticPropsResult, InferGetStaticPropsType } from "next";
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
-import { Accordion, AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, Box, Button, Grid, GridItem, IconButton, Image, Input, InputGroup, InputLeftElement, InputRightAddon, Select, Text, Textarea } from '@chakra-ui/react';
+import { Box, Button, Grid, GridItem, IconButton, Image, Input, InputGroup, InputLeftElement, InputRightAddon, Select, Text, Textarea } from '@chakra-ui/react';
 import { QueueThree } from '@components/Queue.three.component';
 import { Queue, QueueBindingConsumers } from '@services/rabbitmq/interfaces/queue.interface';
 import { usePosition } from '@contexts/position/Position.context';
@@ -88,7 +88,6 @@ export default function App(
       const { queues: componentPositions, exchanges: exchangesWithPosition, producers: producersWithPosition } = definePositionsComponents({ positions, queues, producers, exchanges })
       setComponentsWithPosition({ queues: componentPositions, exchanges: exchangesWithPosition, producers: producersWithPosition })
       setQueuePositions(componentPositions.map(queue => queue.position))
-      console.log("####################### - 8")
       setExchangePositions(exchangesWithPosition.map(exchange => exchange.position))
       setConsumerPositions(getPositions({ components: componentPositions, componentType: COMPONENT_TYPE.CONSUMER }))
       setProducerPositions(producersWithPosition.map(produceParam => produceParam.position))
@@ -102,7 +101,7 @@ export default function App(
       setPointsPositions([...pointsConsumer, ...pointsBindings])
 
       const dataResult = defineMessagePositions({ queues: componentPositions, exchanges: exchangesWithPosition, producers: producersWithPosition })
-
+      console.log(dataResult)
     }
   }, [])
 
@@ -240,7 +239,7 @@ export async function getStaticProps(
   context: GetStaticProps
 ): Promise<GetStaticPropsResult<AppGetStaticInterface>> {
   const queues = await getQueues() || [];
-  const exchanges = await getExchanges(queues) || []
+  const exchanges = await getExchanges() || []
   const producers = await getProducers() || []
 
   return {

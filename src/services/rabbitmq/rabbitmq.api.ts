@@ -42,6 +42,7 @@ export const getQueues = async (): Promise<QueueBindingConsumers[]> => {
 export const getExchanges = async (): Promise<Exchange[]> => {
   const { data: exchanges } = await rabbitMqApiService.get<Exchange[]>(`/api/exchanges/${encodeURIComponent(config.rabbitMq.vhost)}`);
   const { data: bindings } = await rabbitMqApiService.get<Binding[]>(`/api/bindings/${encodeURIComponent(config.rabbitMq.vhost)}`);
+
   const exchangesWithRouteKeys = exchanges.map(exchange => ({
     ...exchange,
     bindings: bindings.filter(binding => binding.source === exchange.name) || []
@@ -101,6 +102,13 @@ export const getProducers = async (): Promise<Producer[]> => {
       "time": 1,
       "payload": "{\n\"fila\":\"route-key-topic\"\n}",
       "id": "063bb02b-dc70-443e-b9c7-76ab50d05404"
+    },
+    {
+      "exchange": "exchange-queue-1-topic",
+      "routeKey": "many.queue-3",
+      "time": 1,
+      "payload": "{\n\"fila\":\"route-key-topic\"\n}",
+      "id": "063bb02b-dc70-443e-b9c7-76ab50d05674"
     }]
   }))
   return connectionsFormat
