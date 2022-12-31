@@ -1,3 +1,5 @@
+import { MessagePoint } from "@contexts/position/functions/definePositionsComponents";
+
 interface Capabilities {
   authentication_failure_close: boolean;
   "basic.nack": boolean;
@@ -41,4 +43,17 @@ interface Message {
 interface WithMessage {
   messages: Message[]
 }
+
+interface MessageWithPositions extends Message {
+  positions: {
+    producerBetweenExchange: MessagePoint[];
+    exchangeBetweenQueue: MessagePoint[];
+  }
+}
+
+interface WithMessageWithPositions {
+  messages: MessageWithPositions[]
+}
 export interface Producer extends Connection, WithId, WithMessage { }
+
+export interface ProducerWithMessageWithPosition extends Connection, WithId, WithMessageWithPositions { }
