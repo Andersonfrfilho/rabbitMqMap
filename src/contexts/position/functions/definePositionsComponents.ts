@@ -2,7 +2,7 @@ import { NUMBER_SEPARATION_LINKS, Position } from "@constants/position.constant"
 import { COMPONENTS, COMPONENT_TYPE, DEPTH, LINK_TYPE } from "@enums/positions.enum";
 import { Consumer } from "@services/rabbitmq/interfaces/consumer.interface";
 import { Exchange } from "@services/rabbitmq/interfaces/exchange.interface";
-import { Producer } from "@services/rabbitmq/interfaces/producer.interface";
+import { Message, Producer } from "@services/rabbitmq/interfaces/producer.interface";
 import { BindingWithPosition, ConsumerWithPosition, Queue, QueueBindingConsumers } from "@services/rabbitmq/interfaces/queue.interface";
 import { ComponentInfo, infoConsumer, infoExchange, infoProducer, infoQueue } from "../builder/info.builder";
 import { v4 as uuidv4 } from 'uuid';
@@ -128,7 +128,7 @@ export interface DefineComponentsDTO {
   producers: Producer[];
 }
 
-interface ProducerWithPosition extends Producer {
+export interface ProducerWithPosition extends Producer {
   position: ComponentWithPosition;
 }
 export interface QueueWithPosition extends QueueBindingConsumers {
@@ -321,4 +321,28 @@ export interface GetPositionsDTO {
 
 export function getPositions({ components, componentType }: GetPositionsDTO): ComponentWithPosition[] {
   return components.reduce((accumulator, queue) => [...accumulator, ...queue[componentType].reduce((accumulatorBinding, binding) => [...accumulatorBinding, binding.position], [])], [])
+}
+
+// export interface DefineMessagePositionsParams {
+//   producers: ProducerWithPosition[]
+//   components: ComponentWithPosition[]
+// }
+export function defineMessagePositions(data: DefineComponentsResult) {
+  console.log("##########", data)
+  // const producersMessageWithPosition = producers.map(producer => {
+  //   const messages = producer.messages.map(message => {
+  //     const producerPosition = producer.position
+  //     console.log("######### exchanges")
+  //     console.log(exchanges)
+  //     // return {
+  //     //   ...message,
+  //     //   positions: {
+  //     //     producer: producerPosition,
+  //     //     exchange: exchangePosition,
+  //     //     queue: queuePosition,
+  //     //     consumer: consumerPosition
+  //     //   }
+  //     // }
+  //   })
+  // })
 }

@@ -65,7 +65,43 @@ export const getProducers = async (): Promise<Producer[]> => {
   const [{ data: consumers }, { data: connections }] = await Promise.all([rabbitMqApiService.get<Consumer[]>(`/api/consumers/${encodeURIComponent(config.rabbitMq.vhost)}`), rabbitMqApiService.get<Connection[]>(`/api/vhosts/${encodeURIComponent(config.rabbitMq.vhost)}/connections`)])
   const consumerNames = consumers.map(consumer => consumer.channel_details.user)
   const connectionsFilterDiffConsumers = connections.filter(connection => !consumerNames.includes(connection.user))
-  const connectionsFormat = connectionsFilterDiffConsumers.map(({ host, name, node, client_properties, user, user_who_performed_action, vhost, port, type }) => ({ id: uuidv4(), host, name, node, user, client_properties, user_who_performed_action, vhost, port, type, messages: [] }))
+  const connectionsFormat = connectionsFilterDiffConsumers.map(({ host, name, node, client_properties, user, user_who_performed_action, vhost, port, type }) => ({
+    id: uuidv4(), host, name, node, user, client_properties, user_who_performed_action, vhost, port, type, messages: [{
+      "exchange": "amq.direct",
+      "routeKey": "",
+      "time": 1,
+      "payload": "{\n\"fila\":\"direct\"\n}",
+      "id": "284d1cbc-b9c7-4d9e-baf9-1827dc1daae4"
+    },
+    {
+      "exchange": "amq.fanout",
+      "routeKey": "",
+      "time": 1,
+      "payload": "{\n\"fila\":\"fanout\"\n}",
+      "id": "e570d66e-5526-4013-9354-65a764e35d1d"
+    },
+    {
+      "exchange": "amq.headers",
+      "routeKey": "",
+      "time": 1,
+      "payload": "{\n\"fila\":\"headers\"\n}",
+      "id": "cf73c63e-8eb1-4d4e-b077-b07333ba810d"
+    },
+    {
+      "exchange": "amq.match",
+      "routeKey": "",
+      "time": 1,
+      "payload": "{\n\"fila\":\"match\"\n}",
+      "id": "b1ebcb65-d165-4a39-b975-299f0706a146"
+    },
+    {
+      "exchange": "amq.topic",
+      "routeKey": "route-key-topic",
+      "time": 1,
+      "payload": "{\n\"fila\":\"route-key-topic\"\n}",
+      "id": "063bb02b-dc70-443e-b9c7-76ab50d05404"
+    }]
+  }))
   return connectionsFormat
 }
 

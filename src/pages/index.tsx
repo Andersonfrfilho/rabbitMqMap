@@ -69,11 +69,12 @@ export default function App(
   const [producerPositions, setProducerPositions] = useState([] as ComponentWithPosition[])
   const [linesPositions, setLinesPositions] = useState([] as GetLinksLinesResult[])
   const [pointsPositions, setPointsPositions] = useState([] as GetPointsLinesResult[])
-  const { createPositionsComponents, definePositionsComponents, definePositionLinksBetweenComponents, getLinksLines, getLinksPoints, getPositions } = usePosition()
   const [componentWithPosition, setComponentsWithPosition] = useState({} as DefineComponentsResult)
   const [queuesEditor, setQueuesEditor] = useState<QueueBindingConsumers[]>([])
   const [exchangesEditor, setExchangesEditor] = useState<Exchange[]>([])
   const [producersEditor, setProducersEditor] = useState<Producer[]>([])
+
+  const { createPositionsComponents, definePositionsComponents, definePositionLinksBetweenComponents, getLinksLines, getLinksPoints, getPositions, defineMessagePositions } = usePosition()
 
   useEffect(() => {
     if (queues.length > 0) {
@@ -98,14 +99,18 @@ export default function App(
       const pointsConsumer = getLinksPoints({ componentLinks: componentsLinks, componentType: COMPONENT_TYPE.CONSUMER })
       const pointsBindings = getLinksPoints({ componentLinks: componentsLinks, componentType: COMPONENT_TYPE.BINDING })
       setPointsPositions([...pointsConsumer, ...pointsBindings])
+
+      const dataResult = defineMessagePositions(componentWithPosition)
+
     }
   }, [])
 
   useEffect(() => {
     const queueIsEqual = queues.length >= 0 && queuesEditor.length >= 0 && queuesEditor.every(queueEditor => queues.some(queue => queue.name === queueEditor.name))
     const exchangeIsEqual = exchanges.length >= 0 && exchangesEditor.length >= 0 && exchangesEditor.every(exchangeEditor => exchanges.some(exchange => exchange.name === exchangeEditor.name))
-    const producerIsEqual = producers.length >= 0 && producersEditor.length >= 0 && producersEditor.every(producerEditor => producers.some(producer => producer.id === producerEditor.id))
+    const producerIsEqual = producers.length >= 0 && producersEditor.length >= 0 && producersEditor.every(producerEditor => producers.some(producer => producer.id === producerEditor.id && producer.messages.length === producerEditor.messages.length))
     const consumers = getConsumers(queuesEditor)
+
     if (!queueIsEqual || !exchangeIsEqual || !producerIsEqual) {
       const components: Components = createComponents({ queues: queuesEditor, exchanges: exchangesEditor, producers: producersEditor, consumers })
       const positions = createPositionsComponents(components)
@@ -192,119 +197,10 @@ export default function App(
           </Box>
         </GridItem>
         <GridItem pl='2' area={'nav'} overflow={"scroll"}>
-          <CodeEditor jsonCode={{ queues, exchanges, producers }} setComponents={{ setQueuesEditor, setExchangesEditor, setProducersEditor }} />
+          <CodeEditor jsonCode={{ queues: queuesEditor, exchanges: exchangesEditor, producers: producersEditor }} setComponents={{ setQueuesEditor, setExchangesEditor, setProducersEditor }} />
         </GridItem>
-        <GridItem pl='2' bg='pink.300' area={'producer'}>
+        <GridItem pl='2' area={'producer'}>
           <SendMessage exchanges={exchangesEditor} producers={producersEditor} setMessage={setProducersEditor} />
-          {/* <Accordion allowMultiple>
-            {producersEditor.length > 0 && producersEditor.map((producer, index) => {
-              return (<AccordionItem key={producer.id}>
-                <h2>
-                  <AccordionButton>
-                    <Box as="span" flex='1' textAlign='left'>
-                      {producer.user}
-                    </Box>
-                    <AccordionIcon />
-                  </AccordionButton>
-                </h2>
-                <AccordionPanel pb={4}>
-                  <AccordionItem>
-                    {({ isExpanded }) => (
-                      <>
-                        <h2>
-                          <AccordionButton>
-                            <Box as="span" flex='1' textAlign='left'>
-                              Adicionar
-                            </Box>
-                            {isExpanded ? (
-                              <MinusIcon fontSize='12px' />
-                            ) : (
-                              <AddIcon fontSize='12px' />
-                            )}
-                          </AccordionButton>
-                        </h2>
-                        <AccordionPanel pb={4}>
-                          <Box as="span" flex='1'>
-                            <Select placeholder='Exchanges'
-                              value={selectedOption}
-                              onChange={(option) => handleChange(option)}
-                              options={options}>
-                              {exchangesEditor.length > 0 && exchangesEditor.map(exchange => <option value={exchange.name}>{exchange.name}</option>)}
-                            </Select>
-                          </Box>
-                          <Box as="span" flex='1'>
-                            <Input placeholder='Route-key' />
-                          </Box>
-                          <Box as="span" flex='1'>
-                            <Textarea placeholder='Here is a sample placeholder' resize={"none"} />
-                          </Box>
-                          <Box as="span" flex='1'>
-                            <Select placeholder='Tempo'>
-                              <option value='option1'>Option 1</option>
-                              <option value='option2'>Option 2</option>
-                              <option value='option3'>Option 3</option>
-                            </Select>
-                          </Box>
-                          <Box as="span" flex='1'>
-                            <Button rightIcon={<ArrowForwardIcon />} colorScheme='teal' variant='outline'>
-                              Call us
-                            </Button>
-                          </Box>
-                        </AccordionPanel>
-                      </>
-                    )}
-                  </AccordionItem>
-                  {!!producer.messages && producer.messages.length > 0 && producer.messages.map(message => (<AccordionItem>
-                    {({ isExpanded }) => (
-                      <>
-                        <h2>
-                          <AccordionButton>
-                            <Box as="span" flex='1' textAlign='left'>
-                              Adicionar
-                            </Box>
-                            {isExpanded ? (
-                              <MinusIcon fontSize='12px' />
-                            ) : (
-                              <AddIcon fontSize='12px' />
-                            )}
-                          </AccordionButton>
-                        </h2>
-                        <AccordionPanel pb={4}>
-                          <Box as="span" flex='1'>
-                            <Select placeholder='Select option'>
-                              <option value='option1'>Option 1</option>
-                              <option value='option2'>Option 2</option>
-                              <option value='option3'>Option 3</option>
-                            </Select>
-                          </Box>
-                          <Box as="span" flex='1'>
-                            <Input placeholder='Route-key' />
-                          </Box>
-                          <Box as="span" flex='1'>
-                            <Textarea placeholder='Here is a sample placeholder' resize={"none"} />
-                          </Box>
-                          <Box as="span" flex='1'>
-                            <Select placeholder='Tempo'>
-                              <option value='option1'>Option 1</option>
-                              <option value='option2'>Option 2</option>
-                              <option value='option3'>Option 3</option>
-                            </Select>
-                          </Box>
-                          <Box as="span" flex='1'>
-                            <Button rightIcon={<ArrowForwardIcon />} colorScheme='teal' variant='outline'>
-                              Call us
-                            </Button>
-                          </Box>
-                        </AccordionPanel>
-                      </>
-                    )}
-                  </AccordionItem>))}
-                </AccordionPanel>
-              </AccordionItem>
-
-              )
-            })}
-          </Accordion> */}
         </GridItem>
         <GridItem pl='2' bg='green.300' area={'main'} display={"flex"} height={'100vh'}>
           <Canvas style={{ width: '100%', height: '100%' }}>
@@ -344,7 +240,7 @@ export async function getStaticProps(
   const queues = await getQueues() || [];
   const exchanges = await getExchanges(queues) || []
   const producers = await getProducers() || []
-  console.log(exchanges[0].bindings)
+
   return {
     props: {
       queues,

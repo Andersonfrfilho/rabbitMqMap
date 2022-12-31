@@ -40,6 +40,10 @@ export default function CodeEditor(props: Props): JSX.Element {
     setJsonTextArea(JSON.stringify(props.jsonCode, null, 2))
   }, [])
 
+  useEffect(() => {
+    setJsonTextArea(JSON.stringify(props.jsonCode, null, 2))
+  }, [props.jsonCode])
+
   const onChangeCodeEditor = React.useCallback((value, viewUpdate) => {
     if (isJsonString(value)) {
       setJsonTextArea(value)
