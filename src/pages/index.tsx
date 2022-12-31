@@ -133,7 +133,7 @@ export default function App(
       setPointsPositions([...pointsConsumer, ...pointsBindings])
     }
   }, [queuesEditor, exchangesEditor, producersEditor])
-  console.log(exchangePositions)
+
   return (
     <>
       {/* <ModalBackdrop modalOpen={modalOpen} onClose={() => { setModalOpen(false) }} connections={connections} /> */}

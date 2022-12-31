@@ -7,6 +7,7 @@ import { Producer } from "@services/rabbitmq/interfaces/producer.interface";
 import { useForm } from "react-hook-form";
 import { v4 as uuidv4 } from 'uuid';
 import { UNDEFINED } from "@constants/commons.constant";
+import { EXCHANGES_WITH_ROUTE_KEY } from "@constants/exchanges.constant";
 
 interface Props {
   producers: Producer[];
@@ -114,8 +115,8 @@ export function SendMessage(data: Props): JSX.Element {
                   </Box>
                   <Box flex='1' marginBottom={'5px'}>
                     {!!errors.routeKey && <Text fontSize='xs' color={'red.600'}>{errors.routeKey.message}</Text>}
-                    {exchange?.type === Type.topic && <Input placeholder='Route-key' {...register("routeKey", { required: configRouteKey })} isInvalid={!!errors.routeKey} marginBottom={'5px'} />}
-                    {exchange?.type === Type.topic && <ButtonGroup variant='outline' orientation={"vertical"}>
+                    {!!exchange && !!exchange?.type && EXCHANGES_WITH_ROUTE_KEY.includes(exchange.type) && <Input placeholder='Route-key' {...register("routeKey", { required: configRouteKey })} isInvalid={!!errors.routeKey} marginBottom={'5px'} />}
+                    {!!exchange && !!exchange?.type && EXCHANGES_WITH_ROUTE_KEY.includes(exchange.type) && <ButtonGroup variant='outline' orientation={"vertical"}>
                       {exchange.bindings?.map(binding => (<Button
                         key={binding.routing_key}
                         size='xs'
