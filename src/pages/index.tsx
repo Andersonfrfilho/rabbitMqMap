@@ -85,10 +85,11 @@ export default function App(
       const components: Components = createComponents({ queues, exchanges, producers, consumers })
       const positions = createPositionsComponents(components)
 
-      const { queues: componentPositions, exchanges: exchangesWithoutQueue, producers: producersWithPosition } = definePositionsComponents({ positions, queues, producers })
-      setComponentsWithPosition({ queues: componentPositions, exchanges: exchangesWithoutQueue, producers: producersWithPosition })
+      const { queues: componentPositions, exchanges: exchangesWithPosition, producers: producersWithPosition } = definePositionsComponents({ positions, queues, producers, exchanges })
+      setComponentsWithPosition({ queues: componentPositions, exchanges: exchangesWithPosition, producers: producersWithPosition })
       setQueuePositions(componentPositions.map(queue => queue.position))
-      setExchangePositions([...getPositions({ components: componentPositions, componentType: COMPONENT_TYPE.BINDING }), ...exchangesWithoutQueue])
+      console.log("####################### - 8")
+      setExchangePositions(exchangesWithPosition.map(exchange => exchange.position))
       setConsumerPositions(getPositions({ components: componentPositions, componentType: COMPONENT_TYPE.CONSUMER }))
       setProducerPositions(producersWithPosition.map(produceParam => produceParam.position))
 
@@ -100,7 +101,7 @@ export default function App(
       const pointsBindings = getLinksPoints({ componentLinks: componentsLinks, componentType: COMPONENT_TYPE.BINDING })
       setPointsPositions([...pointsConsumer, ...pointsBindings])
 
-      const dataResult = defineMessagePositions(componentWithPosition)
+      const dataResult = defineMessagePositions({ queues: componentPositions, exchanges: exchangesWithPosition, producers: producersWithPosition })
 
     }
   }, [])
@@ -114,10 +115,12 @@ export default function App(
     if (!queueIsEqual || !exchangeIsEqual || !producerIsEqual) {
       const components: Components = createComponents({ queues: queuesEditor, exchanges: exchangesEditor, producers: producersEditor, consumers })
       const positions = createPositionsComponents(components)
-      const { queues: componentPositions, exchanges: exchangesWithoutQueue, producers: producerPositions } = definePositionsComponents({ positions, queues: queuesEditor, producers: producersEditor })
-      setComponentsWithPosition({ queues: componentPositions, exchanges: exchangesWithoutQueue, producers: producerPositions })
+      const { queues: componentPositions, exchanges: exchangesWithPosition, producers: producerPositions } = definePositionsComponents({ positions, queues: queuesEditor, producers: producersEditor, exchanges: exchangesEditor })
+      setComponentsWithPosition({
+        queues: componentPositions, exchanges: exchangesWithPosition, producers: producerPositions
+      })
       setQueuePositions(componentPositions.map(queue => queue.position))
-      setExchangePositions([...getPositions({ components: componentPositions, componentType: COMPONENT_TYPE.BINDING }), ...exchangesWithoutQueue])
+      setExchangePositions(exchangesWithPosition.map(exchange => exchange.position))
       setConsumerPositions(getPositions({ components: componentPositions, componentType: COMPONENT_TYPE.CONSUMER }))
       setProducerPositions(producerPositions.map(produceParam => produceParam.position))
 
@@ -130,8 +133,7 @@ export default function App(
       setPointsPositions([...pointsConsumer, ...pointsBindings])
     }
   }, [queuesEditor, exchangesEditor, producersEditor])
-  console.log("#################")
-  console.log(producersEditor)
+  console.log(exchangePositions)
   return (
     <>
       {/* <ModalBackdrop modalOpen={modalOpen} onClose={() => { setModalOpen(false) }} connections={connections} /> */}

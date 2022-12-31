@@ -126,6 +126,7 @@ export interface DefineComponentsDTO {
   queues: QueueBindingConsumers[];
   positions: PositionComponents;
   producers: Producer[];
+  exchanges: Exchange[];
 }
 
 export interface ProducerWithPosition extends Producer {
@@ -138,21 +139,35 @@ export interface QueueWithPosition extends QueueBindingConsumers {
   consumers_register: ConsumerWithPosition[];
 }
 
-export interface DefineComponentsResult { queues: QueueWithPosition[], exchanges: ComponentWithPosition[], producers: ProducerWithPosition[] }
+export interface ExchangeWithPosition extends Exchange {
+  position: ComponentWithPosition,
+  id: string;
+}
 
-export const definePositionsComponents = ({ queues, positions, producers }: DefineComponentsDTO): DefineComponentsResult => {
+export interface DefineComponentsResult { queues: QueueWithPosition[], exchanges: ExchangeWithPosition[], producers: ProducerWithPosition[] }
+
+export const definePositionsComponents = ({ queues, positions, producers, exchanges }: DefineComponentsDTO): DefineComponentsResult => {
   const producerPositions = positions.producer
 
   const exchangePositions = positions.exchange
   const consumerPositions = positions.consumer
+
+  const exchangeWithPosition = exchanges.map(exchange => {
+    const position = exchangePositions[0]
+    exchangePositions.shift()
+    return {
+      id: uuidv4(),
+      ...exchange,
+      position
+    }
+  })
 
   const queuesWithPositions: QueueWithPosition[] = queues.map((queue, index) => ({
     ...queue,
     id: uuidv4(),
     position: positions.queue[index],
     bindings: queue.bindings.map(binding => {
-      const position = exchangePositions[0]
-      exchangePositions.shift()
+      const position = exchangeWithPosition.find(exchange => exchange.name === binding.source)?.position || {} as ComponentWithPosition
       return {
         ...binding,
         position,
@@ -170,7 +185,7 @@ export const definePositionsComponents = ({ queues, positions, producers }: Defi
     })
   }))
 
-  const exchangePositionsWithoutQueue = exchangePositions.map(exchange => ({ ...exchange, id: uuidv4() }))
+
 
   const producerWithPositions = producers.map((producer) => {
     const position = producerPositions[0]
@@ -181,7 +196,7 @@ export const definePositionsComponents = ({ queues, positions, producers }: Defi
     }
   })
 
-  return { queues: queuesWithPositions, exchanges: exchangePositionsWithoutQueue, producers: producerWithPositions }
+  return { queues: queuesWithPositions, exchanges: exchangeWithPosition, producers: producerWithPositions }
 }
 
 export interface DefineLinksBetweenComponentsDTO extends QueueWithPosition { }
@@ -327,8 +342,8 @@ export function getPositions({ components, componentType }: GetPositionsDTO): Co
 //   producers: ProducerWithPosition[]
 //   components: ComponentWithPosition[]
 // }
-export function defineMessagePositions(data: DefineComponentsResult) {
-  console.log("##########", data)
+export function defineMessagePositions({ exchanges, producers, queues }: DefineComponentsResult) {
+  console.log("##########", exchanges)
   // const producersMessageWithPosition = producers.map(producer => {
   //   const messages = producer.messages.map(message => {
   //     const producerPosition = producer.position

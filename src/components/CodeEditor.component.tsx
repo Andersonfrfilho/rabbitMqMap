@@ -7,7 +7,6 @@ import { editor } from 'src/schemas/editor.schema';
 import { Queue, QueueBindingConsumers } from '@services/rabbitmq/interfaces/queue.interface';
 import { Exchange } from '@services/rabbitmq/interfaces/exchange.interface';
 import { Producer } from '@services/rabbitmq/interfaces/producer.interface';
-import { exchange } from 'src/schemas/exchange.schema';
 
 interface SetComponents {
   setQueuesEditor: React.Dispatch<React.SetStateAction<QueueBindingConsumers[]>>

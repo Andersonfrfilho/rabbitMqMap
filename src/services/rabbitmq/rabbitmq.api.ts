@@ -39,13 +39,14 @@ export const getQueues = async (): Promise<QueueBindingConsumers[]> => {
   return queuesWithConsumersBindings
 }
 
-export const getExchanges = async (queues: QueueBindingConsumers[]): Promise<Exchange[]> => {
+export const getExchanges = async (): Promise<Exchange[]> => {
   const { data: exchanges } = await rabbitMqApiService.get<Exchange[]>(`/api/exchanges/${encodeURIComponent(config.rabbitMq.vhost)}`);
-  const bindings = queues.reduce((accumulator: Binding[], current) => [...accumulator, ...current.bindings], [])
+  const { data: bindings } = await rabbitMqApiService.get<Binding[]>(`/api/bindings/${encodeURIComponent(config.rabbitMq.vhost)}`);
   const exchangesWithRouteKeys = exchanges.map(exchange => ({
     ...exchange,
     bindings: bindings.filter(binding => binding.source === exchange.name) || []
   }))
+
   return exchangesWithRouteKeys
 }
 
