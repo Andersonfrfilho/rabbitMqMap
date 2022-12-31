@@ -1,11 +1,15 @@
 import { NUMBER_SEPARATION_LINKS, Position } from "@constants/position.constant";
 import { COMPONENTS, COMPONENT_TYPE, DEPTH, LINK_TYPE } from "@enums/positions.enum";
 import { Consumer } from "@services/rabbitmq/interfaces/consumer.interface";
-import { Exchange } from "@services/rabbitmq/interfaces/exchange.interface";
-import { Message, Producer } from "@services/rabbitmq/interfaces/producer.interface";
+import { Exchange, Type } from "@services/rabbitmq/interfaces/exchange.interface";
+import { Producer, ProducerWithMessageWithPosition } from "@services/rabbitmq/interfaces/producer.interface";
 import { BindingWithPosition, ConsumerWithPosition, Queue, QueueBindingConsumers } from "@services/rabbitmq/interfaces/queue.interface";
 import { ComponentInfo, infoConsumer, infoExchange, infoProducer, infoQueue } from "../builder/info.builder";
 import { v4 as uuidv4 } from 'uuid';
+import { binding } from "src/schemas/queue.schema";
+import { ExchangeType } from "@services/rabbitmq/interfaces/overview.interfaces";
+import { Vector3 } from "three";
+import { Binding } from "@services/rabbitmq/interfaces/binding.interface";
 
 export interface Dimension {
   width: number;
@@ -68,7 +72,7 @@ export const createPositionsComponents = (components: Components): PositionCompo
     const positions: ComponentWithPosition[] = [];
     const positionsIndexes: number[] = [];
     const positionsQuantityIndexes = components[componentName].quantity ** 2
-    const componentsItems = components[componentName].items;
+    const componentsItems = components[componentName].items as Producer[] & Exchange[] & Queue[] & Consumer[];
     let componentItemsIndex = 0;
     while (positionsIndexes.length <= components[componentName].quantity - 1 && indexPosition <= positionsQuantityIndexes - 1) {
 
@@ -202,12 +206,12 @@ export const definePositionsComponents = ({ queues, positions, producers, exchan
 export interface DefineLinksBetweenComponentsDTO extends QueueWithPosition { }
 
 export interface BindingWithLinks extends BindingWithPosition {
-  lines: MakeVerticalCoordinateSeparationResult[]
+  lines: MakeVerticalCoordinateSeparationResult
   points: MakeVerticalCoordinateSeparationResult[]
 }
 
 export interface ConsumerWithLinks extends ConsumerWithPosition {
-  lines: MakeVerticalCoordinateSeparationResult[]
+  lines: MakeVerticalCoordinateSeparationResult
   points: MakeVerticalCoordinateSeparationResult[]
 }
 
@@ -266,7 +270,6 @@ interface MakePointsByNumberSeparation {
   initialPosition: MakeVerticeInfoPosition;
   lastPosition: MakeVerticeInfoPosition;
   numberPoints: number;
-
 }
 interface InfoParent {
   father: string;
@@ -284,8 +287,8 @@ interface MakePointsByNumberSeparationResult {
 }
 function makePointsByNumberSeparation({ initialPosition, lastPosition, numberPoints }: MakePointsByNumberSeparation): MakePointsByNumberSeparationResult[] {
   const arrayLinks = new Array(numberPoints).fill([0, 0, 0])
-  const [x1, y1, z1] = initialPosition.position
-  const [x2, y2, z2] = lastPosition.position
+  const [x1, y1, z1] = initialPosition.position as number[]
+  const [x2, y2, z2] = lastPosition.position as number[]
   const xDiference = x2 - x1;
   const yDiference = y2 - y1;
   const zDiference = z2 - z1;
@@ -335,29 +338,77 @@ export interface GetPositionsDTO {
 }
 
 export function getPositions({ components, componentType }: GetPositionsDTO): ComponentWithPosition[] {
-  return components.reduce((accumulator, queue) => [...accumulator, ...queue[componentType].reduce((accumulatorBinding, binding) => [...accumulatorBinding, binding.position], [])], [])
+  return components.reduce((accumulator: ComponentWithPosition[], queue: QueueWithPosition): ComponentWithPosition[] => [...accumulator, ...queue[componentType].reduce((accumulatorBinding: ComponentWithPosition[], component: BindingWithPosition | ConsumerWithPosition): ComponentWithPosition[] => [...accumulatorBinding, component.position], [])], [])
 }
 
-// export interface DefineMessagePositionsParams {
-//   producers: ProducerWithPosition[]
-//   components: ComponentWithPosition[]
-// }
-export function defineMessagePositions({ exchanges, producers, queues }: DefineComponentsResult) {
-  console.log("##########", exchanges)
-  // const producersMessageWithPosition = producers.map(producer => {
-  //   const messages = producer.messages.map(message => {
-  //     const producerPosition = producer.position
-  //     console.log("######### exchanges")
-  //     console.log(exchanges)
-  //     // return {
-  //     //   ...message,
-  //     //   positions: {
-  //     //     producer: producerPosition,
-  //     //     exchange: exchangePosition,
-  //     //     queue: queuePosition,
-  //     //     consumer: consumerPosition
-  //     //   }
-  //     // }
-  //   })
-  // })
+export function defineMessagePositions({ exchanges, producers, queues }: DefineComponentsResult): ProducerWithMessageWithPosition[] {
+  const producersMessageWithPosition = producers.map(producer => {
+    const messages = producer.messages.map(message => {
+      const producerPosition = producer.position
+      const exchange = exchanges.find(exchange => exchange.name === message.exchange)
+      const producerBetweenExchangePoints = !!producerPosition && !!exchange && createMessagePointsBetweenTwoComponents({ initialPosition: producerPosition, lastPosition: exchange.position, numberPoints: NUMBER_SEPARATION_LINKS, payload: message.messagePayload }) || []
+      const queuesPositionsFilter = !!exchange && queues.filter(queue => !!exchange.bindings && exchange.bindings.some(binding => binding.destination === queue.name)).map(queue => queue.position) || []
+      const exchangeBetweenQueuesPoints = !!exchange && queuesPositionsFilter.map(queuePosition => createMessagePointsBetweenTwoComponents({ initialPosition: exchange.position, lastPosition: queuePosition, numberPoints: NUMBER_SEPARATION_LINKS, payload: message.messagePayload })).reduce((accumulator: MessagePoint[], currentValue: MessagePoint[]): MessagePoint[] => [...accumulator, ...currentValue], []) || []
+      return {
+        ...message,
+        positions: {
+          producerBetweenExchange: producerBetweenExchangePoints,
+          exchangeBetweenQueue: exchangeBetweenQueuesPoints,
+        }
+      }
+    })
+    return {
+      ...producer,
+      messages
+    }
+  })
+
+  return producersMessageWithPosition
+}
+
+interface GetPointsBetweenTwoCoordinatesParams {
+  initialPosition: ComponentWithPosition;
+  lastPosition: ComponentWithPosition;
+  payload: any;
+  numberPoints?: number
+}
+
+interface MessageInfo {
+  source: string;
+  destination: string;
+  payload: any;
+}
+
+export interface MessagePoint {
+  id: string;
+  position: number[];
+  info: MessageInfo
+}
+
+function createMessagePointsBetweenTwoComponents({ initialPosition, lastPosition, payload, numberPoints = NUMBER_SEPARATION_LINKS }: GetPointsBetweenTwoCoordinatesParams): MessagePoint[] {
+  const arrayLinks = new Array(numberPoints).fill([0, 0, 0])
+  const [x1, y1, z1] = initialPosition.position as number[]
+  const [x2, y2, z2] = lastPosition.position as number[]
+  const xDiference = x2 - x1;
+  const yDiference = y2 - y1;
+  const zDiference = z2 - z1;
+  const points = arrayLinks.map((element, indexLink): MessagePoint => {
+    const x = x1 + (xDiference * indexLink / NUMBER_SEPARATION_LINKS)
+    const y = y1 + (yDiference * indexLink / NUMBER_SEPARATION_LINKS)
+    const z = z1 + (zDiference * indexLink / NUMBER_SEPARATION_LINKS)
+    return {
+      id: uuidv4(),
+      position: [x, y, z],
+      info: {
+        source: initialPosition.info.name,
+        destination: lastPosition.info.name,
+        payload
+      }
+    }
+  })
+  return points
+}
+interface GetQueueByTypeExchangeDTO {
+  type: Type;
+  queue: QueueWithPosition;
 }
