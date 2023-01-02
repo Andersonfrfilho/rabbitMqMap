@@ -341,7 +341,9 @@ export function getPositions({ components, componentType }: GetPositionsDTO): Co
   return components.reduce((accumulator: ComponentWithPosition[], queue: QueueWithPosition): ComponentWithPosition[] => [...accumulator, ...queue[componentType].reduce((accumulatorBinding: ComponentWithPosition[], component: BindingWithPosition | ConsumerWithPosition): ComponentWithPosition[] => [...accumulatorBinding, component.position], [])], [])
 }
 
-export function defineMessagePositions({ exchanges, producers, queues }: DefineComponentsResult): ProducerWithMessageWithPosition[] {
+export interface DefineMessagePositionsParams extends DefineComponentsResult { }
+
+export function defineMessagePositions({ exchanges, producers, queues }: DefineMessagePositionsParams): ProducerWithMessageWithPosition[] {
   const producersMessageWithPosition = producers.map(producer => {
     const messages = producer.messages.map(message => {
       const producerPosition = producer.position
@@ -349,11 +351,31 @@ export function defineMessagePositions({ exchanges, producers, queues }: DefineC
       const producerBetweenExchangePoints = !!producerPosition && !!exchange && createMessagePointsBetweenTwoComponents({ initialPosition: producerPosition, lastPosition: exchange.position, numberPoints: NUMBER_SEPARATION_LINKS, payload: message.messagePayload }) || []
       const queuesPositionsFilter = !!exchange && queues.filter(queue => !!exchange.bindings && exchange.bindings.some(binding => binding.destination === queue.name)).map(queue => queue.position) || []
       const exchangeBetweenQueuesPoints = !!exchange && queuesPositionsFilter.map(queuePosition => createMessagePointsBetweenTwoComponents({ initialPosition: exchange.position, lastPosition: queuePosition, numberPoints: NUMBER_SEPARATION_LINKS, payload: message.messagePayload })).reduce((accumulator: MessagePoint[], currentValue: MessagePoint[]): MessagePoint[] => [...accumulator, ...currentValue], []) || []
+      const producerBetweenExchange = {
+        initial: producerPosition,
+      }
+      Object.assign(producerBetweenExchange, exchange && exchange.position && {
+        last: exchange?.position,
+      })
+      const exchangeBetweenQueue = exchangeBetweenQueuesPoints.length > 0 ? {} : {
+        initial: {},
+        last: {}
+      }
       return {
         ...message,
         positions: {
-          producerBetweenExchange: producerBetweenExchangePoints,
-          exchangeBetweenQueue: exchangeBetweenQueuesPoints,
+          points: {
+            producerBetweenExchange: producerBetweenExchangePoints,
+            exchangeBetweenQueue: exchangeBetweenQueuesPoints,
+            queueBetweenConsumer: queueBetweenConsumer
+          },
+          lines: {
+            producerBetweenExchange: {
+              initial: producerPosition,
+              last: exchange?.position,
+            }
+            exchangeBetweenQueue:
+          }
         }
       }
     })

@@ -44,7 +44,7 @@ interface WithMessage {
   messages: Message[]
 }
 
-interface MessageWithPositions extends Message {
+export interface MessageWithPositions extends Message {
   positions: {
     producerBetweenExchange: MessagePoint[];
     exchangeBetweenQueue: MessagePoint[];
