@@ -2,14 +2,10 @@ import { NUMBER_SEPARATION_LINKS, Position } from "@constants/position.constant"
 import { COMPONENTS, COMPONENT_TYPE, DEPTH, LINK_TYPE } from "@enums/positions.enum";
 import { Consumer } from "@services/rabbitmq/interfaces/consumer.interface";
 import { Exchange, Type } from "@services/rabbitmq/interfaces/exchange.interface";
-import { Producer, ProducerWithMessageWithPosition } from "@services/rabbitmq/interfaces/producer.interface";
+import { Producer, ProducerBetweenExchange, ProducerWithMessageWithPosition } from "@services/rabbitmq/interfaces/producer.interface";
 import { BindingWithPosition, ConsumerWithPosition, Queue, QueueBindingConsumers } from "@services/rabbitmq/interfaces/queue.interface";
 import { ComponentInfo, infoConsumer, infoExchange, infoProducer, infoQueue } from "../builder/info.builder";
 import { v4 as uuidv4 } from 'uuid';
-import { binding } from "src/schemas/queue.schema";
-import { ExchangeType } from "@services/rabbitmq/interfaces/overview.interfaces";
-import { Vector3 } from "three";
-import { Binding } from "@services/rabbitmq/interfaces/binding.interface";
 
 export interface Dimension {
   width: number;
@@ -271,11 +267,11 @@ interface MakePointsByNumberSeparation {
   lastPosition: MakeVerticeInfoPosition;
   numberPoints: number;
 }
-interface InfoParent {
+export interface InfoParent {
   father: string;
   children: string;
 }
-interface MakeVerticalCoordinateSeparationResult {
+export interface MakeVerticalCoordinateSeparationResult {
   id: string; positions: Position[]; info?: InfoParent;
 }
 
@@ -315,7 +311,7 @@ interface GetLinkLinesInfo {
 export interface GetLinksLinesResult {
   id: string;
   positions: Position[];
-  info: GetLinkLinesInfo
+  info?: GetLinkLinesInfo | InfoParent | undefined
 }
 
 export function getLinksLines({ componentLinks, componentType }: GetLinksLinesDTO): GetLinksLinesResult[] {
@@ -345,42 +341,51 @@ export interface DefineMessagePositionsParams extends DefineComponentsResult { }
 
 export function defineMessagePositions({ exchanges, producers, queues }: DefineMessagePositionsParams): ProducerWithMessageWithPosition[] {
   const producersMessageWithPosition = producers.map(producer => {
+    const lines = [] as MakeVerticalCoordinateSeparationResult[]
+
     const messages = producer.messages.map(message => {
       const producerPosition = producer.position
       const exchange = exchanges.find(exchange => exchange.name === message.exchange)
+
+      if (!!exchange && !lines.some(line => (
+        line.positions[0][0] === producerPosition.position[0] && line.positions[0][1] === producerPosition.position[1] && line.positions[0][2] === producerPosition.position[2]
+        &&
+        line.positions[1][0] === exchange?.position[0] && line.positions[1][1] === exchange?.position[1] && line.positions[1][2] === exchange?.position[2]))) {
+        const producerLinesBetweenExchange = makeVerticesCoordinatesSeparation({
+          initialPosition: {
+            name: producerPosition.info.name,
+            position: producerPosition.position,
+            destination: exchange.position.info.name,
+          }, lastPosition: {
+            name: exchange.position.info.name,
+            position: exchange.position.position,
+            destination: exchange.position.info.name,
+          },
+        })
+        lines.push(producerLinesBetweenExchange)
+      }
+
       const producerBetweenExchangePoints = !!producerPosition && !!exchange && createMessagePointsBetweenTwoComponents({ initialPosition: producerPosition, lastPosition: exchange.position, numberPoints: NUMBER_SEPARATION_LINKS, payload: message.messagePayload }) || []
-      const queuesPositionsFilter = !!exchange && queues.filter(queue => !!exchange.bindings && exchange.bindings.some(binding => binding.destination === queue.name)).map(queue => queue.position) || []
+
+      const queuesFilter = !!exchange && queues.filter(queue => !!exchange.bindings && exchange.bindings.some(binding => binding.destination === queue.name)) || []
+
+      const queuesPositionsFilter = queuesFilter.map(queue => queue.position) || []
       const exchangeBetweenQueuesPoints = !!exchange && queuesPositionsFilter.map(queuePosition => createMessagePointsBetweenTwoComponents({ initialPosition: exchange.position, lastPosition: queuePosition, numberPoints: NUMBER_SEPARATION_LINKS, payload: message.messagePayload })).reduce((accumulator: MessagePoint[], currentValue: MessagePoint[]): MessagePoint[] => [...accumulator, ...currentValue], []) || []
-      const producerBetweenExchange = {
-        initial: producerPosition,
-      }
-      Object.assign(producerBetweenExchange, exchange && exchange.position && {
-        last: exchange?.position,
-      })
-      const exchangeBetweenQueue = exchangeBetweenQueuesPoints.length > 0 ? {} : {
-        initial: {},
-        last: {}
-      }
+
+      const queuesToConsumersPoints = queuesFilter.reduce((accumulator: MessagePoint[], queue: QueueWithPosition): MessagePoint[] => [...accumulator, ...queue.consumers_register.map((consumer: ConsumerWithPosition): MessagePoint[] => createMessagePointsBetweenTwoComponents({ initialPosition: queue.position, lastPosition: consumer.position, numberPoints: NUMBER_SEPARATION_LINKS, payload: message.messagePayload }))], []) || []
+
       return {
         ...message,
         positions: {
-          points: {
-            producerBetweenExchange: producerBetweenExchangePoints,
-            exchangeBetweenQueue: exchangeBetweenQueuesPoints,
-            queueBetweenConsumer: queueBetweenConsumer
-          },
-          lines: {
-            producerBetweenExchange: {
-              initial: producerPosition,
-              last: exchange?.position,
-            }
-            exchangeBetweenQueue:
-          }
+          producerBetweenExchange: producerBetweenExchangePoints,
+          exchangeBetweenQueue: exchangeBetweenQueuesPoints,
+          queueBetweenConsumer: queuesToConsumersPoints
         }
       }
     })
     return {
       ...producer,
+      lines,
       messages
     }
   })

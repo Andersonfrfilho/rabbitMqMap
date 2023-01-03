@@ -1,4 +1,4 @@
-import { MessagePoint } from "@contexts/position/functions/definePositionsComponents";
+import { GetLinksLinesResult, MakeVerticalCoordinateSeparationResult, MessagePoint } from "@contexts/position/functions/definePositionsComponents";
 
 interface Capabilities {
   authentication_failure_close: boolean;
@@ -44,10 +44,23 @@ interface WithMessage {
   messages: Message[]
 }
 
+export interface ProducerBetweenExchange {
+  initial: GetLinksLinesResult;
+  last: GetLinksLinesResult;
+}
+
+export interface Lines {
+  producerBetweenExchange: ProducerBetweenExchange
+}
+
+interface WithLines {
+  lines: MakeVerticalCoordinateSeparationResult[]
+}
 export interface MessageWithPositions extends Message {
   positions: {
     producerBetweenExchange: MessagePoint[];
     exchangeBetweenQueue: MessagePoint[];
+    queueBetweenConsumer: MessagePoint[];
   }
 }
 
@@ -56,4 +69,5 @@ interface WithMessageWithPositions {
 }
 export interface Producer extends Connection, WithId, WithMessage { }
 
-export interface ProducerWithMessageWithPosition extends Connection, WithId, WithMessageWithPositions { }
+export interface ProducerLines extends WithLines { }
+export interface ProducerWithMessageWithPosition extends Connection, WithId, WithMessageWithPositions, WithLines { }

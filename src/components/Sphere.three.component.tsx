@@ -4,7 +4,6 @@ import { useRef, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Html } from '@react-three/drei'
 import { MessageWithPositions } from '@services/rabbitmq/interfaces/producer.interface'
-import { Vector3 } from 'three'
 
 type Props = MessageWithPositions & JSX.IntrinsicElements['mesh']
 
@@ -18,15 +17,16 @@ export function SphereThree({ positions, id, ...props }: Props): JSX.Element {
 
   let indexPositionMessageProducerToExchange = 0
   let indexPositionMessageExchangeToQueue = 0
+  let indexPositionMessageQueueToConsumer = 0
 
   useFrame(() => {
-    // if (indexPositionMessageProducerToExchange <= positions.producerBetweenExchange.length - 1) {
-    //   indexPositionMessageProducerToExchange += 1;
-    //   const [x, y, z] = positions.producerBetweenExchange[indexPositionMessageProducerToExchange].position
-    //   sphereRef.current.position.set(x, y, z)
-    // } else {
-    //   indexPositionMessageProducerToExchange = 0
-    // }
+    if (indexPositionMessageProducerToExchange < positions.producerBetweenExchange.length) {
+      const [x, y, z] = positions.producerBetweenExchange[indexPositionMessageProducerToExchange].position
+      sphereRef.current.position.set(x, y, z)
+      indexPositionMessageProducerToExchange += 1;
+    } else {
+      indexPositionMessageProducerToExchange = 0
+    }
   })
 
 

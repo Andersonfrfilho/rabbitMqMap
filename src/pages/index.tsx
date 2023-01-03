@@ -9,10 +9,10 @@ import { QueueThree } from '@components/Queue.three.component';
 import { Queue, QueueBindingConsumers } from '@services/rabbitmq/interfaces/queue.interface';
 import { usePosition } from '@contexts/position/Position.context';
 import { componentDTO } from '@dtos/component.dto';
-import { ComponentWithPosition, Components, DefineComponentsResult, GetLinksLinesResult, GetPointsLinesResult } from '@contexts/position/functions/definePositionsComponents';
+import { ComponentWithPosition, Components, DefineComponentsResult, GetLinksLinesResult, GetPointsLinesResult, MakeVerticalCoordinateSeparationResult } from '@contexts/position/functions/definePositionsComponents';
 import { COMPONENT_TYPE, DEPTH } from '@enums/positions.enum';
 import { CONSUMER_DIMENSION, EXCHANGE_DIMENSION, PRODUCER_DIMENSION, QUEUE_DIMENSION } from '@constants/components.constant';
-import { MessageWithPositions, Producer, ProducerWithMessageWithPosition } from '@services/rabbitmq/interfaces/producer.interface';
+import { Lines, MessageWithPositions, Producer, ProducerBetweenExchange, ProducerWithMessageWithPosition } from '@services/rabbitmq/interfaces/producer.interface';
 import { Consumer } from '@services/rabbitmq/interfaces/consumer.interface';
 import { LineThree } from '@components/Line.three.component';
 import { SphereThree } from '@components/Sphere.three.component';
@@ -74,6 +74,7 @@ export default function App(
   const [exchangesEditor, setExchangesEditor] = useState<Exchange[]>([])
   const [producersEditor, setProducersEditor] = useState<Producer[]>([])
   const [messagesPosition, setMessagesPosition] = useState<MessageWithPositions[]>([])
+  const [producerLinesPosition, setProducerLinesPosition] = useState<MakeVerticalCoordinateSeparationResult[]>([] as MakeVerticalCoordinateSeparationResult[])
 
   const { createPositionsComponents, definePositionsComponents, definePositionLinksBetweenComponents, getLinksLines, getLinksPoints, getPositions, defineMessagePositions } = usePosition()
 
@@ -102,8 +103,13 @@ export default function App(
       setPointsPositions([...pointsConsumer, ...pointsBindings])
 
       const producerMessagesPositions = defineMessagePositions({ queues: componentPositions, exchanges: exchangesWithPosition, producers: producersWithPosition })
+
+      const linesProducerPosition = producerMessagesPositions.reduce((accumulator: MakeVerticalCoordinateSeparationResult[], producer: ProducerWithMessageWithPosition): MakeVerticalCoordinateSeparationResult[] => [...accumulator, ...producer.lines], [])
+      setProducerLinesPosition(linesProducerPosition)
+
       const messagesPositions = producerMessagesPositions.reduce((accumulator: MessageWithPositions[], current: ProducerWithMessageWithPosition) => [...accumulator, ...current.messages], [])
       setMessagesPosition(messagesPositions)
+      console.log(messagesPositions)
     }
   }, [])
 
@@ -134,6 +140,10 @@ export default function App(
       setPointsPositions([...pointsConsumer, ...pointsBindings])
 
       const producerMessagesPositions = defineMessagePositions({ queues: componentPositions, exchanges: exchangesWithPosition, producers: producerPositions })
+
+      const linesProducerPosition = producerMessagesPositions.reduce((accumulator: MakeVerticalCoordinateSeparationResult[], producer: ProducerWithMessageWithPosition): MakeVerticalCoordinateSeparationResult[] => [...accumulator, ...producer.lines], [])
+      setProducerLinesPosition(linesProducerPosition)
+
       const messagesPositions = producerMessagesPositions.reduce((accumulator: MessageWithPositions[], current: ProducerWithMessageWithPosition) => [...accumulator, ...current.messages], [])
       setMessagesPosition(messagesPositions)
     }
@@ -229,8 +239,8 @@ export default function App(
               return <ConsumerThree key={position.id} infoComponent={position.info} position={position.position} />
             })}
             {linesPositions.length > 0 && linesPositions.map((line) => <LineThree key={line.id} {...line} />)}
-            {console.log(messagesPosition)}
-            {messagesPosition.length > 0 && messagesPosition.map((message, index) => <SphereThree key={message.id} {...message} />)}
+            {producerLinesPosition.length > 0 && producerLinesPosition.map((line) => <LineThree key={line.id} {...line} />)}
+            {messagesPosition.length > 0 && messagesPosition.map(message => <SphereThree key={message.id} {...message} />)}
             <OrbitControls />
           </Canvas>
         </GridItem>
