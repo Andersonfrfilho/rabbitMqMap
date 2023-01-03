@@ -240,6 +240,7 @@ export default function App(
             })}
             {linesPositions.length > 0 && linesPositions.map((line) => <LineThree key={line.id} {...line} />)}
             {producerLinesPosition.length > 0 && producerLinesPosition.map((line) => <LineThree key={line.id} {...line} />)}
+            {console.log(messagesPosition)}
             {messagesPosition.length > 0 && messagesPosition.map(message => <SphereThree key={message.id} {...message} />)}
             <OrbitControls />
           </Canvas>

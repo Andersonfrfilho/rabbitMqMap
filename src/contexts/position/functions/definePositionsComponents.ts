@@ -372,7 +372,7 @@ export function defineMessagePositions({ exchanges, producers, queues }: DefineM
       const queuesPositionsFilter = queuesFilter.map(queue => queue.position) || []
       const exchangeBetweenQueuesPoints = !!exchange && queuesPositionsFilter.map(queuePosition => createMessagePointsBetweenTwoComponents({ initialPosition: exchange.position, lastPosition: queuePosition, numberPoints: NUMBER_SEPARATION_LINKS, payload: message.messagePayload })).reduce((accumulator: MessagePoint[], currentValue: MessagePoint[]): MessagePoint[] => [...accumulator, ...currentValue], []) || []
 
-      const queuesToConsumersPoints = queuesFilter.reduce((accumulator: MessagePoint[], queue: QueueWithPosition): MessagePoint[] => [...accumulator, ...queue.consumers_register.map((consumer: ConsumerWithPosition): MessagePoint[] => createMessagePointsBetweenTwoComponents({ initialPosition: queue.position, lastPosition: consumer.position, numberPoints: NUMBER_SEPARATION_LINKS, payload: message.messagePayload }))], []) || []
+      const queuesToConsumersPoints = queuesFilter.reduce((accumulator: MessagePoint[], queue: QueueWithPosition): MessagePoint[] => [...accumulator, ...queue.consumers_register.reduce((accumulatorConsumerParam: MessagePoint[], consumer: ConsumerWithPosition): MessagePoint[] => [...accumulatorConsumerParam, ...createMessagePointsBetweenTwoComponents({ initialPosition: queue.position, lastPosition: consumer.position, numberPoints: NUMBER_SEPARATION_LINKS, payload: message.messagePayload })], [])], []) || []
 
       return {
         ...message,

@@ -16,8 +16,11 @@ export function SphereThree({ positions, id, ...props }: Props): JSX.Element {
   const [clicked, click] = useState<boolean>(false)
 
   let indexPositionMessageProducerToExchange = 0
+  let completeMessageProducerToExchange = false
   let indexPositionMessageExchangeToQueue = 0
+  let completeMessageExchangeToQueue = false
   let indexPositionMessageQueueToConsumer = 0
+  let completeMessageQueueToConsumer = false
 
   useFrame(() => {
     if (indexPositionMessageProducerToExchange < positions.producerBetweenExchange.length) {
@@ -25,7 +28,33 @@ export function SphereThree({ positions, id, ...props }: Props): JSX.Element {
       sphereRef.current.position.set(x, y, z)
       indexPositionMessageProducerToExchange += 1;
     } else {
+      completeMessageProducerToExchange = true
+    }
+
+    if (indexPositionMessageExchangeToQueue < positions.exchangeBetweenQueue.length && completeMessageProducerToExchange) {
+      const [x, y, z] = positions.exchangeBetweenQueue[indexPositionMessageExchangeToQueue].position
+      sphereRef.current.position.set(x, y, z)
+      indexPositionMessageExchangeToQueue += 1;
+    } else {
+      completeMessageExchangeToQueue = true
+    }
+
+    if (indexPositionMessageQueueToConsumer < positions.queueBetweenConsumer.length && completeMessageProducerToExchange && completeMessageExchangeToQueue) {
+      const [x, y, z] = positions.queueBetweenConsumer[indexPositionMessageQueueToConsumer].position
+      sphereRef.current.position.set(x, y, z)
+      indexPositionMessageQueueToConsumer += 1;
+    } else {
+      completeMessageQueueToConsumer = true
+    }
+
+    if (completeMessageProducerToExchange && completeMessageExchangeToQueue && completeMessageQueueToConsumer) {
+      completeMessageProducerToExchange = false
+      completeMessageExchangeToQueue = false
+      completeMessageQueueToConsumer = false
+
       indexPositionMessageProducerToExchange = 0
+      indexPositionMessageExchangeToQueue = 0
+      indexPositionMessageQueueToConsumer = 0
     }
   })
 
