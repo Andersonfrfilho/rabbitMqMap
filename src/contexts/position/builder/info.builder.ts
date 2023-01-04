@@ -13,15 +13,15 @@ export function infoExchange({ name, type }: Exchange): ComponentInfo {
   }
 }
 
-export function infoProducer({ name, type }: Producer): ComponentInfo {
+export function infoProducer({ user, type }: Producer): ComponentInfo {
   return {
-    name,
+    name: user,
     type,
     componentType: COMPONENT_INFO_TYPE.PRODUCER,
   }
 }
 
-export function infoConsumer({ channel_details: { name, user } }: Consumer): ComponentInfo {
+export function infoConsumer({ channel_details: { user }, queue: { name } }: Consumer): ComponentInfo {
   return {
     name,
     type: user,

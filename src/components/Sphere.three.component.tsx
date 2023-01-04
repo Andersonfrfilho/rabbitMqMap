@@ -17,44 +17,41 @@ export function SphereThree({ positions, id, ...props }: Props): JSX.Element {
   const [clicked, click] = useState<boolean>(false)
 
   let indexPositionMessageProducerToExchange = 0
-  let completeMessageProducerToExchange = false
   let indexPositionMessageExchangeToQueue = 0
-  let completeMessageExchangeToQueue = false
   let indexPositionMessageQueueToConsumer = 0
-  let completeMessageQueueToConsumer = false
+
+  let firstStep = true;
+  let secondStep = false;
+  let thirdStep = false;
 
   useFrame(() => {
-    if (indexPositionMessageProducerToExchange < positions.producerBetweenExchange.length) {
+    if (firstStep && indexPositionMessageProducerToExchange < positions.producerBetweenExchange.length) {
       const [x, y, z] = positions.producerBetweenExchange[indexPositionMessageProducerToExchange].position
       sphereRef.current.position.set(x, y, z)
       indexPositionMessageProducerToExchange += 1;
-    } else {
-      completeMessageProducerToExchange = true
+    } else if (firstStep) {
+      firstStep = false
+      secondStep = true
+      indexPositionMessageProducerToExchange = 0
     }
 
-    if (indexPositionMessageExchangeToQueue < positions.exchangeBetweenQueue.length && completeMessageProducerToExchange) {
+    if (secondStep && indexPositionMessageExchangeToQueue < positions.exchangeBetweenQueue.length) {
       const [x, y, z] = positions.exchangeBetweenQueue[indexPositionMessageExchangeToQueue].position
       sphereRef.current.position.set(x, y, z)
       indexPositionMessageExchangeToQueue += 1;
-    } else {
-      completeMessageExchangeToQueue = true
+    } else if (secondStep) {
+      secondStep = false
+      thirdStep = true
+      indexPositionMessageExchangeToQueue = 0
     }
 
-    if (indexPositionMessageQueueToConsumer < positions.queueBetweenConsumer.length && completeMessageProducerToExchange && completeMessageExchangeToQueue) {
+    if (thirdStep && indexPositionMessageQueueToConsumer < positions.queueBetweenConsumer.length) {
       const [x, y, z] = positions.queueBetweenConsumer[indexPositionMessageQueueToConsumer].position
       sphereRef.current.position.set(x, y, z)
       indexPositionMessageQueueToConsumer += 1;
-    } else {
-      completeMessageQueueToConsumer = true
-    }
-
-    if (completeMessageProducerToExchange && completeMessageExchangeToQueue && completeMessageQueueToConsumer) {
-      completeMessageProducerToExchange = false
-      completeMessageExchangeToQueue = false
-      completeMessageQueueToConsumer = false
-
-      indexPositionMessageProducerToExchange = 0
-      indexPositionMessageExchangeToQueue = 0
+    } else if (thirdStep) {
+      thirdStep = false
+      firstStep = true
       indexPositionMessageQueueToConsumer = 0
     }
   })
