@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { v4 as uuidV4 } from 'uuid';
 import { UNDEFINED } from "@constants/commons.constant";
 import { EXCHANGES_WITH_ROUTE_KEY } from "@constants/exchanges.constant";
+import { invertHex, randomColor } from "@utils/random-color";
 
 interface Props {
   producers: Producer[];
@@ -56,7 +57,7 @@ export function SendMessage(data: Props): JSX.Element {
       if (producer.id === formData.producerId) {
         return {
           ...producer,
-          messages: [...producer.messages, { ...formData, time: Number(formData.time), producerId: undefined, id: uuidV4() }]
+          messages: [...producer.messages, { ...formData, time: Number(formData.time), producerId: undefined, id: uuidv4(), color: randomColor() }]
         }
       }
       return producer
@@ -154,7 +155,7 @@ export function SendMessage(data: Props): JSX.Element {
             </h2>
             {!!producer.messages && producer.messages.length > 0 && producer.messages.map((message, index) => (
               <ButtonGroup key={message.id} size='sm' isAttached variant='outline' marginBottom={'5px'} >
-                <Button>Message - {index + 1}</Button>
+                <Button backgroundColor={message.color} textColor={invertHex(message.color)}>Message - {index + 1}</Button>
                 <IconButton onClick={() => stopMessage({ producerId: producer.id, messageId: message.id })} aria-label='Stop Message' icon={<GiStopSign />} color="red.600" />
               </ButtonGroup>
             ))}

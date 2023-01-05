@@ -36,6 +36,14 @@ interface PropertyId {
 }
 
 export interface Producer extends Connection, PropertyId, PropertyMessage { }
+interface Message {
+  exchange: string;
+  routeKey?: string;
+  messagePayload?: string;
+  time: number;
+  id: string;
+  color: string;
+}
 
 export interface ProducerPosition extends Connection, PropertyId, PropertyMessage, PropertyPosition { }
 

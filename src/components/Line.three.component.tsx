@@ -5,7 +5,9 @@ import { Vector3 } from 'three'
 import { GetLinksLinesResult } from '@contexts/position/functions/definePositionsComponents'
 import { Line } from '@react-three/drei'
 
-type Props = JSX.IntrinsicElements['line'] & GetLinksLinesResult
+type Props = JSX.IntrinsicElements['line'] & GetLinksLinesResult & {
+  visibleInfo: boolean;
+}
 export function LineThree(props: Props): JSX.Element {
   const points: Vector3[] = props.positions as unknown as Vector3[];
   const pointsConvertInVector3 = points.map(point => new Vector3(point[0], point[1], point[2]))

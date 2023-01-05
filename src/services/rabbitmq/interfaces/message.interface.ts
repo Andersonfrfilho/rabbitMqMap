@@ -18,6 +18,7 @@ interface Message {
   messagePayload?: string;
   time: number;
   id: string;
+  color: string;
 }
 
 export interface PropertyMessage {

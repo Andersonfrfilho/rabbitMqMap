@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Exchange } from "@services/rabbitmq/interfaces/exchange.interface";
-import { getExchanges, getProducers, getQueues } from '@services/rabbitmq/rabbitmq.api'
+import { getExchanges, getProducers, getQueues, rabbitMqApiService } from '@services/rabbitmq/rabbitmq.api'
 import { GetStaticProps, GetStaticPropsResult, InferGetStaticPropsType } from "next";
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
@@ -26,6 +26,8 @@ import { Position } from '@contexts/interfaces/positions.interface';
 import { MessagePositions } from '@services/rabbitmq/interfaces/message.interface';
 import { Point } from '@contexts/interfaces/lines.interface';
 import { SendMessage } from '@components/SendMessage.component';
+import { useForm } from 'react-hook-form';
+import { URL_PATTERN } from '@constants/regex.constant';
 
 interface AppGetStaticInterface {
   queues: QueueBindingConsumerRegister[]
@@ -54,7 +56,14 @@ export default function App(
   const [producerLinesPosition, setProducerLinesPosition] = useState<Point[]>([] as Point[])
   const [visibleInfos, setVisibleInfos] = useState<boolean>(false)
   const { getQueuePositionsCoordinates, createPositionsComponents, definePositionsComponents, defineLinesQueuesBetweenExchangesConsumers, getLinksLinesCoordinates, defineMessagePositions } = usePosition()
-
+  const { register, handleSubmit, setValue, resetField, watch, formState: { errors } } = useForm({
+    defaultValues: {
+      baseUrl: '',
+      username: '',
+      password: '',
+      vHost: '',
+    }
+  });
   useEffect(() => {
     if (queues.length > 0) {
       const consumers = getConsumers(queues)
@@ -118,6 +127,28 @@ export default function App(
     }
   }, [queuesEditor, exchangesEditor, producersEditor])
 
+  interface ChangeAxiosConfig {
+    baseUrl: string;
+    username: string;
+    password: string;
+  }
+
+  const changeAxiosConfig = async ({ baseUrl, username, password }: ChangeAxiosConfig) => {
+    console.log(baseUrl, username, password)
+    rabbitMqApiService.defaults.baseURL = baseUrl;
+    rabbitMqApiService.defaults.auth = {
+      username,
+      password
+    }
+    const queues = await getQueues() || [];
+    const exchanges = await getExchanges() || []
+    const producers = await getProducers() || []
+
+    setQueuesEditor(queues);
+    setExchangesEditor(exchanges);
+    setProducersEditor(producers);
+  }
+
   return (
     <>
       {/* <ModalBackdrop modalOpen={modalOpen} onClose={() => { setModalOpen(false) }} connections={connections} /> */}
@@ -127,7 +158,7 @@ export default function App(
                         "nav producer components"
                         "nav producer main"
                         "footer footer footer"`}
-        gridTemplateRows={'50px 50px 50px 1fr 30px'}
+        gridTemplateRows={'50px 80px 80px 1fr 30px'}
         gridTemplateColumns={'300px 300px 1fr'}
         h='100vh'
         gap='1'
@@ -147,37 +178,63 @@ export default function App(
           </Box>
         </GridItem>
         <GridItem pl='2' area={'configs'} display='flex'>
-          <Box boxSize='sm' display='flex' flex={1} overflow={'hidden'} height={'100%'} justifyContent={"center"} alignItems={"center"} paddingInline={2}>
+          <Box boxSize='sm' display='flex' flex={1} flexDirection={'column'} overflow={'hidden'} height={'100%'} justifyContent={"center"} alignItems={"flex-start"} paddingInline={2}>
+            {!!errors.baseUrl && <Text fontSize='xs' color={'red.600'}>{errors.baseUrl.message}</Text>}
             <InputGroup>
               <InputLeftElement
                 pointerEvents='none'
                 children={<MdHttp color='gray.300' />}
+
               />
-              <Input type='url' placeholder='base url' />
+              <Input  {...register("baseUrl", {
+                required: "Digite uma baseURl", pattern: URL_PATTERN
+              })} type='https://url.com' placeholder='base url' isInvalid={!!errors.baseUrl} />
             </InputGroup>
           </Box>
           <Box boxSize='sm' display='flex' flex={3} overflow={'hidden'} height={'100%'} flexDirection={"row"} justifyContent={"space-around"} alignItems={"center"}>
             <Box boxSize='sm' display='flex' flex={2} flexDirection={"row"} height={'100%'} alignItems={"center"}>
-              <InputGroup marginInline={2}>
-                <InputLeftElement
-                  pointerEvents='none'
-                  children={<AiOutlineUser color='gray.300' />}
-                />
-                <Input type='text' placeholder='username' />
-              </InputGroup>
-              <InputGroup marginInline={2}>
-                <InputLeftElement
-                  pointerEvents='none'
-                  children={<AiOutlineLock color='gray.300' />}
-                />
-                <Input type={true ? 'text' : 'password'} placeholder='password' />
-                <InputRightAddon>
-                  <IconButton onClick={() => setVisibleFieldPassword(data => !data)} aria-label='Visible password' icon={visibleFieldPassword ? <FaRegEyeSlash color='gray.300' /> : <FaRegEye color='gray.300' />} />
-                </InputRightAddon>
-              </InputGroup>
+              <Box boxSize='sm' display='flex' flex={1} flexDirection={"column"} height={'100%'} justifyContent={'center'} alignItems={"flex-start"} marginRight={2}>
+                {!!errors.username && <Text fontSize='xs' color={'red.600'}>{errors.username.message}</Text>}
+                <InputGroup>
+                  <InputLeftElement
+                    pointerEvents='none'
+                    children={<AiOutlineUser color='gray.300' />}
+                  />
+                  <Input {...register("username", {
+                    required: "Digite um usuário"
+                  })} type='text' placeholder='username' isInvalid={!!errors.username} />
+                </InputGroup>
+              </Box>
+              <Box boxSize='sm' display='flex' flex={1} flexDirection={"column"} height={'100%'} justifyContent={'center'} alignItems={"flex-start"} marginRight={2}>
+                {!!errors.password && <Text fontSize='xs' color={'red.600'}>{errors.password.message}</Text>}
+                <InputGroup>
+                  <InputLeftElement
+                    pointerEvents='none'
+                    children={<AiOutlineLock color='gray.300' />}
+                  />
+                  <Input {...register("password", {
+                    required: "Digite um password"
+                  })} type={true ? 'text' : 'password'} placeholder='password' isInvalid={!!errors.password} />
+                  <InputRightAddon>
+                    <IconButton onClick={() => setVisibleFieldPassword(data => !data)} aria-label='Visible password' icon={visibleFieldPassword ? <FaRegEyeSlash color='gray.300' /> : <FaRegEye color='gray.300' />} />
+                  </InputRightAddon>
+                </InputGroup>
+              </Box>
+              <Box boxSize='sm' display='flex' flex={1} flexDirection={"column"} height={'100%'} justifyContent={'center'} alignItems={"flex-start"}>
+                {!!errors.vHost && <Text fontSize='xs' color={'red.600'}>{errors.vHost.message}</Text>}
+                <InputGroup>
+                  <InputLeftElement
+                    pointerEvents='none'
+                    children={<AiOutlineUser color='gray.300' />}
+                  />
+                  <Input {...register("vHost", {
+                    required: "Digite um vhost"
+                  })} type='text' placeholder='vHost' isInvalid={!!errors.vHost} />
+                </InputGroup>
+              </Box>
             </Box>
             <Box boxSize='sm' display='flex' flex={1} height={'100%'} justifyContent={"center"} alignItems={"center"} padding={'2px'}>
-              <Button height={'100%'} size='sm' onClick={() => { }}>
+              <Button size='sm' onClick={handleSubmit(changeAxiosConfig)}>
                 Enviar
               </Button>
             </Box>
@@ -187,28 +244,37 @@ export default function App(
           <CodeEditor jsonCode={{ queues: queuesEditor, exchanges: exchangesEditor, producers: producersEditor }} setComponents={{ setQueuesEditor, setExchangesEditor, setProducersEditor }} />
         </GridItem>
         <GridItem pl='2' area={'producer'}>
+          <Text>Enviar Mensagens</Text>
           <SendMessage exchanges={exchangesEditor} producers={producersEditor} setMessage={setProducersEditor} />
         </GridItem>
-        <GridItem pl='2' area={'components'}>
-          <Flex>
+        <GridItem pl='2' area={'components'} display={'flex'} flexDirection={'column'}>
+          <Flex flex={1}>
             <Spacer />
-            <Button height={'100%'} width={"80px"} rightIcon={visibleInfos ? <MdInfoOutline color='gray.300' /> : <MdInfo color='gray.300' />} colorScheme='teal' variant='solid'>
+            <Button onClick={() => setVisibleInfos((value) => !value)} height={'100%'} width={"80px"} rightIcon={visibleInfos ? <MdInfoOutline color='gray.300' /> : <MdInfo color='gray.300' />} colorScheme='teal' variant={visibleInfos ? 'solid' : 'outline'}>
               infos
             </Button>
           </Flex>
-          <Flex>
-            <Button height={'100%'} width={"80px"} rightIcon={visibleInfos ? <MdInfoOutline color='gray.300' /> : <MdInfo color='gray.300' />} colorScheme='teal' variant='solid'>
-              producer
-            </Button>
-            <Button height={'100%'} width={"80px"} rightIcon={visibleInfos ? <MdInfoOutline color='gray.300' /> : <MdInfo color='gray.300' />} colorScheme='teal' variant='solid'>
-              exchange
-            </Button>
-            <Button height={'100%'} width={"80px"} rightIcon={visibleInfos ? <MdInfoOutline color='gray.300' /> : <MdInfo color='gray.300' />} colorScheme='teal' variant='solid'>
-              queue
-            </Button>
-            <Button height={'100%'} width={"80px"} rightIcon={visibleInfos ? <MdInfoOutline color='gray.300' /> : <MdInfo color='gray.300' />} colorScheme='teal' variant='solid'>
-              consumer
-            </Button>
+          <Flex flex={1}>
+            <Flex flex={1}>
+              <Button height={'100%'} rightIcon={visibleInfos ? <MdInfoOutline color='gray.300' /> : <MdInfo color='gray.300' />} colorScheme='teal' variant='solid'>
+                producer
+              </Button>
+            </Flex>
+            <Flex flex={1}>
+              <Button height={'100%'} rightIcon={visibleInfos ? <MdInfoOutline color='gray.300' /> : <MdInfo color='gray.300' />} colorScheme='teal' variant='solid'>
+                exchange
+              </Button>
+            </Flex>
+            <Flex flex={1}>
+              <Button height={'100%'} rightIcon={visibleInfos ? <MdInfoOutline color='gray.300' /> : <MdInfo color='gray.300' />} colorScheme='teal' variant='solid'>
+                queue
+              </Button>
+            </Flex>
+            <Flex flex={1}>
+              <Button height={'100%'} rightIcon={visibleInfos ? <MdInfoOutline color='gray.300' /> : <MdInfo color='gray.300' />} colorScheme='teal' variant='solid'>
+                consumer
+              </Button>
+            </Flex>
           </Flex>
         </GridItem>
         <GridItem pl='2' bg='green.300' area={'main'} display={"flex"} height={'100vh'}>
@@ -219,20 +285,20 @@ export default function App(
             />
             <pointLight position={[-10, -10, -10]} />
             {producerPositions.length > 0 && producerPositions.map((position, index) => {
-              return <ProducerThree key={position.id} infoComponent={position.info} position={position.position} />
+              return <ProducerThree key={position.id} infoComponent={position.info} position={position.position} visibleInfo={visibleInfos} />
             })}
             {exchangePositions.length > 0 && exchangePositions.map(position => {
-              return <ExchangeThree key={position.id} infoComponent={position.info} position={position.position} />
+              return <ExchangeThree key={position.id} infoComponent={position.info} position={position.position} visibleInfo={visibleInfos} />
             })}
             {queuePositions.length > 0 && queuePositions.map(position => {
-              return <QueueThree key={position.id} infoComponent={position.info} position={position.position} />
+              return <QueueThree key={position.id} infoComponent={position.info} position={position.position} visibleInfo={visibleInfos} />
             })}
             {consumerPositions.length > 0 && consumerPositions.map(position => {
-              return <ConsumerThree key={position.id} infoComponent={position.info} position={position.position} />
+              return <ConsumerThree key={position.id} infoComponent={position.info} position={position.position} visibleInfo={visibleInfos} />
             })}
-            {linesPositions.length > 0 && linesPositions.map((line) => <LineThree key={line.id} {...line} />)}
-            {producerLinesPosition.length > 0 && producerLinesPosition.map((line) => <LineThree key={line.id} {...line} />)}
-            {messagesPosition.length > 0 && messagesPosition.map(message => <SphereThree key={message.id} {...message} />)}
+            {linesPositions.length > 0 && linesPositions.map((line) => <LineThree key={line.id} {...line} visibleInfo={visibleInfos} />)}
+            {producerLinesPosition.length > 0 && producerLinesPosition.map((line) => <LineThree key={line.id} {...line} visibleInfo={visibleInfos} />)}
+            {messagesPosition.length > 0 && messagesPosition.map(message => <SphereThree key={message.id} {...message} visibleInfo={visibleInfos} />)}
             <OrbitControls />
           </Canvas>
         </GridItem>

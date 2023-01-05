@@ -73,42 +73,48 @@ export const getProducers = async (): Promise<Producer[]> => {
       "routeKey": "",
       "time": 1,
       "payload": "{\n\"fila\":\"direct\"\n}",
-      "id": "284d1cbc-b9c7-4d9e-baf9-1827dc1daae4"
+      "id": "284d1cbc-b9c7-4d9e-baf9-1827dc1daae4",
+      "color": "#7a2d16"
     },
     {
       "exchange": "amq.fanout",
       "routeKey": "",
       "time": 1,
       "payload": "{\n\"fila\":\"fanout\"\n}",
-      "id": "e570d66e-5526-4013-9354-65a764e35d1d"
+      "id": "e570d66e-5526-4013-9354-65a764e35d1d",
+      "color": "#59b651"
     },
     {
       "exchange": "amq.headers",
       "routeKey": "",
       "time": 1,
       "payload": "{\n\"fila\":\"headers\"\n}",
-      "id": "cf73c63e-8eb1-4d4e-b077-b07333ba810d"
+      "id": "cf73c63e-8eb1-4d4e-b077-b07333ba810d",
+      "color": "#1cc0c2"
     },
     {
       "exchange": "amq.match",
       "routeKey": "",
       "time": 1,
       "payload": "{\n\"fila\":\"match\"\n}",
-      "id": "b1ebcb65-d165-4a39-b975-299f0706a146"
+      "id": "b1ebcb65-d165-4a39-b975-299f0706a146",
+      "color": "#6e1e9d"
     },
     {
       "exchange": "amq.topic",
       "routeKey": "route-key-topic",
       "time": 1,
       "payload": "{\n\"fila\":\"route-key-topic\"\n}",
-      "id": "063bb02b-dc70-443e-b9c7-76ab50d05404"
+      "id": "063bb02b-dc70-443e-b9c7-76ab50d05404",
+      "color": "#1ad1a6"
     },
     {
       "exchange": "exchange-queue-1-topic",
       "routeKey": "many.queue-3",
       "time": 1,
       "payload": "{\n\"fila\":\"route-key-topic\"\n}",
-      "id": "063bb02b-dc70-443e-b9c7-76ab50d05674"
+      "id": "063bb02b-dc70-443e-b9c7-76ab50d05674",
+      "color": "#361c34"
     }]
   }))
   return connectionsFormat

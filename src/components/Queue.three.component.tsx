@@ -9,6 +9,7 @@ import { ComponentInfo } from '@contexts/position/builder/info.builder'
 
 type Props = JSX.IntrinsicElements['mesh'] & {
   infoComponent: ComponentInfo
+  visibleInfo: boolean;
 }
 
 export function QueueThree(props: Props): JSX.Element {
@@ -30,7 +31,7 @@ export function QueueThree(props: Props): JSX.Element {
       onPointerOut={(event) => hover(false)}>
       <boxGeometry args={QUEUE_DIMENSION} />
       <meshStandardMaterial color={hovered ? 'red' : 'green'} />
-      {(clicked || hovered) && <Html distanceFactor={10}>
+      {(clicked || hovered || props.visibleInfo) && <Html distanceFactor={10}>
         <div className="content">
           {props.infoComponent.componentType} <br />
           {props.infoComponent.name} <br />

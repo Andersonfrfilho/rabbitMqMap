@@ -6,9 +6,11 @@ import { Html } from '@react-three/drei'
 import { MessageWithPositions } from '@services/rabbitmq/interfaces/producer.interface'
 import { INITIAL_POSITION } from '@constants/position.constant'
 
-type Props = MessageWithPositions & JSX.IntrinsicElements['mesh']
+type Props = MessageWithPositions & JSX.IntrinsicElements['mesh'] & {
+  visibleInfo: boolean;
+}
 
-export function SphereThree({ positions, id, ...props }: Props): JSX.Element {
+export function SphereThree({ positions, id, color, ...props }: Props): JSX.Element {
   // This reference gives us direct access to the THREE.Mesh object
   const sphereRef = useRef<THREE.Mesh>(null!)
   // Hold state for hovered and clicked events
@@ -56,7 +58,7 @@ export function SphereThree({ positions, id, ...props }: Props): JSX.Element {
     }
   })
 
-
+  console.log(color)
 
   return (
     <mesh
@@ -70,8 +72,8 @@ export function SphereThree({ positions, id, ...props }: Props): JSX.Element {
       position={INITIAL_POSITION}
     >
       <sphereGeometry args={[1, 32]} />
-      <meshStandardMaterial color={hovered ? 'hotpink' : 'orange'} />
-      {(hovered || visible) && <Html distanceFactor={10}>
+      <meshStandardMaterial color={color} />
+      {(clicked || hovered || props.visibleInfo) && <Html distanceFactor={10}>
         <div className="content">
           {'info.father'} <br />
           {'info.children'} <br />
