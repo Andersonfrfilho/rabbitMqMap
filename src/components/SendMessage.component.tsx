@@ -5,7 +5,7 @@ import { SERIES } from "@constants/time.constant";
 import { Exchange, Type } from "@services/rabbitmq/interfaces/exchange.interface";
 import { Producer } from "@services/rabbitmq/interfaces/producer.interface";
 import { useForm } from "react-hook-form";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidV4 } from 'uuid';
 import { UNDEFINED } from "@constants/commons.constant";
 import { EXCHANGES_WITH_ROUTE_KEY } from "@constants/exchanges.constant";
 
@@ -57,7 +57,7 @@ export function SendMessage(data: Props): JSX.Element {
       if (producer.id === formData.producerId) {
         return {
           ...producer,
-          messages: [...producer.messages, { ...formData, time: Number(formData.time), producerId: undefined, id: uuidv4() }]
+          messages: [...producer.messages, { ...formData, time: Number(formData.time), producerId: undefined, id: uuidV4() }]
         }
       }
       return producer

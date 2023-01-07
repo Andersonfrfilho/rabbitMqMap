@@ -1,30 +1,17 @@
-import { NUMBER_SEPARATION_LINKS, Position } from "@constants/position.constant";
+import { INITIAL_POSITION, Position } from "@constants/position.constant";
 import { COMPONENTS, COMPONENT_TYPE, DEPTH, LINK_TYPE } from "@enums/positions.enum";
 import { Consumer } from "@services/rabbitmq/interfaces/consumer.interface";
 import { Exchange, Type } from "@services/rabbitmq/interfaces/exchange.interface";
 import { Producer, ProducerBetweenExchange, ProducerWithMessageWithPosition } from "@services/rabbitmq/interfaces/producer.interface";
 import { BindingWithPosition, ConsumerWithPosition, Queue, QueueBindingConsumers } from "@services/rabbitmq/interfaces/queue.interface";
 import { ComponentInfo, infoConsumer, infoExchange, infoProducer, infoQueue } from "../builder/info.builder";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidV4 } from 'uuid';
+import { NUMBER_POINTS } from "@constants/components.constant";
 
 export interface Dimension {
   width: number;
   height: number;
   depth: number;
-}
-
-export interface Component<T> {
-  quantity: number;
-  depth: DEPTH;
-  dimension: Dimension;
-  items: T[];
-}
-
-export interface Components {
-  producer: Component<Producer>;
-  exchange: Component<Exchange>;
-  queue: Component<Queue>;
-  consumer: Component<Consumer>;
 }
 
 export type ComponentWithPosition = {
@@ -37,89 +24,6 @@ export interface PositionComponents {
   exchange: ComponentWithPosition[];
   queue: ComponentWithPosition[];
   consumer: ComponentWithPosition[];
-}
-
-function findColumn(length: number, indexFound: number) {
-  return new Array(length).findIndex((element, index) => (index * length) > indexFound && indexFound < ((index + 1) * length - 1))
-}
-
-const builder = {
-  producer: infoProducer,
-  exchange: infoExchange,
-  queue: infoQueue,
-  consumer: infoConsumer
-}
-
-
-
-export const createPositionsComponents = (components: Components): PositionComponents => {
-  const numberComponents = Object.keys(components).length
-  let indexComponent = 0;
-  const componentsPosition: PositionComponents = {
-    producer: [],
-    exchange: [],
-    queue: [],
-    consumer: []
-  }
-
-  while (numberComponents - 1 >= indexComponent) {
-    const componentName: keyof PositionComponents = COMPONENTS[indexComponent] as keyof PositionComponents
-    let indexPosition = 0;
-    const positions: ComponentWithPosition[] = [];
-    const positionsIndexes: number[] = [];
-    const positionsQuantityIndexes = components[componentName].quantity ** 2
-    const componentsItems = components[componentName].items as Producer[] & Exchange[] & Queue[] & Consumer[];
-    let componentItemsIndex = 0;
-    while (positionsIndexes.length <= components[componentName].quantity - 1 && indexPosition <= positionsQuantityIndexes - 1) {
-
-      const alreadyPosition = positionsIndexes.some(indexCurrentPosition => indexCurrentPosition === indexPosition)
-      if (alreadyPosition) {
-        indexPosition += 1
-        continue;
-      }
-      const row = Math.floor(indexPosition / components[componentName].quantity)
-      const anteriorPositionHasElement = positionsIndexes.some(indexCurrentPosition => indexPosition > 0 && indexPosition - 1 === indexCurrentPosition)
-      if (anteriorPositionHasElement) {
-        indexPosition += 1
-        continue;
-      }
-      const posteriorPositionHasElement = positionsIndexes.some(indexCurrentPosition => indexPosition < positionsQuantityIndexes - 1 && (indexPosition + 1) === indexCurrentPosition)
-
-      if (posteriorPositionHasElement) {
-        indexPosition += 1
-        continue;
-      }
-
-      const upPositionHasElement = positionsIndexes.some(indexCurrentPosition => {
-        return indexPosition >= components[componentName].quantity && (indexPosition - components[componentName].quantity) === indexCurrentPosition
-      })
-
-      if (upPositionHasElement) {
-        indexPosition += 1
-        continue;
-      }
-
-      const downPositionHasElement = positionsIndexes.some(indexCurrentPosition => row < components[componentName].quantity - 1 && (indexPosition + components[componentName].quantity) === indexCurrentPosition)
-      if (downPositionHasElement) {
-        indexPosition += 1
-        continue;
-      }
-
-      positionsIndexes.push(indexPosition)
-
-      const x = row + indexPosition;
-      const y = findColumn(components[componentName].quantity, indexPosition)
-      const z = DEPTH[componentName.toUpperCase() as any] as unknown as number
-      const position: Position = [x, y, z]
-
-      const info = builder[componentName](componentsItems[componentItemsIndex])
-
-      positions.push({ position, info, id: uuidv4() })
-    }
-    indexComponent += 1;
-    componentsPosition[componentName] = positions
-  }
-  return componentsPosition
 }
 
 export interface DefineComponentsDTO {
@@ -156,7 +60,7 @@ export const definePositionsComponents = ({ queues, positions, producers, exchan
     const position = exchangePositions[0]
     exchangePositions.shift()
     return {
-      id: uuidv4(),
+      id: uuidV4(),
       ...exchange,
       position
     }
@@ -164,14 +68,14 @@ export const definePositionsComponents = ({ queues, positions, producers, exchan
 
   const queuesWithPositions: QueueWithPosition[] = queues.map((queue, index) => ({
     ...queue,
-    id: uuidv4(),
+    id: uuidV4(),
     position: positions.queue[index],
     bindings: queue.bindings.map(binding => {
       const position = exchangeWithPosition.find(exchange => exchange.name === binding.source)?.position || {} as ComponentWithPosition
       return {
         ...binding,
         position,
-        id: uuidv4()
+        id: uuidV4()
       }
     }),
     consumers_register: queue.consumers_register.map(consumer => {
@@ -180,7 +84,7 @@ export const definePositionsComponents = ({ queues, positions, producers, exchan
       return {
         ...consumer,
         position,
-        id: uuidv4()
+        id: uuidV4()
       }
     })
   }))
@@ -225,7 +129,7 @@ export function definePositionLinksBetweenComponents(queues: DefineLinksBetweenC
         initialPosition, lastPosition: { name: binding.source, destination: binding.destination, destinationType: binding.destination_type, routingKey: binding.routing_key, position: binding.position.position },
       })
       const points = makePointsByNumberSeparation({
-        initialPosition, lastPosition: { name: binding.source, destination: binding.destination, destinationType: binding.destination_type, routingKey: binding.routing_key, position: binding.position.position }, numberPoints: NUMBER_SEPARATION_LINKS
+        initialPosition, lastPosition: { name: binding.source, destination: binding.destination, destinationType: binding.destination_type, routingKey: binding.routing_key, position: binding.position.position }, numberPoints: NUMBER_POINTS
       })
       return {
         ...binding,
@@ -239,7 +143,7 @@ export function definePositionLinksBetweenComponents(queues: DefineLinksBetweenC
         initialPosition, lastPosition: { name: consumer.channel_details.name, position: consumer.position.position },
       })
       const points = makePointsByNumberSeparation({
-        initialPosition, lastPosition: { name: consumer.channel_details.name, position: consumer.position.position }, numberPoints: NUMBER_SEPARATION_LINKS
+        initialPosition, lastPosition: { name: consumer.channel_details.name, position: consumer.position.position }, numberPoints: NUMBER_POINTS
       })
       return {
         ...consumer,
@@ -276,24 +180,24 @@ export interface MakeVerticalCoordinateSeparationResult {
 }
 
 function makeVerticesCoordinatesSeparation({ initialPosition, lastPosition }: MakeVerticesCoordinatesSeparation): MakeVerticalCoordinateSeparationResult {
-  return { id: uuidv4(), positions: [initialPosition.position, lastPosition.position], info: { children: lastPosition.name, father: initialPosition.name } }
+  return { id: uuidV4(), positions: [initialPosition.position, lastPosition.position], info: { children: lastPosition.name, father: initialPosition.name } }
 }
 interface MakePointsByNumberSeparationResult {
   id: string; position: Position; info?: InfoParent;
 }
 function makePointsByNumberSeparation({ initialPosition, lastPosition, numberPoints }: MakePointsByNumberSeparation): MakePointsByNumberSeparationResult[] {
-  const arrayLinks = new Array(numberPoints).fill([0, 0, 0])
+  const arrayLinks = new Array(numberPoints).fill(INITIAL_POSITION)
   const [x1, y1, z1] = initialPosition.position as number[]
   const [x2, y2, z2] = lastPosition.position as number[]
   const xDiference = x2 - x1;
   const yDiference = y2 - y1;
   const zDiference = z2 - z1;
   const points: MakePointsByNumberSeparationResult[] = arrayLinks.map((element, indexLink): MakePointsByNumberSeparationResult => {
-    const x = x1 + (xDiference * indexLink / NUMBER_SEPARATION_LINKS)
-    const y = y1 + (yDiference * indexLink / NUMBER_SEPARATION_LINKS)
-    const z = z1 + (zDiference * indexLink / NUMBER_SEPARATION_LINKS)
+    const x = x1 + (xDiference * indexLink / NUMBER_POINTS)
+    const y = y1 + (yDiference * indexLink / NUMBER_POINTS)
+    const z = z1 + (zDiference * indexLink / NUMBER_POINTS)
     return {
-      id: uuidv4(), position: [x, y, z], info: {
+      id: uuidV4(), position: [x, y, z], info: {
         father: initialPosition.name,
         children: lastPosition.name
       }
@@ -365,14 +269,14 @@ export function defineMessagePositions({ exchanges, producers, queues }: DefineM
         lines.push(producerLinesBetweenExchange)
       }
 
-      const producerBetweenExchangePoints = !!producerPosition && !!exchange && createMessagePointsBetweenTwoComponents({ initialPosition: producerPosition, lastPosition: exchange.position, numberPoints: NUMBER_SEPARATION_LINKS, payload: message.messagePayload }) || []
+      const producerBetweenExchangePoints = !!producerPosition && !!exchange && createMessagePointsBetweenTwoComponents({ initialPosition: producerPosition, lastPosition: exchange.position, numberPoints: NUMBER_POINTS, payload: message.messagePayload }) || []
 
       const queuesFilter = !!exchange && queues.filter(queue => !!exchange.bindings && exchange.bindings.some(binding => binding.destination === queue.name)) || []
 
       const queuesPositionsFilter = queuesFilter.map(queue => queue.position) || []
-      const exchangeBetweenQueuesPoints = !!exchange && queuesPositionsFilter.map(queuePosition => createMessagePointsBetweenTwoComponents({ initialPosition: exchange.position, lastPosition: queuePosition, numberPoints: NUMBER_SEPARATION_LINKS, payload: message.messagePayload })).reduce((accumulator: MessagePoint[], currentValue: MessagePoint[]): MessagePoint[] => [...accumulator, ...currentValue], []) || []
+      const exchangeBetweenQueuesPoints = !!exchange && queuesPositionsFilter.map(queuePosition => createMessagePointsBetweenTwoComponents({ initialPosition: exchange.position, lastPosition: queuePosition, numberPoints: NUMBER_POINTS, payload: message.messagePayload })).reduce((accumulator: MessagePoint[], currentValue: MessagePoint[]): MessagePoint[] => [...accumulator, ...currentValue], []) || []
 
-      const queuesToConsumersPoints = queuesFilter.reduce((accumulator: MessagePoint[], queue: QueueWithPosition): MessagePoint[] => [...accumulator, ...queue.consumers_register.reduce((accumulatorConsumerParam: MessagePoint[], consumer: ConsumerWithPosition): MessagePoint[] => [...accumulatorConsumerParam, ...createMessagePointsBetweenTwoComponents({ initialPosition: queue.position, lastPosition: consumer.position, numberPoints: NUMBER_SEPARATION_LINKS, payload: message.messagePayload })], [])], []) || []
+      const queuesToConsumersPoints = queuesFilter.reduce((accumulator: MessagePoint[], queue: QueueWithPosition): MessagePoint[] => [...accumulator, ...queue.consumers_register.reduce((accumulatorConsumerParam: MessagePoint[], consumer: ConsumerWithPosition): MessagePoint[] => [...accumulatorConsumerParam, ...createMessagePointsBetweenTwoComponents({ initialPosition: queue.position, lastPosition: consumer.position, numberPoints: NUMBER_POINTS, payload: message.messagePayload })], [])], []) || []
 
       return {
         ...message,
@@ -412,19 +316,19 @@ export interface MessagePoint {
   info: MessageInfo
 }
 
-function createMessagePointsBetweenTwoComponents({ initialPosition, lastPosition, payload, numberPoints = NUMBER_SEPARATION_LINKS }: GetPointsBetweenTwoCoordinatesParams): MessagePoint[] {
-  const arrayLinks = new Array(numberPoints).fill([0, 0, 0])
+function createMessagePointsBetweenTwoComponents({ initialPosition, lastPosition, payload, numberPoints = NUMBER_POINTS }: GetPointsBetweenTwoCoordinatesParams): MessagePoint[] {
+  const arrayLinks = new Array(numberPoints).fill(INITIAL_POSITION)
   const [x1, y1, z1] = initialPosition.position as number[]
   const [x2, y2, z2] = lastPosition.position as number[]
   const xDiference = x2 - x1;
   const yDiference = y2 - y1;
   const zDiference = z2 - z1;
   const points = arrayLinks.map((element, indexLink): MessagePoint => {
-    const x = x1 + (xDiference * indexLink / NUMBER_SEPARATION_LINKS)
-    const y = y1 + (yDiference * indexLink / NUMBER_SEPARATION_LINKS)
-    const z = z1 + (zDiference * indexLink / NUMBER_SEPARATION_LINKS)
+    const x = x1 + (xDiference * indexLink / NUMBER_POINTS)
+    const y = y1 + (yDiference * indexLink / NUMBER_POINTS)
+    const z = z1 + (zDiference * indexLink / NUMBER_POINTS)
     return {
-      id: uuidv4(),
+      id: uuidV4(),
       position: [x, y, z],
       info: {
         source: initialPosition.info.name,

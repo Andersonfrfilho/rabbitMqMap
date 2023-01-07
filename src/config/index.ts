@@ -1,14 +1,14 @@
 import { dev } from '@config/dev'
-interface config {
-  rabbitMq: {
-    baseUrl: string;
-    username: string;
-    password: string;
-    vhost: string;
-  }
-}
+import { stg } from '@config/stg'
+import { prod } from '@config/prod'
+import { ENVIRONMENTS } from '@constants/environment.constant';
+
 const configs = {
-  DEV: dev
+  DEV: dev,
+  STG: stg,
+  PROD: prod
 }
 
-export const config: typeof dev = configs[process.env.ENVIRONMENT] as config
+const environment = process.env.ENVIRONMENT || ENVIRONMENTS.DEV
+
+export const config: typeof dev & typeof stg & typeof prod = configs[environment]

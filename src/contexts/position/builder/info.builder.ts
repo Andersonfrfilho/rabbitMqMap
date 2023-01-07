@@ -10,12 +10,11 @@ export interface ComponentInfo {
   componentType: COMPONENT_INFO_TYPE;
 }
 
-//Exchange[] | Producer[] | Consumer[] | Queue[]
 export function infoExchange({ name, type }: Exchange): ComponentInfo {
   return {
     name,
     type,
-    componentType: COMPONENT_INFO_TYPE.exchange,
+    componentType: COMPONENT_INFO_TYPE.EXCHANGE,
   }
 }
 
@@ -23,7 +22,7 @@ export function infoProducer({ name, type }: Producer): ComponentInfo {
   return {
     name,
     type,
-    componentType: COMPONENT_INFO_TYPE.producer,
+    componentType: COMPONENT_INFO_TYPE.PRODUCER,
   }
 }
 
@@ -31,7 +30,7 @@ export function infoConsumer({ channel_details: { name, user } }: Consumer): Com
   return {
     name,
     type: user,
-    componentType: COMPONENT_INFO_TYPE.consumer,
+    componentType: COMPONENT_INFO_TYPE.CONSUMER,
   }
 }
 
@@ -39,6 +38,13 @@ export function infoQueue({ name, type }: Queue): ComponentInfo {
   return {
     name,
     type,
-    componentType: COMPONENT_INFO_TYPE.consumer,
+    componentType: COMPONENT_INFO_TYPE.QUEUE,
   }
+}
+
+export const builder = {
+  producer: infoProducer,
+  exchange: infoExchange,
+  queue: infoQueue,
+  consumer: infoConsumer
 }

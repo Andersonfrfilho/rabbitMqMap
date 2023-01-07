@@ -4,6 +4,7 @@ import { useRef, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Html } from '@react-three/drei'
 import { MessageWithPositions } from '@services/rabbitmq/interfaces/producer.interface'
+import { INITIAL_POSITION } from '@constants/position.constant'
 
 type Props = MessageWithPositions & JSX.IntrinsicElements['mesh']
 
@@ -69,7 +70,7 @@ export function SphereThree({ positions, id, ...props }: Props): JSX.Element {
       onPointerOver={(event) => setVisible(true)}
       onPointerOut={(event) => setVisible(false)}
       visible={true}
-      position={[0, 0, 0]}
+      position={INITIAL_POSITION}
     >
       <sphereGeometry args={[1, 32]} />
       <meshStandardMaterial color={hovered ? 'hotpink' : 'orange'} />

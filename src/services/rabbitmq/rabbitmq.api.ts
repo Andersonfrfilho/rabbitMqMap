@@ -8,7 +8,7 @@ import { Connection as ConnectionRabbit } from './interfaces/connection.interfac
 import { Overview } from './interfaces/overview.interfaces'
 import axios from 'axios'
 import { Trace } from './interfaces/trace.interface'
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidV4 } from 'uuid';
 import { exchange } from 'src/schemas/exchange.schema'
 
 export const rabbitMqApiService = function () {
@@ -68,7 +68,7 @@ export const getProducers = async (): Promise<Producer[]> => {
   const consumerNames = consumers.map(consumer => consumer.channel_details.user)
   const connectionsFilterDiffConsumers = connections.filter(connection => !consumerNames.includes(connection.user))
   const connectionsFormat = connectionsFilterDiffConsumers.map(({ host, name, node, client_properties, user, user_who_performed_action, vhost, port, type }) => ({
-    id: uuidv4(), host, name, node, user, client_properties, user_who_performed_action, vhost, port, type, messages: [{
+    id: uuidV4(), host, name, node, user, client_properties, user_who_performed_action, vhost, port, type, messages: [{
       "exchange": "amq.direct",
       "routeKey": "",
       "time": 1,
