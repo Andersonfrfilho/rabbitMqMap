@@ -1,15 +1,12 @@
 import { config } from '@config/index'
 import { Exchange } from '@services/rabbitmq/interfaces/exchange.interface'
-import { Queue, } from '@services/rabbitmq/interfaces/queue.interface'
+import { Queue, QueueBindingConsumerRegister, } from '@services/rabbitmq/interfaces/queue.interface'
 import { Binding } from './interfaces/binding.interface'
 import { Consumer } from './interfaces/consumer.interface'
 import { Connection, Producer } from './interfaces/producer.interface'
-import { Connection as ConnectionRabbit } from './interfaces/connection.interface'
 import { Overview } from './interfaces/overview.interfaces'
 import axios from 'axios'
-import { Trace } from './interfaces/trace.interface'
 import { v4 as uuidV4 } from 'uuid';
-import { exchange } from 'src/schemas/exchange.schema'
 
 export const rabbitMqApiService = function () {
   return axios.create({
@@ -21,7 +18,7 @@ export const rabbitMqApiService = function () {
   })
 }();
 
-export const getQueues = async (): Promise<Queue[]> => {
+export const getQueues = async (): Promise<QueueBindingConsumerRegister[]> => {
   const { data: queues } = await rabbitMqApiService.get<Queue[]>(`/api/queues/${encodeURIComponent(config.rabbitMq.vhost)}`);
 
   const queuesFormat = queues.map(({ arguments: argumentsQueue, name, node, vhost, type }) => ({ arguments: argumentsQueue, name, node, vhost, type }))
@@ -125,17 +122,3 @@ export const getOverview = async (): Promise<Overview> => {
   return data
 }
 
-export interface CreateTraceDTO {
-  user: string;
-  password: string;
-  cluster: string;
-  nameConnection: string;
-  nameConnectionTrace: string;
-  pattern?: string;
-  node: string;
-}
-
-export const getTraces = async () => {
-  const { data: trace } = await rabbitMqApiService.get<Trace[]>(`/api/traces/${encodeURIComponent(config.rabbitMq.vhost)}`)
-  return trace
-}

@@ -30,7 +30,7 @@ export const createPositionsComponents = (components: CreatePositionsComponentsP
     const positionsIndexes: number[] = [];
     const positionsQuantityIndexes = components[componentName].quantity ** 2
     const componentsItems = components[componentName].items as Producer[] & Exchange[] & Queue[] & Consumer[];
-    let componentItemsIndex = 0;
+
     while (positionsIndexes.length <= components[componentName].quantity - 1 && indexPosition <= positionsQuantityIndexes - 1) {
       const component = components[componentName];
 
@@ -41,6 +41,7 @@ export const createPositionsComponents = (components: CreatePositionsComponentsP
         continue;
       }
 
+      //const row = Math.floor(indexPosition / component.quantity) linear positions
       const row = Math.floor(indexPosition / component.quantity)
 
       const alreadyExistElementInFourDirections = verifyFourDirectionHasElement({ component, indexPosition, positionsIndexes, positionsQuantityIndexes, row })

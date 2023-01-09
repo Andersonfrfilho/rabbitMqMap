@@ -11,11 +11,12 @@ interface CreateCoordinateParams {
   positionsIndexes: number[];
   indexPosition: number;
   positionsQuantityIndexes: number;
-  row: number;
+  row?: number;
 }
 
-export function createCoordinate({ row, indexPosition, component }: CreateCoordinateParams): Position {
-  const x = row + indexPosition;
+export function createCoordinate({ indexPosition, component }: CreateCoordinateParams): Position {
+  // const x = row + indexPosition; linear positions
+  const x = indexPosition % component.quantity;
   const y = findColumn(component.quantity, indexPosition)
   const z = component.depth
   const position: Position = [x, y, z]

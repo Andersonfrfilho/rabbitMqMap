@@ -8,7 +8,6 @@ import { Box, Button, Flex, Grid, GridItem, IconButton, Image, Input, InputGroup
 import { QueueThree } from '@components/Queue.three.component';
 import { usePosition } from '@contexts/position/Position.context';
 import { Producer, ProducerPositionLinesMessagePosition } from '@services/rabbitmq/interfaces/producer.interface';
-import { Consumer } from '@services/rabbitmq/interfaces/consumer.interface';
 import { LineThree } from '@components/Line.three.component';
 import { SphereThree } from '@components/Sphere.three.component';
 import { ProducerThree } from '@components/Producer.three.component';
@@ -21,7 +20,7 @@ import CodeEditor from '@components/CodeEditor.component';
 import { createComponents } from '@contexts/position/utils/createComponents';
 import { Components } from '@contexts/interfaces/components.interface';
 import { COMPONENT_TYPE } from '@enums/components.enum';
-import { QueueBindingConsumerRegister } from '@services/rabbitmq/interfaces/queue.interface';
+import { Queue, QueueBindingConsumerRegister } from '@services/rabbitmq/interfaces/queue.interface';
 import { Position } from '@contexts/interfaces/positions.interface';
 import { MessagePositions } from '@services/rabbitmq/interfaces/message.interface';
 import { Point } from '@contexts/interfaces/lines.interface';
@@ -34,11 +33,6 @@ interface AppGetStaticInterface {
   exchanges: Exchange[]
   producers: Producer[]
 }
-
-function getConsumers(queues: QueueBindingConsumerRegister[]): Consumer[] {
-  return queues.map(queue => queue.consumers_register).reduce((accumulator, consumerCurrent) => [...accumulator, ...consumerCurrent], [])
-}
-
 
 export default function App(
   { queues, exchanges, producers }: InferGetStaticPropsType<typeof getStaticProps>
@@ -55,8 +49,16 @@ export default function App(
   const [messagesPosition, setMessagesPosition] = useState<MessagePositions[]>([])
   const [producerLinesPosition, setProducerLinesPosition] = useState<Point[]>([] as Point[])
   const [visibleInfos, setVisibleInfos] = useState<boolean>(false)
-  const { getQueuePositionsCoordinates, createPositionsComponents, definePositionsComponents, defineLinesQueuesBetweenExchangesConsumers, getLinksLinesCoordinates, defineMessagePositions } = usePosition()
-  const { register, handleSubmit, setValue, resetField, watch, formState: { errors } } = useForm({
+
+  const {
+    getQueuePositionsCoordinates,
+    createPositionsComponents,
+    definePositionsComponents,
+    defineLinesQueuesBetweenExchangesConsumers,
+    getLinksLinesCoordinates,
+    defineMessagePositions,
+    getConsumers } = usePosition()
+  const { register, handleSubmit, formState: { errors } } = useForm({
     defaultValues: {
       baseUrl: '',
       username: '',
@@ -64,6 +66,7 @@ export default function App(
       vHost: '',
     }
   });
+
   useEffect(() => {
     if (queues.length > 0) {
       const consumers = getConsumers(queues)
@@ -75,6 +78,7 @@ export default function App(
       const positions = createPositionsComponents(components)
 
       const { queues: componentPositions, exchanges: exchangesWithPosition, producers: producersWithPosition } = definePositionsComponents({ positions, queues, producers, exchanges })
+
       setQueuePositions(componentPositions.map(queue => queue.position))
       setExchangePositions(exchangesWithPosition.map(exchange => exchange.position))
       setConsumerPositions(getQueuePositionsCoordinates({ components: componentPositions, componentType: COMPONENT_TYPE.CONSUMER }))
@@ -105,24 +109,26 @@ export default function App(
     if (!queueIsEqual || !exchangeIsEqual || !producerIsEqual) {
       const components: Components = createComponents({ queues: queuesEditor, exchanges: exchangesEditor, producers: producersEditor, consumers })
       const positions = createPositionsComponents(components)
-      const { queues: componentPositions, exchanges: exchangesWithPosition, producers: producerPositions } = definePositionsComponents({ positions, queues: queuesEditor, producers: producersEditor, exchanges: exchangesEditor })
+
+      const { queues: componentPositions, exchanges: exchangesPosition, producers: producerPositions } = definePositionsComponents({ positions, queues: queuesEditor, producers: producersEditor, exchanges: exchangesEditor })
 
       setQueuePositions(componentPositions.map(queue => queue.position))
-      setExchangePositions(exchangesWithPosition.map(exchange => exchange.position))
-      setConsumerPositions(getPositionsCoordinates({ components: componentPositions, componentType: COMPONENT_TYPE.CONSUMER }))
+      setExchangePositions(exchangesPosition.map(exchange => exchange.position))
+      setConsumerPositions(getQueuePositionsCoordinates({ components: componentPositions, componentType: COMPONENT_TYPE.CONSUMER }))
       setProducerPositions(producerPositions.map(produceParam => produceParam.position))
 
-      const componentsLinks = defineLinesQueuesBetweenExchangesConsumers(componentPositions)
-      const linesConsumers = getLinksLines({ componentLinks: componentsLinks, componentType: COMPONENT_TYPE.CONSUMER })
-      const linesBindings = getLinksLines({ componentLinks: componentsLinks, componentType: COMPONENT_TYPE.BINDING })
+      const componentsLines = defineLinesQueuesBetweenExchangesConsumers(componentPositions)
+      const linesConsumers = getLinksLinesCoordinates({ componentLinks: componentsLines, componentType: COMPONENT_TYPE.CONSUMER })
+      const linesBindings = getLinksLinesCoordinates({ componentLinks: componentsLines, componentType: COMPONENT_TYPE.BINDING })
       setLinesPositions([...linesConsumers, ...linesBindings])
 
-      const producerMessagesPositions = defineMessagePositions({ queues: componentPositions, exchanges: exchangesWithPosition, producers: producerPositions })
+      const producerMessagesPositions = defineMessagePositions({ queues: componentPositions, exchanges: exchangesPosition, producers: producerPositions })
 
-      const linesProducerPosition = producerMessagesPositions.reduce((accumulator: MakeVerticalCoordinateSeparationResult[], producer: ProducerWithMessageWithPosition): MakeVerticalCoordinateSeparationResult[] => [...accumulator, ...producer.lines], [])
+      const linesProducerPosition = producerMessagesPositions.reduce((accumulator: Point[], producer: ProducerPositionLinesMessagePosition): Point[] => [...accumulator, ...producer.lines], [])
       setProducerLinesPosition(linesProducerPosition)
 
-      const messagesPositions = producerMessagesPositions.reduce((accumulator: MessageWithPositions[], current: ProducerWithMessageWithPosition) => [...accumulator, ...current.messages], [])
+      const messagesPositions = producerMessagesPositions.reduce((accumulator: MessagePositions[], current: ProducerPositionLinesMessagePosition) => [...accumulator, ...current.messages], [])
+
       setMessagesPosition(messagesPositions)
     }
   }, [queuesEditor, exchangesEditor, producersEditor])
@@ -134,7 +140,6 @@ export default function App(
   }
 
   const changeAxiosConfig = async ({ baseUrl, username, password }: ChangeAxiosConfig) => {
-    console.log(baseUrl, username, password)
     rabbitMqApiService.defaults.baseURL = baseUrl;
     rabbitMqApiService.defaults.auth = {
       username,
