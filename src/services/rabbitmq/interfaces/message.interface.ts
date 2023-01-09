@@ -1,3 +1,17 @@
+import { Position as TypePosition } from "@constants/position.constant";
+
+interface Info {
+  source: string;
+  destination: string;
+  payload: any;
+}
+
+export interface MessagePoint {
+  id: string;
+  position: TypePosition;
+  info: Info
+}
+
 interface Message {
   exchange: string;
   routeKey?: string;
@@ -19,17 +33,15 @@ export interface PropertyMessage {
 //   producerBetweenExchange: ProducerBetweenExchange
 // }
 
-// interface WithLines {
-//   lines: MakeVerticalCoordinateSeparationResult[]
-// }
-// export interface MessageWithPositions extends Message {
-//   positions: {
-//     producerBetweenExchange: MessagePoint[];
-//     exchangeBetweenQueue: MessagePoint[];
-//     queueBetweenConsumer: MessagePoint[];
-//   }
-// }
 
-// interface WithMessageWithPositions {
-//   messages: MessageWithPositions[]
-// }
+export interface MessagePositions extends Message {
+  positions: {
+    producerBetweenExchange: MessagePoint[];
+    exchangeBetweenQueue: MessagePoint[];
+    queueBetweenConsumer: MessagePoint[];
+  }
+}
+
+export interface PropertyMessagePositions {
+  messages: MessagePositions[]
+}

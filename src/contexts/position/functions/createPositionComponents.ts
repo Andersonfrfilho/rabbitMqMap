@@ -54,7 +54,7 @@ export const createPositionsComponents = (components: CreatePositionsComponentsP
 
       const position = createCoordinate({ component, indexPosition, positionsIndexes, positionsQuantityIndexes, row })
 
-      const componentItem = componentsItems[componentItemsIndex]
+      const componentItem = componentsItems[positions.length]
 
       builderInfoComponent({ componentName, data: componentItem })
 

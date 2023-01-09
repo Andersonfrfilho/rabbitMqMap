@@ -13,3 +13,6 @@ export interface PropertyLines {
   lines: Point
 }
 
+export interface PropertyManyLines {
+  lines: Point[]
+}

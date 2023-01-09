@@ -1,5 +1,6 @@
 import { PropertyPosition } from "@contexts/interfaces/positions.interface";
-import { PropertyMessage } from "./message.interface";
+import { MessagePositions, PropertyMessage, PropertyMessagePositions } from "./message.interface";
+import { PropertyLines, PropertyManyLines } from "@contexts/interfaces/lines.interface";
 
 interface Capabilities {
   authentication_failure_close: boolean;
@@ -38,5 +39,6 @@ export interface Producer extends Connection, PropertyId, PropertyMessage { }
 
 export interface ProducerPosition extends Connection, PropertyId, PropertyMessage, PropertyPosition { }
 
-// export interface ProducerLines extends WithLines { }
-// export interface ProducerWithMessageWithPosition extends Connection, WithId, WithMessageWithPositions, WithLines { }
+export interface ProducerPositionLinesMessages extends Connection, PropertyId, PropertyMessage, PropertyPosition { }
+
+export interface ProducerPositionLinesMessagePosition extends Connection, PropertyId, PropertyManyLines, PropertyMessagePositions { }

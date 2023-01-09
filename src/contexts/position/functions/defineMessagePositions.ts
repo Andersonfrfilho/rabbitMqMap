@@ -1,11 +1,22 @@
-import { ProducerWithMessageWithPosition } from "@services/rabbitmq/interfaces/producer.interface"
-import { DefineMessagePositionsParams } from "./definePositionsComponents"
+import { ExchangePosition } from "@services/rabbitmq/interfaces/exchange.interface"
 import { createPointsBetweenTwoCoordinates } from "../utils/createPointsBetweenTwoCoordinates"
-import { createTwoPointsCoordinateToLine } from "../utils/createTwoPointsDrawLine"
+import { createTwoPointsCoordinateToLine } from "../utils/createTwoPointsCoordinateToLine"
+import { Point } from "@contexts/interfaces/lines.interface"
+import { ProducerPosition, ProducerPositionLinesMessagePosition } from "@services/rabbitmq/interfaces/producer.interface"
+import { QueueBindingConsumerRegisterPosition } from "@services/rabbitmq/interfaces/queue.interface"
+import { NUMBER_POINTS } from "@constants/components.constant"
+import { ConsumerPosition } from "@services/rabbitmq/interfaces/consumer.interface"
+import { MessagePoint } from "@services/rabbitmq/interfaces/message.interface"
 
-export function defineMessagePositions({ exchanges, producers, queues }: DefineMessagePositionsParams): ProducerWithMessageWithPosition[] {
+export interface CreateMessagePositionsParams {
+  exchanges: ExchangePosition[]
+  producers: ProducerPosition[]
+  queues: QueueBindingConsumerRegisterPosition[]
+}
+
+export function defineMessagePositions({ exchanges, producers, queues }: CreateMessagePositionsParams): ProducerPositionLinesMessagePosition[] {
   const producersMessageWithPosition = producers.map(producer => {
-    const lines = [] as MakeVerticalCoordinateSeparationResult[]
+    const lines = [] as Point[]
 
     const messages = producer.messages.map(message => {
       const producerPosition = producer.position
@@ -36,7 +47,7 @@ export function defineMessagePositions({ exchanges, producers, queues }: DefineM
       const queuesPositionsFilter = queuesFilter.map(queue => queue.position) || []
       const exchangeBetweenQueuesPoints = !!exchange && queuesPositionsFilter.map(queuePosition => createPointsBetweenTwoCoordinates({ initialPosition: exchange.position, lastPosition: queuePosition, numberPoints: NUMBER_POINTS, payload: message.messagePayload })).reduce((accumulator: MessagePoint[], currentValue: MessagePoint[]): MessagePoint[] => [...accumulator, ...currentValue], []) || []
 
-      const queuesToConsumersPoints = queuesFilter.reduce((accumulator: MessagePoint[], queue: QueueWithPosition): MessagePoint[] => [...accumulator, ...queue.consumers_register.reduce((accumulatorConsumerParam: MessagePoint[], consumer: ConsumerWithPosition): MessagePoint[] => [...accumulatorConsumerParam, ...createMessagePointsBetweenTwoComponents({ initialPosition: queue.position, lastPosition: consumer.position, numberPoints: NUMBER_POINTS, payload: message.messagePayload })], [])], []) || []
+      const queuesToConsumersPoints = queuesFilter.reduce((accumulator: MessagePoint[], queue: QueueBindingConsumerRegisterPosition): MessagePoint[] => [...accumulator, ...queue.consumers_register.reduce((accumulatorConsumerParam: MessagePoint[], consumer: ConsumerPosition): MessagePoint[] => [...accumulatorConsumerParam, ...createPointsBetweenTwoCoordinates({ initialPosition: queue.position, lastPosition: consumer.position, numberPoints: NUMBER_POINTS, payload: message.messagePayload })], [])], []) || []
 
       return {
         ...message,

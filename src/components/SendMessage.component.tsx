@@ -1,7 +1,6 @@
 import { AddIcon, MinusIcon } from "@chakra-ui/icons";
 import { GiStopSign } from 'react-icons/gi'
 import { Accordion, AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, Box, Button, ButtonGroup, IconButton, Input, Select, Text, Textarea } from "@chakra-ui/react"
-import { SERIES } from "@constants/time.constant";
 import { Exchange, Type } from "@services/rabbitmq/interfaces/exchange.interface";
 import { Producer } from "@services/rabbitmq/interfaces/producer.interface";
 import { useForm } from "react-hook-form";
@@ -136,7 +135,6 @@ export function SendMessage(data: Props): JSX.Element {
                     {!!errors.time && <Text fontSize='xs' color={'red.600'}>{errors.time.message}</Text>}
                     <Select {...register("time", { required: "Selecione um período!" })} isInvalid={!!errors.time}>
                       <option value={UNDEFINED} disabled>Tempo</option>
-                      {SERIES.map(serie => <option key={serie.name} value={serie.value}>{serie.name} segundos</option>)}
                     </Select>
                   </Box>
                   <Box flex='1' backgroundColor={'red.400'}>

@@ -7,7 +7,7 @@ import { OrbitControls } from '@react-three/drei'
 import { Box, Button, Grid, GridItem, IconButton, Image, Input, InputGroup, InputLeftElement, InputRightAddon, Text } from '@chakra-ui/react';
 import { QueueThree } from '@components/Queue.three.component';
 import { usePosition } from '@contexts/position/Position.context';
-import { Producer } from '@services/rabbitmq/interfaces/producer.interface';
+import { Producer, ProducerPositionLinesMessagePosition } from '@services/rabbitmq/interfaces/producer.interface';
 import { Consumer } from '@services/rabbitmq/interfaces/consumer.interface';
 import { LineThree } from '@components/Line.three.component';
 import { SphereThree } from '@components/Sphere.three.component';
@@ -23,6 +23,9 @@ import { Components, ComponentsPositions } from '@contexts/interfaces/components
 import { COMPONENT_TYPE } from '@enums/components.enum';
 import { QueueBindingConsumerRegister } from '@services/rabbitmq/interfaces/queue.interface';
 import { Position } from '@contexts/interfaces/positions.interface';
+import { MessagePositions } from '@services/rabbitmq/interfaces/message.interface';
+import { Point } from '@contexts/interfaces/lines.interface';
+import { SendMessage } from '@components/SendMessage.component';
 
 interface AppGetStaticInterface {
   queues: QueueBindingConsumerRegister[]
@@ -43,15 +46,14 @@ export default function App(
   const [exchangePositions, setExchangePositions] = useState([] as Position[])
   const [consumerPositions, setConsumerPositions] = useState([] as Position[])
   const [producerPositions, setProducerPositions] = useState([] as Position[])
-  const [linesPositions, setLinesPositions] = useState([] as GetLinksLinesResult[])
-  const [componentWithPosition, setComponentsWithPosition] = useState({} as DefineComponentsResult)
-  const [queuesEditor, setQueuesEditor] = useState<QueueBindingConsumers[]>([])
+  const [linesPositions, setLinesPositions] = useState([] as Point[])
+  const [queuesEditor, setQueuesEditor] = useState<QueueBindingConsumerRegister[]>([])
   const [exchangesEditor, setExchangesEditor] = useState<Exchange[]>([])
   const [producersEditor, setProducersEditor] = useState<Producer[]>([])
-  const [messagesPosition, setMessagesPosition] = useState<MessageWithPositions[]>([])
-  const [producerLinesPosition, setProducerLinesPosition] = useState<MakeVerticalCoordinateSeparationResult[]>([] as MakeVerticalCoordinateSeparationResult[])
+  const [messagesPosition, setMessagesPosition] = useState<MessagePositions[]>([])
+  const [producerLinesPosition, setProducerLinesPosition] = useState<Point[]>([] as Point[])
 
-  const { getQueuePositionsCoordinates, createPositionsComponents, definePositionsComponents, defineLinesQueuesBetweenExchangesConsumers, getLinksLinesCoordinates } = usePosition()
+  const { getQueuePositionsCoordinates, createPositionsComponents, definePositionsComponents, defineLinesQueuesBetweenExchangesConsumers, getLinksLinesCoordinates, defineMessagePositions } = usePosition()
 
   useEffect(() => {
     if (queues.length > 0) {
@@ -63,7 +65,6 @@ export default function App(
       const positions = createPositionsComponents(components)
 
       const { queues: componentPositions, exchanges: exchangesWithPosition, producers: producersWithPosition } = definePositionsComponents({ positions, queues, producers, exchanges })
-      setComponentsWithPosition({ queues: componentPositions, exchanges: exchangesWithPosition, producers: producersWithPosition })
       setQueuePositions(componentPositions.map(queue => queue.position))
       setExchangePositions(exchangesWithPosition.map(exchange => exchange.position))
       setConsumerPositions(getQueuePositionsCoordinates({ components: componentPositions, componentType: COMPONENT_TYPE.CONSUMER }))
@@ -76,10 +77,10 @@ export default function App(
 
       const producerMessagesPositions = defineMessagePositions({ queues: componentPositions, exchanges: exchangesWithPosition, producers: producersWithPosition })
 
-      const linesProducerPosition = producerMessagesPositions.reduce((accumulator: MakeVerticalCoordinateSeparationResult[], producer: ProducerWithMessageWithPosition): MakeVerticalCoordinateSeparationResult[] => [...accumulator, ...producer.lines], [])
+      const linesProducerPosition = producerMessagesPositions.reduce((accumulator: Point[], producer: ProducerPositionLinesMessagePosition): Point[] => [...accumulator, ...producer.lines], [])
       setProducerLinesPosition(linesProducerPosition)
 
-      const messagesPositions = producerMessagesPositions.reduce((accumulator: MessageWithPositions[], current: ProducerWithMessageWithPosition) => [...accumulator, ...current.messages], [])
+      const messagesPositions = producerMessagesPositions.reduce((accumulator: MessagePositions[], current: ProducerPositionLinesMessagePosition) => [...accumulator, ...current.messages], [])
       setMessagesPosition(messagesPositions)
       console.log(messagesPositions)
     }

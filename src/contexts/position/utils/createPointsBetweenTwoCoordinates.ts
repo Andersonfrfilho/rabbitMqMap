@@ -1,16 +1,14 @@
 import { NUMBER_POINTS } from "@constants/components.constant";
 import { INITIAL_POSITION } from "@constants/position.constant";
+import { Position } from "@contexts/interfaces/positions.interface";
+import { MessagePoint } from "@services/rabbitmq/interfaces/message.interface";
+import { v4 as uuidV4 } from 'uuid';
 
-interface MessageInfo {
-  source: string;
-  destination: string;
+interface GetPointsBetweenTwoCoordinatesParams {
+  initialPosition: Position;
+  lastPosition: Position;
   payload: any;
-}
-
-export interface MessagePoint {
-  id: string;
-  position: number[];
-  info: MessageInfo
+  numberPoints?: number
 }
 
 export function createPointsBetweenTwoCoordinates({ initialPosition, lastPosition, payload, numberPoints = NUMBER_POINTS }: GetPointsBetweenTwoCoordinatesParams): MessagePoint[] {

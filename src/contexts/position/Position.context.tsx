@@ -8,6 +8,8 @@ import { QueueBindingConsumerRegisterPosition, QueueBindingConsumerRegisterPosit
 import { defineLinesQueuesBetweenExchangesConsumers } from './functions/defineLinesQueuesBetweenExchangesConsumers';
 import { GetLinksLinesCoordinatesDTO, getLinksLinesCoordinates } from './utils/getLinksLinesCoordinates';
 import { Point } from '@contexts/interfaces/lines.interface';
+import { CreateMessagePositionsParams, defineMessagePositions } from './functions/defineMessagePositions';
+import { ProducerPositionLinesMessagePosition } from '@services/rabbitmq/interfaces/producer.interface';
 
 type PositionStateProps = {
   children: React.ReactNode;
@@ -18,21 +20,15 @@ interface UsePosition {
   createPositionsComponents(components: CreatePositionsComponentsParams): ComponentsPositions
   definePositionsComponents(data: DefinePositionsComponentsParams): DefinePositionsComponentsResult
   defineLinesQueuesBetweenExchangesConsumers(queues: QueueBindingConsumerRegisterPosition[]): QueueBindingConsumerRegisterPositionLines[]
-  getLinksLinesCoordinates({ componentLinks, componentType }: GetLinksLinesCoordinatesDTO): Point[]
-  // createPositionsComponents: (data: Components) => PositionComponents
-  // definePositionsComponents: (data: DefineComponentsDTO) => DefineComponentsResult
-  // defineLinesQueuesBetweenExchangesConsumers(queues: DefineLinksBetweenComponentsDTO[]): DefineLinksBetweenComponentsResult[]
-  // getPositionsCoordinates: (data: GetPositionsDTO) => ComponentWithPosition[]
-  // getLinksPoints: (data: GetLinksPointsDTO) => GetPointsLinesResult[]
-  // getLinksLines: (data: GetLinksLinesDTO) => GetLinksLinesResult[]
-  // defineMessagePositions: (data: DefineMessagePositionsParams) => ProducerWithMessageWithPosition[]
+  getLinksLinesCoordinates(data: GetLinksLinesCoordinatesDTO): Point[]
+  defineMessagePositions(data: CreateMessagePositionsParams): ProducerPositionLinesMessagePosition[]
 }
 
 export const PositionContext = React.createContext<UsePosition>({} as UsePosition);
 
 export function PositionState({ children }: PositionStateProps) {
   return (
-    <PositionContext.Provider value={{ getQueuePositionsCoordinates, createPositionsComponents, definePositionsComponents, defineLinesQueuesBetweenExchangesConsumers, getLinksLinesCoordinates }}>{children}</PositionContext.Provider>
+    <PositionContext.Provider value={{ getQueuePositionsCoordinates, createPositionsComponents, definePositionsComponents, defineLinesQueuesBetweenExchangesConsumers, getLinksLinesCoordinates, defineMessagePositions }}>{children}</PositionContext.Provider>
   )
 }
 
