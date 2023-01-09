@@ -1,3 +1,6 @@
+import { PropertyLines } from "@contexts/interfaces/lines.interface";
+import { PropertyPosition } from "@contexts/interfaces/positions.interface";
+
 enum activity_status {
   up = "up"
 }
@@ -26,3 +29,11 @@ export interface Consumer {
   prefetch_count: number;
   queue: QUEUE;
 }
+
+export interface PropertyConsumersRegister {
+  consumers_register: Consumer[]
+}
+
+export interface ConsumerPosition extends Consumer, PropertyPosition { }
+
+export interface ConsumerPositionLines extends ConsumerPosition, PropertyLines { }

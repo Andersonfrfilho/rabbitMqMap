@@ -1,6 +1,6 @@
 import { config } from '@config/index'
 import { Exchange } from '@services/rabbitmq/interfaces/exchange.interface'
-import { Queue, QueueBindingConsumers, } from '@services/rabbitmq/interfaces/queue.interface'
+import { Queue, } from '@services/rabbitmq/interfaces/queue.interface'
 import { Binding } from './interfaces/binding.interface'
 import { Consumer } from './interfaces/consumer.interface'
 import { Connection, Producer } from './interfaces/producer.interface'
@@ -21,7 +21,7 @@ export const rabbitMqApiService = function () {
   })
 }();
 
-export const getQueues = async (): Promise<QueueBindingConsumers[]> => {
+export const getQueues = async (): Promise<Queue[]> => {
   const { data: queues } = await rabbitMqApiService.get<Queue[]>(`/api/queues/${encodeURIComponent(config.rabbitMq.vhost)}`);
 
   const queuesFormat = queues.map(({ arguments: argumentsQueue, name, node, vhost, type }) => ({ arguments: argumentsQueue, name, node, vhost, type }))

@@ -1,4 +1,5 @@
-import { GetLinksLinesResult, MakeVerticalCoordinateSeparationResult, MessagePoint } from "@contexts/position/functions/definePositionsComponents";
+import { PropertyPosition } from "@contexts/interfaces/positions.interface";
+import { PropertyMessage } from "./message.interface";
 
 interface Capabilities {
   authentication_failure_close: boolean;
@@ -28,46 +29,14 @@ export interface Connection {
   type: string;
   port: number;
 }
-interface WithId {
+
+interface PropertyId {
   id: string;
 }
 
-interface Message {
-  exchange: string;
-  routeKey?: string;
-  messagePayload?: string;
-  time: number;
-  id: string;
-}
+export interface Producer extends Connection, PropertyId, PropertyMessage { }
 
-interface WithMessage {
-  messages: Message[]
-}
+export interface ProducerPosition extends Connection, PropertyId, PropertyMessage, PropertyPosition { }
 
-export interface ProducerBetweenExchange {
-  initial: GetLinksLinesResult;
-  last: GetLinksLinesResult;
-}
-
-export interface Lines {
-  producerBetweenExchange: ProducerBetweenExchange
-}
-
-interface WithLines {
-  lines: MakeVerticalCoordinateSeparationResult[]
-}
-export interface MessageWithPositions extends Message {
-  positions: {
-    producerBetweenExchange: MessagePoint[];
-    exchangeBetweenQueue: MessagePoint[];
-    queueBetweenConsumer: MessagePoint[];
-  }
-}
-
-interface WithMessageWithPositions {
-  messages: MessageWithPositions[]
-}
-export interface Producer extends Connection, WithId, WithMessage { }
-
-export interface ProducerLines extends WithLines { }
-export interface ProducerWithMessageWithPosition extends Connection, WithId, WithMessageWithPositions, WithLines { }
+// export interface ProducerLines extends WithLines { }
+// export interface ProducerWithMessageWithPosition extends Connection, WithId, WithMessageWithPositions, WithLines { }

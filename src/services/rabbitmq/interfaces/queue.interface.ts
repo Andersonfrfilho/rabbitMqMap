@@ -1,6 +1,6 @@
-import { Binding } from "./binding.interface"
-import { Consumer } from "./consumer.interface"
-import { ComponentWithPosition } from "@contexts/position/functions/definePositionsComponents"
+import { PropertyPosition } from "@contexts/interfaces/positions.interface"
+import { Binding, BindingPosition, BindingPositionLines, PropertyBindings } from "./binding.interface"
+import { ConsumerPosition, ConsumerPositionLines, PropertyConsumersRegister } from "./consumer.interface"
 
 type ArgumentsQueue = {
   "x-queue-type": string
@@ -14,17 +14,14 @@ export type Queue = {
   vhost: string
 }
 
-export interface BindingWithPosition extends Binding {
-  position: ComponentWithPosition;
-  id: string;
+export interface QueueBindingConsumerRegister extends Queue, PropertyBindings, PropertyConsumersRegister { }
+
+export interface QueueBindingConsumerRegisterPosition extends QueueBindingConsumerRegister, PropertyPosition {
+  bindings: BindingPosition[];
+  consumers_register: ConsumerPosition[];
 }
 
-export interface ConsumerWithPosition extends Consumer {
-  position: ComponentWithPosition;
-  id: string;
-}
-
-export interface QueueBindingConsumers extends Queue {
-  bindings: Binding[];
-  consumers_register: Consumer[];
+export interface QueueBindingConsumerRegisterPositionLines extends QueueBindingConsumerRegisterPosition {
+  bindings: BindingPositionLines[];
+  consumers_register: ConsumerPositionLines[];
 }

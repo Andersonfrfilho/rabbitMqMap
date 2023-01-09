@@ -1,3 +1,4 @@
+import { PropertyPosition } from "@contexts/interfaces/positions.interface"
 import { Binding } from "./binding.interface"
 
 export enum Type {
@@ -17,3 +18,5 @@ export type Exchange = {
   vhost: string,
   bindings?: Binding[]
 }
+
+export interface ExchangePosition extends Exchange, PropertyPosition { }

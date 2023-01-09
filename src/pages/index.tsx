@@ -1,18 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { Exchange } from "@services/rabbitmq/interfaces/exchange.interface";
-import { getExchanges, getProducers, getQueues, getTraces } from '@services/rabbitmq/rabbitmq.api'
+import { getExchanges, getProducers, getQueues } from '@services/rabbitmq/rabbitmq.api'
 import { GetStaticProps, GetStaticPropsResult, InferGetStaticPropsType } from "next";
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
-import { Box, Button, Grid, GridItem, IconButton, Image, Input, InputGroup, InputLeftElement, InputRightAddon, Select, Text, Textarea } from '@chakra-ui/react';
+import { Box, Button, Grid, GridItem, IconButton, Image, Input, InputGroup, InputLeftElement, InputRightAddon, Text } from '@chakra-ui/react';
 import { QueueThree } from '@components/Queue.three.component';
-import { Queue, QueueBindingConsumers } from '@services/rabbitmq/interfaces/queue.interface';
 import { usePosition } from '@contexts/position/Position.context';
-import { componentDTO } from '@dtos/component.dto';
-import { ComponentWithPosition, Components, DefineComponentsResult, GetLinksLinesResult, GetPointsLinesResult, MakeVerticalCoordinateSeparationResult } from '@contexts/position/functions/definePositionsComponents';
-import { COMPONENT_TYPE, DEPTH } from '@enums/positions.enum';
-import { CONSUMER_DIMENSION, EXCHANGE_DIMENSION, PRODUCER_DIMENSION, QUEUE_DIMENSION } from '@constants/components.constant';
-import { Lines, MessageWithPositions, Producer, ProducerBetweenExchange, ProducerWithMessageWithPosition } from '@services/rabbitmq/interfaces/producer.interface';
+import { Producer } from '@services/rabbitmq/interfaces/producer.interface';
 import { Consumer } from '@services/rabbitmq/interfaces/consumer.interface';
 import { LineThree } from '@components/Line.three.component';
 import { SphereThree } from '@components/Sphere.three.component';
@@ -23,52 +18,32 @@ import { MdHttp } from 'react-icons/md'
 import { AiOutlineLock, AiOutlineUser } from 'react-icons/ai'
 import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa';
 import CodeEditor from '@components/CodeEditor.component';
-import { MinusIcon, AddIcon, ArrowForwardIcon } from '@chakra-ui/icons'
-import { SendMessage } from '@components/SendMessage.component';
+import { createComponents } from '@contexts/position/utils/createComponents';
+import { Components, ComponentsPositions } from '@contexts/interfaces/components.interface';
+import { COMPONENT_TYPE } from '@enums/components.enum';
+import { QueueBindingConsumerRegister } from '@services/rabbitmq/interfaces/queue.interface';
+import { Position } from '@contexts/interfaces/positions.interface';
+
 interface AppGetStaticInterface {
-  queues: QueueBindingConsumers[]
+  queues: QueueBindingConsumerRegister[]
   exchanges: Exchange[]
   producers: Producer[]
 }
 
-const codePreview = {
-  name: "preview",
-  keyCommand: "preview",
-  value: "preview",
-  icon: <Button />
-};
-
-function getConsumers(queues: QueueBindingConsumers[]): Consumer[] {
+function getConsumers(queues: QueueBindingConsumerRegister[]): Consumer[] {
   return queues.map(queue => queue.consumers_register).reduce((accumulator, consumerCurrent) => [...accumulator, ...consumerCurrent], [])
 }
-interface CreateComponent {
-  consumers: Consumer[]
-  exchanges: Exchange[]
-  queues: Queue[]
-  producers: Producer[]
-}
 
-function createComponents({ consumers, exchanges, queues, producers }: CreateComponent): Components {
-  return {
-    consumer: componentDTO<Consumer>({
-      items: consumers, depth: DEPTH.CONSUMER, dimensions: CONSUMER_DIMENSION
-    }),
-    exchange: componentDTO<Exchange>({ items: exchanges, depth: DEPTH.EXCHANGE, dimensions: EXCHANGE_DIMENSION }),
-    queue: componentDTO<Queue>({ items: queues, depth: DEPTH.QUEUE, dimensions: QUEUE_DIMENSION }),
-    producer: componentDTO<Producer>({ items: producers, depth: DEPTH.PRODUCER, dimensions: PRODUCER_DIMENSION }),
-  }
-}
 
 export default function App(
   { queues, exchanges, producers }: InferGetStaticPropsType<typeof getStaticProps>
 ) {
   const [visibleFieldPassword, setVisibleFieldPassword] = useState<boolean>(false)
-  const [queuePositions, setQueuePositions] = useState([] as ComponentWithPosition[])
-  const [exchangePositions, setExchangePositions] = useState([] as ComponentWithPosition[])
-  const [consumerPositions, setConsumerPositions] = useState([] as ComponentWithPosition[])
-  const [producerPositions, setProducerPositions] = useState([] as ComponentWithPosition[])
+  const [queuePositions, setQueuePositions] = useState([] as Position[])
+  const [exchangePositions, setExchangePositions] = useState([] as Position[])
+  const [consumerPositions, setConsumerPositions] = useState([] as Position[])
+  const [producerPositions, setProducerPositions] = useState([] as Position[])
   const [linesPositions, setLinesPositions] = useState([] as GetLinksLinesResult[])
-  const [pointsPositions, setPointsPositions] = useState([] as GetPointsLinesResult[])
   const [componentWithPosition, setComponentsWithPosition] = useState({} as DefineComponentsResult)
   const [queuesEditor, setQueuesEditor] = useState<QueueBindingConsumers[]>([])
   const [exchangesEditor, setExchangesEditor] = useState<Exchange[]>([])
@@ -76,7 +51,7 @@ export default function App(
   const [messagesPosition, setMessagesPosition] = useState<MessageWithPositions[]>([])
   const [producerLinesPosition, setProducerLinesPosition] = useState<MakeVerticalCoordinateSeparationResult[]>([] as MakeVerticalCoordinateSeparationResult[])
 
-  const { createPositionsComponents, definePositionsComponents, definePositionLinksBetweenComponents, getLinksLines, getLinksPoints, getPositions, defineMessagePositions } = usePosition()
+  const { getQueuePositionsCoordinates, createPositionsComponents, definePositionsComponents, defineLinesQueuesBetweenExchangesConsumers, getLinksLinesCoordinates } = usePosition()
 
   useEffect(() => {
     if (queues.length > 0) {
@@ -91,16 +66,13 @@ export default function App(
       setComponentsWithPosition({ queues: componentPositions, exchanges: exchangesWithPosition, producers: producersWithPosition })
       setQueuePositions(componentPositions.map(queue => queue.position))
       setExchangePositions(exchangesWithPosition.map(exchange => exchange.position))
-      setConsumerPositions(getPositions({ components: componentPositions, componentType: COMPONENT_TYPE.CONSUMER }))
+      setConsumerPositions(getQueuePositionsCoordinates({ components: componentPositions, componentType: COMPONENT_TYPE.CONSUMER }))
       setProducerPositions(producersWithPosition.map(produceParam => produceParam.position))
 
-      const componentsLinks = definePositionLinksBetweenComponents(componentPositions)
-      const linesConsumers = getLinksLines({ componentLinks: componentsLinks, componentType: COMPONENT_TYPE.CONSUMER })
-      const linesBindings = getLinksLines({ componentLinks: componentsLinks, componentType: COMPONENT_TYPE.BINDING })
+      const componentsLines = defineLinesQueuesBetweenExchangesConsumers(componentPositions)
+      const linesConsumers = getLinksLinesCoordinates({ componentLinks: componentsLines, componentType: COMPONENT_TYPE.CONSUMER })
+      const linesBindings = getLinksLinesCoordinates({ componentLinks: componentsLines, componentType: COMPONENT_TYPE.BINDING })
       setLinesPositions([...linesConsumers, ...linesBindings])
-      const pointsConsumer = getLinksPoints({ componentLinks: componentsLinks, componentType: COMPONENT_TYPE.CONSUMER })
-      const pointsBindings = getLinksPoints({ componentLinks: componentsLinks, componentType: COMPONENT_TYPE.BINDING })
-      setPointsPositions([...pointsConsumer, ...pointsBindings])
 
       const producerMessagesPositions = defineMessagePositions({ queues: componentPositions, exchanges: exchangesWithPosition, producers: producersWithPosition })
 
@@ -128,16 +100,13 @@ export default function App(
       })
       setQueuePositions(componentPositions.map(queue => queue.position))
       setExchangePositions(exchangesWithPosition.map(exchange => exchange.position))
-      setConsumerPositions(getPositions({ components: componentPositions, componentType: COMPONENT_TYPE.CONSUMER }))
+      setConsumerPositions(getPositionsCoordinates({ components: componentPositions, componentType: COMPONENT_TYPE.CONSUMER }))
       setProducerPositions(producerPositions.map(produceParam => produceParam.position))
 
-      const componentsLinks = definePositionLinksBetweenComponents(componentPositions)
+      const componentsLinks = defineLinesQueuesBetweenExchangesConsumers(componentPositions)
       const linesConsumers = getLinksLines({ componentLinks: componentsLinks, componentType: COMPONENT_TYPE.CONSUMER })
       const linesBindings = getLinksLines({ componentLinks: componentsLinks, componentType: COMPONENT_TYPE.BINDING })
       setLinesPositions([...linesConsumers, ...linesBindings])
-      const pointsConsumer = getLinksPoints({ componentLinks: componentsLinks, componentType: COMPONENT_TYPE.CONSUMER })
-      const pointsBindings = getLinksPoints({ componentLinks: componentsLinks, componentType: COMPONENT_TYPE.BINDING })
-      setPointsPositions([...pointsConsumer, ...pointsBindings])
 
       const producerMessagesPositions = defineMessagePositions({ queues: componentPositions, exchanges: exchangesWithPosition, producers: producerPositions })
 

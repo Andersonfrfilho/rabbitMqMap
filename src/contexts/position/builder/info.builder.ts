@@ -1,14 +1,9 @@
-import { COMPONENT_INFO_TYPE } from "@enums/positions.enum";
+import { COMPONENT_INFO_TYPE } from "@enums/components.enum";
 import { Consumer } from "@services/rabbitmq/interfaces/consumer.interface";
 import { Exchange } from "@services/rabbitmq/interfaces/exchange.interface";
 import { Producer } from "@services/rabbitmq/interfaces/producer.interface";
 import { Queue } from "@services/rabbitmq/interfaces/queue.interface";
-
-export interface ComponentInfo {
-  name: string;
-  type?: string;
-  componentType: COMPONENT_INFO_TYPE;
-}
+import { PositionComponents } from "../functions/definePositionsComponents";
 
 export function infoExchange({ name, type }: Exchange): ComponentInfo {
   return {
@@ -42,9 +37,23 @@ export function infoQueue({ name, type }: Queue): ComponentInfo {
   }
 }
 
-export const builder = {
-  producer: infoProducer,
-  exchange: infoExchange,
-  queue: infoQueue,
-  consumer: infoConsumer
+interface BuilderComponentParams {
+  componentName: keyof PositionComponents;
+  data: Queue & Producer & Exchange & Consumer;
 }
+
+export function builderInfoComponent({ componentName, data }: BuilderComponentParams): ComponentInfo {
+  switch (componentName) {
+    case COMPONENT_INFO_TYPE.PRODUCER:
+      return infoProducer(data)
+    case COMPONENT_INFO_TYPE.EXCHANGE:
+      return infoExchange(data)
+    case COMPONENT_INFO_TYPE.QUEUE:
+      return infoQueue(data)
+    case COMPONENT_INFO_TYPE.CONSUMER:
+      return infoConsumer(data)
+    default:
+      throw new Error("not component info type define found!");
+  }
+}
+
