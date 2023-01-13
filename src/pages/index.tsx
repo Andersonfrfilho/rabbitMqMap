@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { ResizeObserver } from '@juggle/resize-observer';
 import { Exchange } from "@services/rabbitmq/interfaces/exchange.interface";
 import { getExchanges, getProducers, getQueues, rabbitMqApiService } from '@services/rabbitmq/rabbitmq.api'
 import { GetStaticProps, GetStaticPropsResult, InferGetStaticPropsType } from "next";
@@ -283,7 +284,7 @@ export default function App(
           </Flex>
         </GridItem>
         <GridItem pl='2' bg='green.300' area={'main'} display={"flex"} height={'100vh'}>
-          <Canvas style={{ width: '100%', height: '100%' }}>
+          <Canvas resize={{ polyfill: ResizeObserver }} style={{ width: '100%', height: '100%' }}>
             <ambientLight intensity={0.5} />
             <spotLight position={[10, 10, 10]}
               penumbra={1}

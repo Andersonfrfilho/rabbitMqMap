@@ -2,20 +2,20 @@ import React, { useEffect, useState } from 'react'
 import CodeMirror from '@uiw/react-codemirror';
 import { json } from '@codemirror/lang-json';
 import { dracula } from '@uiw/codemirror-theme-dracula';
-import { validator } from 'src/schemas/validator';
-import { editor } from 'src/schemas/editor.schema';
-import { Queue, QueueBindingConsumers } from '@services/rabbitmq/interfaces/queue.interface';
+import { validator } from '@schemas/validator';
+import { editor } from '@schemas/editor.schema';
 import { Exchange } from '@services/rabbitmq/interfaces/exchange.interface';
 import { Producer } from '@services/rabbitmq/interfaces/producer.interface';
+import { QueueBindingConsumerRegister } from '@services/rabbitmq/interfaces/queue.interface';
 
 interface SetComponents {
-  setQueuesEditor: React.Dispatch<React.SetStateAction<QueueBindingConsumers[]>>
+  setQueuesEditor: React.Dispatch<React.SetStateAction<QueueBindingConsumerRegister[]>>
   setExchangesEditor: React.Dispatch<React.SetStateAction<Exchange[]>>;
   setProducersEditor: React.Dispatch<React.SetStateAction<Producer[]>>;
 }
 
 interface JsonCode {
-  queues: QueueBindingConsumers[];
+  queues: QueueBindingConsumerRegister[];
   exchanges: Exchange[];
   producers: Producer[];
 }

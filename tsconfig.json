@@ -27,6 +27,7 @@
       "@utils/*": ["src/utils/*"],
       "@enums/*": ["src/enums/*"],
       "@dtos/*": ["src/dtos/*"],
+      "@schemas/*": ["src/schemas/*"]
 
     }
   },
