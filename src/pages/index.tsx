@@ -70,32 +70,27 @@ export default function App(
 
   useEffect(() => {
 
-    console.log("########")
-    console.log(queues)
     if (queues.length > 0) {
       const consumers = getConsumers(queues)
-      console.log("################")
-      console.log(consumers)
       setQueuesEditor(queues);
       setExchangesEditor(exchanges);
       setProducersEditor(producers);
       const components: Components = createComponents({ queues, exchanges, producers, consumers })
-
       const positions = createPositionsComponents(components)
 
-      const { queues: componentPositions, exchanges: exchangesWithPosition, producers: producersWithPosition } = definePositionsComponents({ positions, queues, producers, exchanges })
+      const { queues: componentsPositions, exchanges: exchangesWithPosition, producers: producersWithPosition } = definePositionsComponents({ positions, queues, producers, exchanges })
 
-      setQueuePositions(componentPositions.map(queue => queue.position))
+      setQueuePositions(componentsPositions.map(queue => queue.position))
       setExchangePositions(exchangesWithPosition.map(exchange => exchange.position))
-      setConsumerPositions(getQueuePositionsCoordinates({ components: componentPositions, componentType: COMPONENT_TYPE.CONSUMER }))
+      setConsumerPositions(getQueuePositionsCoordinates({ components: componentsPositions, componentType: COMPONENT_TYPE.CONSUMER }))
       setProducerPositions(producersWithPosition.map(produceParam => produceParam.position))
 
-      const componentsLines = defineLinesQueuesBetweenExchangesConsumers(componentPositions)
+      const componentsLines = defineLinesQueuesBetweenExchangesConsumers(componentsPositions)
       const linesConsumers = getLinksLinesCoordinates({ componentLinks: componentsLines, componentType: COMPONENT_TYPE.CONSUMER })
       const linesBindings = getLinksLinesCoordinates({ componentLinks: componentsLines, componentType: COMPONENT_TYPE.BINDING })
       setLinesPositions([...linesConsumers, ...linesBindings])
 
-      const producerMessagesPositions = defineMessagePositions({ queues: componentPositions, exchanges: exchangesWithPosition, producers: producersWithPosition })
+      const producerMessagesPositions = defineMessagePositions({ queues: componentsPositions, exchanges: exchangesWithPosition, producers: producersWithPosition })
 
       const linesProducerPosition = producerMessagesPositions.reduce((accumulator: Point[], producer: ProducerPositionLinesMessagePosition): Point[] => [...accumulator, ...producer.lines], [])
       setProducerLinesPosition(linesProducerPosition)
@@ -116,19 +111,19 @@ export default function App(
       const components: Components = createComponents({ queues: queuesEditor, exchanges: exchangesEditor, producers: producersEditor, consumers })
       const positions = createPositionsComponents(components)
 
-      const { queues: componentPositions, exchanges: exchangesPosition, producers: producerPositions } = definePositionsComponents({ positions, queues: queuesEditor, producers: producersEditor, exchanges: exchangesEditor })
+      const { queues: componentsPositions, exchanges: exchangesPosition, producers: producerPositions } = definePositionsComponents({ positions, queues: queuesEditor, producers: producersEditor, exchanges: exchangesEditor })
 
-      setQueuePositions(componentPositions.map(queue => queue.position))
+      setQueuePositions(componentsPositions.map(queue => queue.position))
       setExchangePositions(exchangesPosition.map(exchange => exchange.position))
-      setConsumerPositions(getQueuePositionsCoordinates({ components: componentPositions, componentType: COMPONENT_TYPE.CONSUMER }))
+      setConsumerPositions(getQueuePositionsCoordinates({ components: componentsPositions, componentType: COMPONENT_TYPE.CONSUMER }))
       setProducerPositions(producerPositions.map(produceParam => produceParam.position))
 
-      const componentsLines = defineLinesQueuesBetweenExchangesConsumers(componentPositions)
+      const componentsLines = defineLinesQueuesBetweenExchangesConsumers(componentsPositions)
       const linesConsumers = getLinksLinesCoordinates({ componentLinks: componentsLines, componentType: COMPONENT_TYPE.CONSUMER })
       const linesBindings = getLinksLinesCoordinates({ componentLinks: componentsLines, componentType: COMPONENT_TYPE.BINDING })
       setLinesPositions([...linesConsumers, ...linesBindings])
 
-      const producerMessagesPositions = defineMessagePositions({ queues: componentPositions, exchanges: exchangesPosition, producers: producerPositions })
+      const producerMessagesPositions = defineMessagePositions({ queues: componentsPositions, exchanges: exchangesPosition, producers: producerPositions })
 
       const linesProducerPosition = producerMessagesPositions.reduce((accumulator: Point[], producer: ProducerPositionLinesMessagePosition): Point[] => [...accumulator, ...producer.lines], [])
       setProducerLinesPosition(linesProducerPosition)

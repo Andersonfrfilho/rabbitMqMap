@@ -15,22 +15,16 @@
     "rabbitmq",
     "Threejs",
     "Vertice"
-  ]
-  // "eslint.alwaysShowStatus": true,
-  // "eslint.codeActionsOnSave.rules": [
-  //   "*"
-  // ],
-  // "eslint.debug": true,
-  // "eslint.format.enable": true,
-  // "eslint.lintTask.enable": true,
-  // "eslint.run": "onSave",
-  // "eslint.useESLintClass": true,
-  // "cSpell.words": [
-  //   "rabbitmq",
-  //   "rabbitmqmapper",
-  //   "svgr"
-  // ],
-  // "[typescriptreact]": {
-  //   "editor.defaultFormatter": "vscode.typescript-language-features"
-  // },
+  ],
+  "search.exclude": {
+    "**/.git": true,
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/tmp": true,
+    ".history":true,
+    "**/.next":true,
+    "**/applications":true,
+    "**/public":true,
+    "package-lock.json":true,
+  },
 }

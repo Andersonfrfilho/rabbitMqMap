@@ -58,8 +58,6 @@ export function SphereThree({ positions, id, color, ...props }: Props): JSX.Elem
     }
   })
 
-  console.log(color)
-
   return (
     <mesh
       {...props}
