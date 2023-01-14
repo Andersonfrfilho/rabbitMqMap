@@ -69,8 +69,13 @@ export default function App(
   });
 
   useEffect(() => {
+
+    console.log("########")
+    console.log(queues)
     if (queues.length > 0) {
       const consumers = getConsumers(queues)
+      console.log("################")
+      console.log(consumers)
       setQueuesEditor(queues);
       setExchangesEditor(exchanges);
       setProducersEditor(producers);
