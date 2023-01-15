@@ -25,7 +25,7 @@ const customJestConfig = {
     "@schemas/(.*)$": "<rootDir>/src/schemas/$1"
   },
   testEnvironment: 'jest-environment-jsdom',
-  testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/.next/', '<rootDir>/.docker/', '<rootDir>/.history/', '<rootDir>/.storybook/', '<rootDir>/.swc/', '<rootDir>/.vscode/', '<rootDir>/applications/', '<rootDir>/public/']
+  testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/.next/', '<rootDir>/.docker/', '<rootDir>/.history/', '<rootDir>/.storybook/', '<rootDir>/.swc/', '<rootDir>/.vscode/', '<rootDir>/applications/', '<rootDir>/public/', '<rootDir>/**/mocks']
 }
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
