@@ -76,7 +76,7 @@ export const producers = [
   }
 ]
 
-const producerPositionMessage = [
+export const producerPositionMessage = [
   {
     "id": "68d48ccf-66db-4703-8958-13df67f6e180",
     "host": "172.18.0.2",
@@ -167,7 +167,7 @@ const producerPositionMessage = [
   }
 ]
 
-const positions = [
+export const positions = [
   {
     "position": [
       0,
@@ -183,7 +183,7 @@ const positions = [
   }
 ]
 
-const producersPositionMessagesPosition = [
+export const producersPositionMessagesPosition = [
   {
     "id": "79a3fb8f-916d-4f21-b7cb-65e50e39f187",
     "host": "172.18.0.2",
@@ -11228,7 +11228,7 @@ const producersPositionMessagesPosition = [
   }
 ]
 
-const linesPositions = [
+export const linesPositions = [
   {
     "id": "95085af1-6575-4024-a05d-2220e01ba984",
     "positions": [

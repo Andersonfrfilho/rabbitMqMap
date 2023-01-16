@@ -7,7 +7,7 @@ import { Exchange } from "@services/rabbitmq/interfaces/exchange.interface"
 import { Producer } from "@services/rabbitmq/interfaces/producer.interface"
 import { Queue, QueueBindingConsumerRegister } from "@services/rabbitmq/interfaces/queue.interface"
 
-interface CreateComponentParams {
+export interface CreateComponentParams {
   consumers: Consumer[]
   exchanges: Exchange[]
   queues: QueueBindingConsumerRegister[]

@@ -1,4 +1,5 @@
 export const getConsumerMock = jest.fn()
+export const createComponentsMock = jest.fn()
 export const getQueuePositionsCoordinatesMock = jest.fn()
 export const createPositionsComponentsMock = jest.fn()
 export const definePositionsComponentsMock = jest.fn()
@@ -14,6 +15,7 @@ export const usePositionMock = {
   defineLinesQueuesBetweenExchangesConsumers: () => defineLinesQueuesBetweenExchangesConsumersMock(),
   getLinksLinesCoordinates: () => getLinksLinesCoordinatesMock(),
   defineMessagePositions: () => defineMessagePositionsMock(),
+  createComponents: () => createComponentsMock()
 }
 
 export const positions = {

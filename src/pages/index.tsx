@@ -18,7 +18,6 @@ import { MdHttp, MdInfo, MdInfoOutline } from 'react-icons/md'
 import { AiOutlineLock, AiOutlineUser } from 'react-icons/ai'
 import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa';
 import CodeEditor from '@components/CodeEditor.component';
-import { createComponents } from '@contexts/position/utils/createComponents';
 import { Components } from '@contexts/interfaces/components.interface';
 import { COMPONENT_TYPE } from '@enums/components.enum';
 import { Queue, QueueBindingConsumerRegister } from '@services/rabbitmq/interfaces/queue.interface';
@@ -52,13 +51,15 @@ export default function App(
   const [visibleInfos, setVisibleInfos] = useState<boolean>(false)
 
   const {
+    getConsumers,
+    createComponents,
     getQueuePositionsCoordinates,
     createPositionsComponents,
     definePositionsComponents,
     defineLinesQueuesBetweenExchangesConsumers,
     getLinksLinesCoordinates,
     defineMessagePositions,
-    getConsumers } = usePosition()
+  } = usePosition()
   const { register, handleSubmit, formState: { errors } } = useForm({
     defaultValues: {
       baseUrl: '',
@@ -69,8 +70,8 @@ export default function App(
   });
 
   useEffect(() => {
-
     if (queues.length > 0) {
+      console.log("Entrou")
       const consumers = getConsumers(queues)
       setQueuesEditor(queues);
       setExchangesEditor(exchanges);
@@ -159,6 +160,7 @@ export default function App(
     <>
       {/* <ModalBackdrop modalOpen={modalOpen} onClose={() => { setModalOpen(false) }} connections={connections} /> */}
       <Grid
+        data-testid="container"
         templateAreas={`"header header header"
                         "configs configs configs"
                         "nav producer components"
@@ -171,7 +173,7 @@ export default function App(
         color='blackAlpha.700'
         fontWeight='bold'
       >
-        <GridItem pl='2' area={'header'} overflow={'hidden'} display='flex'>
+        <GridItem data-testid="header" pl='2' area={'header'} overflow={'hidden'} display='flex'>
           <Box boxSize='sm' padding={'2px'} display='flex' flex={1} overflow={'hidden'} height={'100%'} flexDirection="row">
             <Box display='flex' flex={1} justifyContent={'flex-start'} alignItems={'center'}>
               <Image src='https://upload.wikimedia.org/wikipedia/commons/7/71/RabbitMQ_logo.svg' alt='Dan Abramov' height={'100%'} />
@@ -183,7 +185,7 @@ export default function App(
             </Box>
           </Box>
         </GridItem>
-        <GridItem pl='2' area={'configs'} display='flex'>
+        <GridItem data-testid="box-content" pl='2' area={'configs'} display='flex'>
           <Box boxSize='sm' display='flex' flex={1} flexDirection={'column'} overflow={'hidden'} height={'100%'} justifyContent={"center"} alignItems={"flex-start"} paddingInline={2}>
             {!!errors.baseUrl && <Text fontSize='xs' color={'red.600'}>{errors.baseUrl.message}</Text>}
             <InputGroup>
@@ -246,14 +248,14 @@ export default function App(
             </Box>
           </Box>
         </GridItem>
-        <GridItem pl='2' area={'nav'} overflow={"scroll"}>
+        <GridItem data-testid="box-editor" pl='2' area={'nav'} overflow={"scroll"}>
           <CodeEditor jsonCode={{ queues: queuesEditor, exchanges: exchangesEditor, producers: producersEditor }} setComponents={{ setQueuesEditor, setExchangesEditor, setProducersEditor }} />
         </GridItem>
-        <GridItem pl='2' area={'producer'}>
+        <GridItem data-testid="send-message" pl='2' area={'producer'}>
           <Text>Enviar Mensagens</Text>
           <SendMessage exchanges={exchangesEditor} producers={producersEditor} setMessage={setProducersEditor} />
         </GridItem>
-        <GridItem pl='2' area={'components'} display={'flex'} flexDirection={'column'}>
+        <GridItem data-testid="content-configs" pl='2' area={'components'} display={'flex'} flexDirection={'column'}>
           <Flex flex={1}>
             <Spacer />
             <Button onClick={() => setVisibleInfos((value) => !value)} height={'100%'} width={"80px"} rightIcon={visibleInfos ? <MdInfoOutline color='gray.300' /> : <MdInfo color='gray.300' />} colorScheme='teal' variant={visibleInfos ? 'solid' : 'outline'}>
@@ -283,7 +285,7 @@ export default function App(
             </Flex>
           </Flex>
         </GridItem>
-        <GridItem pl='2' bg='green.300' area={'main'} display={"flex"} height={'100vh'}>
+        <GridItem data-testid="content-components" pl='2' bg='green.300' area={'main'} display={"flex"} height={'100vh'}>
           <Canvas resize={{ polyfill: ResizeObserver }} style={{ width: '100%', height: '100%' }}>
             <ambientLight intensity={0.5} />
             <spotLight position={[10, 10, 10]}
@@ -291,24 +293,24 @@ export default function App(
             />
             <pointLight position={[-10, -10, -10]} />
             {producerPositions.length > 0 && producerPositions.map((position, index) => {
-              return <ProducerThree key={position.id} infoComponent={position.info} position={position.position} visibleInfo={visibleInfos} />
+              return <ProducerThree data-testid="producer-component" key={position.id} infoComponent={position.info} position={position.position} visibleInfo={visibleInfos} />
             })}
             {exchangePositions.length > 0 && exchangePositions.map(position => {
-              return <ExchangeThree key={position.id} infoComponent={position.info} position={position.position} visibleInfo={visibleInfos} />
+              return <ExchangeThree data-testid="exchange-component" key={position.id} infoComponent={position.info} position={position.position} visibleInfo={visibleInfos} />
             })}
             {queuePositions.length > 0 && queuePositions.map(position => {
-              return <QueueThree key={position.id} infoComponent={position.info} position={position.position} visibleInfo={visibleInfos} />
+              return <QueueThree data-testid="queue-component" key={position.id} infoComponent={position.info} position={position.position} visibleInfo={visibleInfos} />
             })}
             {consumerPositions.length > 0 && consumerPositions.map(position => {
-              return <ConsumerThree key={position.id} infoComponent={position.info} position={position.position} visibleInfo={visibleInfos} />
+              return <ConsumerThree data-testid="consumer-component" key={position.id} infoComponent={position.info} position={position.position} visibleInfo={visibleInfos} />
             })}
-            {linesPositions.length > 0 && linesPositions.map((line) => <LineThree key={line.id} {...line} visibleInfo={visibleInfos} />)}
-            {producerLinesPosition.length > 0 && producerLinesPosition.map((line) => <LineThree key={line.id} {...line} visibleInfo={visibleInfos} />)}
-            {messagesPosition.length > 0 && messagesPosition.map(message => <SphereThree key={message.id} {...message} visibleInfo={visibleInfos} />)}
+            {linesPositions.length > 0 && linesPositions.map((line) => <LineThree data-testid="line-component" key={line.id} {...line} visibleInfo={visibleInfos} />)}
+            {producerLinesPosition.length > 0 && producerLinesPosition.map((line) => <LineThree data-testid="producer-line-component" key={line.id} {...line} visibleInfo={visibleInfos} />)}
+            {messagesPosition.length > 0 && messagesPosition.map(message => <SphereThree data-testid="message-line-component" key={message.id} {...message} visibleInfo={visibleInfos} />)}
             <OrbitControls />
           </Canvas>
         </GridItem>
-        <GridItem pl='2' bg='blue.300' area={'footer'}>
+        <GridItem data-testid="footer" pl='2' bg='blue.300' area={'footer'}>
           Footer
         </GridItem>
       </Grid >

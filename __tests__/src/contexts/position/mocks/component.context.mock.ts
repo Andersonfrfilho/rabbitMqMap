@@ -475,7 +475,7 @@ export const components = {
   }
 }
 
-const componentsPositions = [
+export const componentsPositions = [
   {
     "arguments": {
       "x-queue-type": "classic"
@@ -831,7 +831,7 @@ const componentsPositions = [
   }
 ]
 
-const componentsLines = [
+export const componentsLines = [
   {
     "arguments": {
       "x-queue-type": "classic"

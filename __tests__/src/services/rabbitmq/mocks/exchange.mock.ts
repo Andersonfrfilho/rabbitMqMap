@@ -1,11 +1,13 @@
-const exchanges = [
+import { Exchange, Type } from "@services/rabbitmq/interfaces/exchange.interface"
+
+export const exchanges: Exchange[] = [
   {
     "arguments": {},
     "auto_delete": false,
     "durable": true,
     "internal": false,
     "name": "",
-    "type": "direct",
+    "type": Type.direct,
     "user_who_performed_action": "rmq-internal",
     "vhost": "/",
     "bindings": [
@@ -62,7 +64,7 @@ const exchanges = [
     "durable": true,
     "internal": false,
     "name": "amq.direct",
-    "type": "direct",
+    "type": Type.direct,
     "user_who_performed_action": "rmq-internal",
     "vhost": "/",
     "bindings": []
@@ -73,7 +75,7 @@ const exchanges = [
     "durable": true,
     "internal": false,
     "name": "amq.fanout",
-    "type": "fanout",
+    "type": Type.fanout,
     "user_who_performed_action": "rmq-internal",
     "vhost": "/",
     "bindings": []
@@ -84,7 +86,7 @@ const exchanges = [
     "durable": true,
     "internal": false,
     "name": "amq.headers",
-    "type": "headers",
+    "type": Type.headers,
     "user_who_performed_action": "rmq-internal",
     "vhost": "/",
     "bindings": []
@@ -95,7 +97,7 @@ const exchanges = [
     "durable": true,
     "internal": false,
     "name": "amq.match",
-    "type": "headers",
+    "type": Type.headers,
     "user_who_performed_action": "rmq-internal",
     "vhost": "/",
     "bindings": []
@@ -106,7 +108,7 @@ const exchanges = [
     "durable": true,
     "internal": true,
     "name": "amq.rabbitmq.trace",
-    "type": "topic",
+    "type": Type.topic,
     "user_who_performed_action": "rmq-internal",
     "vhost": "/",
     "bindings": []
@@ -117,7 +119,7 @@ const exchanges = [
     "durable": true,
     "internal": false,
     "name": "amq.topic",
-    "type": "topic",
+    "type": Type.topic,
     "user_who_performed_action": "rmq-internal",
     "vhost": "/",
     "bindings": []
@@ -128,7 +130,7 @@ const exchanges = [
     "durable": true,
     "internal": false,
     "name": "dead-letter-exchange-queue-1",
-    "type": "direct",
+    "type": Type.direct,
     "user_who_performed_action": "guest",
     "vhost": "/",
     "bindings": [
@@ -149,7 +151,7 @@ const exchanges = [
     "durable": true,
     "internal": false,
     "name": "exchange-queue-1-topic",
-    "type": "topic",
+    "type": Type.topic,
     "user_who_performed_action": "guest",
     "vhost": "/",
     "bindings": [
@@ -177,7 +179,7 @@ const exchanges = [
   }
 ]
 
-const exchangesPosition = [
+export const exchangesPosition = [
   {
     "id": "f93b414e-2d76-43c9-9372-adb24095d0dc",
     "arguments": {},
@@ -185,7 +187,7 @@ const exchangesPosition = [
     "durable": true,
     "internal": false,
     "name": "",
-    "type": "direct",
+    "type": Type.direct,
     "user_who_performed_action": "rmq-internal",
     "vhost": "/",
     "bindings": [
@@ -243,7 +245,7 @@ const exchangesPosition = [
       ],
       "info": {
         "name": "",
-        "type": "direct",
+        "type": Type.direct,
         "componentType": "exchange"
       },
       "id": "4e08b399-71cb-4592-8a3b-5d87e5aa5bb3"
@@ -256,7 +258,7 @@ const exchangesPosition = [
     "durable": true,
     "internal": false,
     "name": "amq.direct",
-    "type": "direct",
+    "type": Type.direct,
     "user_who_performed_action": "rmq-internal",
     "vhost": "/",
     "bindings": [],
@@ -268,7 +270,7 @@ const exchangesPosition = [
       ],
       "info": {
         "name": "amq.direct",
-        "type": "direct",
+        "type": Type.direct,
         "componentType": "exchange"
       },
       "id": "ecca8f8b-5209-44e4-9d9b-0a6dc1b1bf6c"
@@ -281,7 +283,7 @@ const exchangesPosition = [
     "durable": true,
     "internal": false,
     "name": "amq.fanout",
-    "type": "fanout",
+    "type": Type.fanout,
     "user_who_performed_action": "rmq-internal",
     "vhost": "/",
     "bindings": [],
@@ -293,7 +295,7 @@ const exchangesPosition = [
       ],
       "info": {
         "name": "amq.fanout",
-        "type": "fanout",
+        "type": Type.fanout,
         "componentType": "exchange"
       },
       "id": "b3118389-8de6-4b94-8f8c-7b362605a106"
@@ -306,7 +308,7 @@ const exchangesPosition = [
     "durable": true,
     "internal": false,
     "name": "amq.headers",
-    "type": "headers",
+    "type": Type.headers,
     "user_who_performed_action": "rmq-internal",
     "vhost": "/",
     "bindings": [],
@@ -318,7 +320,7 @@ const exchangesPosition = [
       ],
       "info": {
         "name": "amq.headers",
-        "type": "headers",
+        "type": Type.headers,
         "componentType": "exchange"
       },
       "id": "3aa6d2c2-6c27-4b30-be99-f085288a48e1"
@@ -331,7 +333,7 @@ const exchangesPosition = [
     "durable": true,
     "internal": false,
     "name": "amq.match",
-    "type": "headers",
+    "type": Type.headers,
     "user_who_performed_action": "rmq-internal",
     "vhost": "/",
     "bindings": [],
@@ -343,7 +345,7 @@ const exchangesPosition = [
       ],
       "info": {
         "name": "amq.match",
-        "type": "headers",
+        "type": Type.headers,
         "componentType": "exchange"
       },
       "id": "e148d35d-0cc9-47a0-96b9-295c6ade532a"
@@ -356,7 +358,7 @@ const exchangesPosition = [
     "durable": true,
     "internal": true,
     "name": "amq.rabbitmq.trace",
-    "type": "topic",
+    "type": Type.topic,
     "user_who_performed_action": "rmq-internal",
     "vhost": "/",
     "bindings": [],
@@ -368,7 +370,7 @@ const exchangesPosition = [
       ],
       "info": {
         "name": "amq.rabbitmq.trace",
-        "type": "topic",
+        "type": Type.topic,
         "componentType": "exchange"
       },
       "id": "c2e5afaf-fb09-4c02-8987-cdde7c39cb73"
@@ -381,7 +383,7 @@ const exchangesPosition = [
     "durable": true,
     "internal": false,
     "name": "amq.topic",
-    "type": "topic",
+    "type": Type.topic,
     "user_who_performed_action": "rmq-internal",
     "vhost": "/",
     "bindings": [],
@@ -393,7 +395,7 @@ const exchangesPosition = [
       ],
       "info": {
         "name": "amq.topic",
-        "type": "topic",
+        "type": Type.topic,
         "componentType": "exchange"
       },
       "id": "51a6f7e5-c5fa-449b-b76c-019b2f20fe31"
@@ -406,7 +408,7 @@ const exchangesPosition = [
     "durable": true,
     "internal": false,
     "name": "dead-letter-exchange-queue-1",
-    "type": "direct",
+    "type": Type.direct,
     "user_who_performed_action": "guest",
     "vhost": "/",
     "bindings": [
@@ -428,7 +430,7 @@ const exchangesPosition = [
       ],
       "info": {
         "name": "dead-letter-exchange-queue-1",
-        "type": "direct",
+        "type": Type.direct,
         "componentType": "exchange"
       },
       "id": "2cb4e399-f325-4118-a788-de159b7dccb1"
@@ -441,7 +443,7 @@ const exchangesPosition = [
     "durable": true,
     "internal": false,
     "name": "exchange-queue-1-topic",
-    "type": "topic",
+    "type": Type.topic,
     "user_who_performed_action": "guest",
     "vhost": "/",
     "bindings": [
@@ -474,7 +476,7 @@ const exchangesPosition = [
       ],
       "info": {
         "name": "exchange-queue-1-topic",
-        "type": "topic",
+        "type": Type.topic,
         "componentType": "exchange"
       },
       "id": "90eb440a-769c-4eb9-904a-2da0001df7da"
@@ -482,7 +484,7 @@ const exchangesPosition = [
   }
 ]
 
-const positions = [
+export const positions = [
   {
     "position": [
       0,
@@ -491,7 +493,7 @@ const positions = [
     ],
     "info": {
       "name": "",
-      "type": "direct",
+      "type": Type.direct,
       "componentType": "exchange"
     },
     "id": "1c4866c8-3c04-4767-9f91-a103e2b6a003"
@@ -504,7 +506,7 @@ const positions = [
     ],
     "info": {
       "name": "amq.direct",
-      "type": "direct",
+      "type": Type.direct,
       "componentType": "exchange"
     },
     "id": "c894e41b-b877-499f-8eaa-83400925c27a"
@@ -517,7 +519,7 @@ const positions = [
     ],
     "info": {
       "name": "amq.fanout",
-      "type": "fanout",
+      "type": Type.fanout,
       "componentType": "exchange"
     },
     "id": "9ec52a6e-ef61-454f-b19e-1303cada8883"
@@ -530,7 +532,7 @@ const positions = [
     ],
     "info": {
       "name": "amq.headers",
-      "type": "headers",
+      "type": Type.headers,
       "componentType": "exchange"
     },
     "id": "086db4b3-42f3-41ad-8256-555904b8acd7"
@@ -543,7 +545,7 @@ const positions = [
     ],
     "info": {
       "name": "amq.match",
-      "type": "headers",
+      "type": Type.headers,
       "componentType": "exchange"
     },
     "id": "5bfd24b8-f40b-4d11-a545-ac7cfe7ea5e8"
@@ -556,7 +558,7 @@ const positions = [
     ],
     "info": {
       "name": "amq.rabbitmq.trace",
-      "type": "topic",
+      "type": Type.topic,
       "componentType": "exchange"
     },
     "id": "b8b919cb-ce8c-4ffa-bb62-0e8244e71466"
@@ -569,7 +571,7 @@ const positions = [
     ],
     "info": {
       "name": "amq.topic",
-      "type": "topic",
+      "type": Type.topic,
       "componentType": "exchange"
     },
     "id": "8dd87f07-d5e5-409c-8f7d-579b2112c721"
@@ -582,7 +584,7 @@ const positions = [
     ],
     "info": {
       "name": "dead-letter-exchange-queue-1",
-      "type": "direct",
+      "type": Type.direct,
       "componentType": "exchange"
     },
     "id": "5b2a2251-8287-499a-9d5b-e809fabf8128"
@@ -595,7 +597,7 @@ const positions = [
     ],
     "info": {
       "name": "exchange-queue-1-topic",
-      "type": "topic",
+      "type": Type.topic,
       "componentType": "exchange"
     },
     "id": "08251a80-76cb-41cf-b33f-9b7dd50223e7"

@@ -2,7 +2,7 @@ import React, { useContext } from 'react'
 import { GetQueuePositionsParams, getQueuePositionsCoordinates } from './utils/getQueuePositionsCoordinates';
 import { Position } from '@contexts/interfaces/positions.interface';
 import { CreatePositionsComponentsParams, createPositionsComponents } from './functions/createPositionComponents';
-import { ComponentsPositions } from '@contexts/interfaces/components.interface';
+import { Components, ComponentsPositions } from '@contexts/interfaces/components.interface';
 import { DefinePositionsComponentsResult, DefinePositionsComponentsParams, definePositionsComponents } from './functions/definePositionsComponents';
 import { QueueBindingConsumerRegister, QueueBindingConsumerRegisterPosition, QueueBindingConsumerRegisterPositionLines } from '@services/rabbitmq/interfaces/queue.interface';
 import { defineLinesQueuesBetweenExchangesConsumers } from './functions/defineLinesQueuesBetweenExchangesConsumers';
@@ -12,6 +12,7 @@ import { CreateMessagePositionsParams, defineMessagePositions } from './function
 import { ProducerPositionLinesMessagePosition } from '@services/rabbitmq/interfaces/producer.interface';
 import { Consumer } from '@services/rabbitmq/interfaces/consumer.interface';
 import { getConsumers } from './utils/getConsumers';
+import { CreateComponentParams, createComponents } from './utils/createComponents';
 
 type PositionStateProps = {
   children: React.ReactNode;
@@ -25,6 +26,7 @@ interface UsePosition {
   getLinksLinesCoordinates(data: GetLinksLinesCoordinatesDTO): Point[]
   defineMessagePositions(data: CreateMessagePositionsParams): ProducerPositionLinesMessagePosition[]
   getConsumers(queues: QueueBindingConsumerRegister[]): Consumer[]
+  createComponents(data: CreateComponentParams): Components
 }
 
 export const PositionContext = React.createContext<UsePosition>({} as UsePosition);
@@ -38,7 +40,8 @@ export function PositionState({ children }: PositionStateProps) {
       defineLinesQueuesBetweenExchangesConsumers,
       getLinksLinesCoordinates,
       defineMessagePositions,
-      getConsumers
+      getConsumers,
+      createComponents
     }}>{children}</PositionContext.Provider>
   )
 }

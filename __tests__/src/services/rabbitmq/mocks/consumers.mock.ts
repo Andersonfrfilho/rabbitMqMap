@@ -1,4 +1,4 @@
-const consumers = [
+export const consumers = [
   {
     "arguments": {},
     "ack_required": true,
@@ -23,7 +23,7 @@ const consumers = [
   }
 ]
 
-const positions = [
+export const positions = [
   {
     "position": [
       0,
@@ -39,7 +39,7 @@ const positions = [
   }
 ]
 
-const consumersLines = [
+export const consumersLines = [
   {
     "id": "b726effb-6f32-40ff-a320-3a335b40fa00",
     "positions": [
@@ -61,7 +61,7 @@ const consumersLines = [
   }
 ]
 
-const bindingsLines = [
+export const bindingsLines = [
   {
     "id": "7b350f0b-4e7e-44b3-992a-0eeb739f7158",
     "positions": [

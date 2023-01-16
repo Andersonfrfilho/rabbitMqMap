@@ -1,4 +1,6 @@
-const queues = [
+import { QueueBindingConsumerRegister } from "@services/rabbitmq/interfaces/queue.interface"
+
+export const queues: QueueBindingConsumerRegister[] = [
   {
     "arguments": {
       "x-queue-type": "classic"
@@ -158,7 +160,7 @@ const queues = [
   }
 ]
 
-const positions = [
+export const positions = [
   {
     "position": [
       0,
