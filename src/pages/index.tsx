@@ -60,7 +60,7 @@ export default function App(
     getLinksLinesCoordinates,
     defineMessagePositions,
   } = usePosition()
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const dataTest = useForm({
     defaultValues: {
       baseUrl: '',
       username: '',
@@ -68,10 +68,15 @@ export default function App(
       vHost: '',
     }
   });
-
+  const { register, handleSubmit, formState: { errors } } = dataTest
+  console.log("###########")
+  console.log({
+    ...register("baseUrl", {
+      required: "Digite uma baseURl", pattern: URL_PATTERN
+    })
+  })
   useEffect(() => {
     if (queues.length > 0) {
-      console.log("Entrou")
       const consumers = getConsumers(queues)
       setQueuesEditor(queues);
       setExchangesEditor(exchanges);
@@ -220,11 +225,11 @@ export default function App(
                     pointerEvents='none'
                     children={<AiOutlineLock color='gray.300' />}
                   />
-                  <Input {...register("password", {
+                  <Input data-testid="input-password" {...register("password", {
                     required: "Digite um password"
-                  })} type={true ? 'text' : 'password'} placeholder='password' isInvalid={!!errors.password} />
+                  })} type={visibleFieldPassword ? 'text' : 'password'} placeholder='password' isInvalid={!!errors.password} />
                   <InputRightAddon>
-                    <IconButton onClick={() => setVisibleFieldPassword(data => !data)} aria-label='Visible password' icon={visibleFieldPassword ? <FaRegEyeSlash color='gray.300' /> : <FaRegEye color='gray.300' />} />
+                    <IconButton data-testid="button-change-type-input-password" onClick={() => setVisibleFieldPassword(data => !data)} aria-label='Visible password' icon={visibleFieldPassword ? <FaRegEyeSlash data-testid="button-visible-password" color='gray.300' /> : <FaRegEye data-testid="button-secret-password" color='gray.300' />} />
                   </InputRightAddon>
                 </InputGroup>
               </Box>
@@ -249,7 +254,7 @@ export default function App(
           </Box>
         </GridItem>
         <GridItem data-testid="box-editor" pl='2' area={'nav'} overflow={"scroll"}>
-          <CodeEditor jsonCode={{ queues: queuesEditor, exchanges: exchangesEditor, producers: producersEditor }} setComponents={{ setQueuesEditor, setExchangesEditor, setProducersEditor }} />
+          <CodeEditor data-testid="code-editor" jsonCode={{ queues: queuesEditor, exchanges: exchangesEditor, producers: producersEditor }} setComponents={{ setQueuesEditor, setExchangesEditor, setProducersEditor }} />
         </GridItem>
         <GridItem data-testid="send-message" pl='2' area={'producer'}>
           <Text>Enviar Mensagens</Text>
@@ -258,7 +263,7 @@ export default function App(
         <GridItem data-testid="content-configs" pl='2' area={'components'} display={'flex'} flexDirection={'column'}>
           <Flex flex={1}>
             <Spacer />
-            <Button onClick={() => setVisibleInfos((value) => !value)} height={'100%'} width={"80px"} rightIcon={visibleInfos ? <MdInfoOutline color='gray.300' /> : <MdInfo color='gray.300' />} colorScheme='teal' variant={visibleInfos ? 'solid' : 'outline'}>
+            <Button data-testid="button-infos" onClick={() => setVisibleInfos((value) => !value)} height={'100%'} width={"80px"} rightIcon={visibleInfos ? <MdInfoOutline data-testid="button-infos-outline" color='gray.300' /> : <MdInfo data-testid="button-infos-colorFull" color='gray.300' />} colorScheme='teal' variant={visibleInfos ? 'solid' : 'outline'}>
               infos
             </Button>
           </Flex>
@@ -301,9 +306,9 @@ export default function App(
             {queuePositions.length > 0 && queuePositions.map(position => {
               return <QueueThree data-testid="queue-component" key={position.id} infoComponent={position.info} position={position.position} visibleInfo={visibleInfos} />
             })}
-            {consumerPositions.length > 0 && consumerPositions.map(position => {
+            {/*consumerPositions.length > 0 && consumerPositions.map(position => {
               return <ConsumerThree data-testid="consumer-component" key={position.id} infoComponent={position.info} position={position.position} visibleInfo={visibleInfos} />
-            })}
+            })*/}
             {linesPositions.length > 0 && linesPositions.map((line) => <LineThree data-testid="line-component" key={line.id} {...line} visibleInfo={visibleInfos} />)}
             {producerLinesPosition.length > 0 && producerLinesPosition.map((line) => <LineThree data-testid="producer-line-component" key={line.id} {...line} visibleInfo={visibleInfos} />)}
             {messagesPosition.length > 0 && messagesPosition.map(message => <SphereThree data-testid="message-line-component" key={message.id} {...message} visibleInfo={visibleInfos} />)}
