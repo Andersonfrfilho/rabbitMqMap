@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { ResizeObserver } from '@juggle/resize-observer';
 import { Exchange } from "@services/rabbitmq/interfaces/exchange.interface";
-import { getExchanges, getProducers, getQueues, rabbitMqApiService } from '@services/rabbitmq/rabbitmq.api'
+import { ChangeAxiosConfig, changeAxiosConfig, getExchanges, getProducers, getQueues, rabbitMqApiService } from '@services/rabbitmq/rabbitmq.service'
 import { GetStaticProps, GetStaticPropsResult, InferGetStaticPropsType } from "next";
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
@@ -19,14 +19,15 @@ import { AiOutlineLock, AiOutlineUser } from 'react-icons/ai'
 import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa';
 import CodeEditor from '@components/CodeEditor.component';
 import { Components } from '@contexts/interfaces/components.interface';
-import { COMPONENT_TYPE } from '@enums/components.enum';
-import { Queue, QueueBindingConsumerRegister } from '@services/rabbitmq/interfaces/queue.interface';
+import { COMPONENT_INFO_TYPE, COMPONENT_TYPE } from '@enums/components.enum';
+import { QueueBindingConsumerRegister } from '@services/rabbitmq/interfaces/queue.interface';
 import { Position } from '@contexts/interfaces/positions.interface';
 import { MessagePositions } from '@services/rabbitmq/interfaces/message.interface';
 import { Point } from '@contexts/interfaces/lines.interface';
 import { SendMessage } from '@components/SendMessage.component';
 import { useForm } from 'react-hook-form';
-import { URL_PATTERN } from '@constants/regex.constant';
+import { useSchema } from '@contexts/schema/Schema.context';
+import { isValidUrl } from '@utils/isValidUrl';
 
 interface AppGetStaticInterface {
   queues: QueueBindingConsumerRegister[]
@@ -50,6 +51,8 @@ export default function App(
   const [producerLinesPosition, setProducerLinesPosition] = useState<Point[]>([] as Point[])
   const [visibleInfos, setVisibleInfos] = useState<boolean>(false)
 
+  const { verifyDiffContent } = useSchema()
+
   const {
     getConsumers,
     createComponents,
@@ -69,12 +72,7 @@ export default function App(
     }
   });
   const { register, handleSubmit, formState: { errors } } = dataTest
-  console.log("###########")
-  console.log({
-    ...register("baseUrl", {
-      required: "Digite uma baseURl", pattern: URL_PATTERN
-    })
-  })
+
   useEffect(() => {
     if (queues.length > 0) {
       const consumers = getConsumers(queues)
@@ -108,12 +106,12 @@ export default function App(
   }, [])
 
   useEffect(() => {
-    const queueIsEqual = queues.length >= 0 && queuesEditor.length >= 0 && queuesEditor.every(queueEditor => queues.some(queue => queue.name === queueEditor.name))
-    const exchangeIsEqual = exchanges.length >= 0 && exchangesEditor.length >= 0 && exchangesEditor.every(exchangeEditor => exchanges.some(exchange => exchange.name === exchangeEditor.name))
-    const producerIsEqual = producers.length >= 0 && producersEditor.length >= 0 && producersEditor.every(producerEditor => producers.some(producer => producer.id === producerEditor.id && producer.messages.length === producerEditor.messages.length))
+    const queueIsEqual = verifyDiffContent({ components: queues, componentsEditor: queuesEditor, type: COMPONENT_INFO_TYPE.QUEUE })
+    const exchangeIsEqual = verifyDiffContent({ components: exchanges, componentsEditor: exchangesEditor, type: COMPONENT_INFO_TYPE.EXCHANGE })
+    const producerIsEqual = verifyDiffContent({ components: producers, componentsEditor: producersEditor, type: COMPONENT_INFO_TYPE.PRODUCER })
     const consumers = getConsumers(queuesEditor)
 
-    if (!queueIsEqual || !exchangeIsEqual || !producerIsEqual) {
+    if (queueIsEqual || exchangeIsEqual || producerIsEqual) {
       const components: Components = createComponents({ queues: queuesEditor, exchanges: exchangesEditor, producers: producersEditor, consumers })
       const positions = createPositionsComponents(components)
 
@@ -125,8 +123,10 @@ export default function App(
       setProducerPositions(producerPositions.map(produceParam => produceParam.position))
 
       const componentsLines = defineLinesQueuesBetweenExchangesConsumers(componentsPositions)
+
       const linesConsumers = getLinksLinesCoordinates({ componentLinks: componentsLines, componentType: COMPONENT_TYPE.CONSUMER })
       const linesBindings = getLinksLinesCoordinates({ componentLinks: componentsLines, componentType: COMPONENT_TYPE.BINDING })
+
       setLinesPositions([...linesConsumers, ...linesBindings])
 
       const producerMessagesPositions = defineMessagePositions({ queues: componentsPositions, exchanges: exchangesPosition, producers: producerPositions })
@@ -140,26 +140,16 @@ export default function App(
     }
   }, [queuesEditor, exchangesEditor, producersEditor])
 
-  interface ChangeAxiosConfig {
-    baseUrl: string;
-    username: string;
-    password: string;
+  const alterConfigUrl = async ({ baseUrl, username, password, vHost }: ChangeAxiosConfig) => {
+    const {
+      queues,
+      exchanges,
+      producers } = await changeAxiosConfig({ baseUrl, username, password, vHost })
+    setQueuesEditor(queues)
+    setExchangesEditor(exchanges)
+    setProducersEditor(producers)
   }
 
-  const changeAxiosConfig = async ({ baseUrl, username, password }: ChangeAxiosConfig) => {
-    rabbitMqApiService.defaults.baseURL = baseUrl;
-    rabbitMqApiService.defaults.auth = {
-      username,
-      password
-    }
-    const queues = await getQueues() || [];
-    const exchanges = await getExchanges() || []
-    const producers = await getProducers() || []
-
-    setQueuesEditor(queues);
-    setExchangesEditor(exchanges);
-    setProducersEditor(producers);
-  }
 
   return (
     <>
@@ -192,22 +182,21 @@ export default function App(
         </GridItem>
         <GridItem data-testid="box-content" pl='2' area={'configs'} display='flex'>
           <Box boxSize='sm' display='flex' flex={1} flexDirection={'column'} overflow={'hidden'} height={'100%'} justifyContent={"center"} alignItems={"flex-start"} paddingInline={2}>
-            {!!errors.baseUrl && <Text fontSize='xs' color={'red.600'}>{errors.baseUrl.message}</Text>}
+            {errors.baseUrl && <Text data-testid="text-error-baseUrl" fontSize='xs' color={'red.600'}>{errors.baseUrl.message}</Text>}
             <InputGroup>
               <InputLeftElement
                 pointerEvents='none'
                 children={<MdHttp color='gray.300' />}
-
               />
               <Input  {...register("baseUrl", {
-                required: "Digite uma baseURl", pattern: URL_PATTERN
-              })} type='https://url.com' placeholder='base url' isInvalid={!!errors.baseUrl} />
+                required: "Digite uma baseURl", validate: (value: string) => isValidUrl(value) ? undefined : 'Url invalida!'
+              })} data-testid="input-baseUrl" type='https://url.com' placeholder='base url' isInvalid={!!errors.baseUrl} />
             </InputGroup>
           </Box>
           <Box boxSize='sm' display='flex' flex={3} overflow={'hidden'} height={'100%'} flexDirection={"row"} justifyContent={"space-around"} alignItems={"center"}>
             <Box boxSize='sm' display='flex' flex={2} flexDirection={"row"} height={'100%'} alignItems={"center"}>
               <Box boxSize='sm' display='flex' flex={1} flexDirection={"column"} height={'100%'} justifyContent={'center'} alignItems={"flex-start"} marginRight={2}>
-                {!!errors.username && <Text fontSize='xs' color={'red.600'}>{errors.username.message}</Text>}
+                {errors.username && <Text data-testid="text-error-username" fontSize='xs' color={'red.600'}>{errors.username.message}</Text>}
                 <InputGroup>
                   <InputLeftElement
                     pointerEvents='none'
@@ -215,11 +204,11 @@ export default function App(
                   />
                   <Input {...register("username", {
                     required: "Digite um usuário"
-                  })} type='text' placeholder='username' isInvalid={!!errors.username} />
+                  })} data-testid="input-username" type='text' placeholder='username' isInvalid={!!errors.username} />
                 </InputGroup>
               </Box>
               <Box boxSize='sm' display='flex' flex={1} flexDirection={"column"} height={'100%'} justifyContent={'center'} alignItems={"flex-start"} marginRight={2}>
-                {!!errors.password && <Text fontSize='xs' color={'red.600'}>{errors.password.message}</Text>}
+                {errors.password && <Text data-testid="text-error-password" fontSize='xs' color={'red.600'}>{errors.password.message}</Text>}
                 <InputGroup>
                   <InputLeftElement
                     pointerEvents='none'
@@ -234,7 +223,7 @@ export default function App(
                 </InputGroup>
               </Box>
               <Box boxSize='sm' display='flex' flex={1} flexDirection={"column"} height={'100%'} justifyContent={'center'} alignItems={"flex-start"}>
-                {!!errors.vHost && <Text fontSize='xs' color={'red.600'}>{errors.vHost.message}</Text>}
+                {errors.vHost && <Text data-testid="text-error-vHost" fontSize='xs' color={'red.600'}>{errors.vHost.message}</Text>}
                 <InputGroup>
                   <InputLeftElement
                     pointerEvents='none'
@@ -242,19 +231,19 @@ export default function App(
                   />
                   <Input {...register("vHost", {
                     required: "Digite um vhost"
-                  })} type='text' placeholder='vHost' isInvalid={!!errors.vHost} />
+                  })} type='text' data-testid="input-vHost" placeholder='vHost' isInvalid={!!errors.vHost} />
                 </InputGroup>
               </Box>
             </Box>
             <Box boxSize='sm' display='flex' flex={1} height={'100%'} justifyContent={"center"} alignItems={"center"} padding={'2px'}>
-              <Button size='sm' onClick={handleSubmit(changeAxiosConfig)}>
+              <Button data-testid="button-config-base-url" size='sm' onClick={handleSubmit(alterConfigUrl)}>
                 Enviar
               </Button>
             </Box>
           </Box>
         </GridItem>
         <GridItem data-testid="box-editor" pl='2' area={'nav'} overflow={"scroll"}>
-          <CodeEditor data-testid="code-editor" jsonCode={{ queues: queuesEditor, exchanges: exchangesEditor, producers: producersEditor }} setComponents={{ setQueuesEditor, setExchangesEditor, setProducersEditor }} />
+          <CodeEditor jsonCode={{ queues: queuesEditor, exchanges: exchangesEditor, producers: producersEditor }} setComponents={{ setQueuesEditor, setExchangesEditor, setProducersEditor }} />
         </GridItem>
         <GridItem data-testid="send-message" pl='2' area={'producer'}>
           <Text>Enviar Mensagens</Text>
@@ -298,27 +287,27 @@ export default function App(
             />
             <pointLight position={[-10, -10, -10]} />
             {producerPositions.length > 0 && producerPositions.map((position, index) => {
-              return <ProducerThree data-testid="producer-component" key={position.id} infoComponent={position.info} position={position.position} visibleInfo={visibleInfos} />
+              return <ProducerThree key={position.id} infoComponent={position.info} position={position.position} visibleInfo={visibleInfos} />
             })}
             {exchangePositions.length > 0 && exchangePositions.map(position => {
-              return <ExchangeThree data-testid="exchange-component" key={position.id} infoComponent={position.info} position={position.position} visibleInfo={visibleInfos} />
+              return <ExchangeThree key={position.id} infoComponent={position.info} position={position.position} visibleInfo={visibleInfos} />
             })}
             {queuePositions.length > 0 && queuePositions.map(position => {
-              return <QueueThree data-testid="queue-component" key={position.id} infoComponent={position.info} position={position.position} visibleInfo={visibleInfos} />
+              return <QueueThree key={position.id} infoComponent={position.info} position={position.position} visibleInfo={visibleInfos} />
             })}
-            {/*consumerPositions.length > 0 && consumerPositions.map(position => {
-              return <ConsumerThree data-testid="consumer-component" key={position.id} infoComponent={position.info} position={position.position} visibleInfo={visibleInfos} />
-            })*/}
-            {linesPositions.length > 0 && linesPositions.map((line) => <LineThree data-testid="line-component" key={line.id} {...line} visibleInfo={visibleInfos} />)}
-            {producerLinesPosition.length > 0 && producerLinesPosition.map((line) => <LineThree data-testid="producer-line-component" key={line.id} {...line} visibleInfo={visibleInfos} />)}
-            {messagesPosition.length > 0 && messagesPosition.map(message => <SphereThree data-testid="message-line-component" key={message.id} {...message} visibleInfo={visibleInfos} />)}
+            {consumerPositions.length > 0 && consumerPositions.map(position => {
+              return <ConsumerThree key={position.id} infoComponent={position.info} position={position.position} visibleInfo={visibleInfos} />
+            })}
+            {linesPositions.length > 0 && linesPositions.map((line) => <LineThree key={line.id} {...line} visibleInfo={visibleInfos} />)}
+            {producerLinesPosition.length > 0 && producerLinesPosition.map((line) => <LineThree key={line.id} {...line} visibleInfo={visibleInfos} />)}
+            {messagesPosition.length > 0 && messagesPosition.map(message => <SphereThree key={message.id} {...message} visibleInfo={visibleInfos} />)}
             <OrbitControls />
           </Canvas>
         </GridItem>
         <GridItem data-testid="footer" pl='2' bg='blue.300' area={'footer'}>
           Footer
         </GridItem>
-      </Grid >
+      </Grid>
     </>
   );
 }

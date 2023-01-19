@@ -68,6 +68,7 @@ export default function CodeEditor(props: Props): JSX.Element {
 
   return (
     <CodeMirror
+      data-testid="code-editor"
       value={jsonTextArea}
       height="100%"
       extensions={[json()]}
