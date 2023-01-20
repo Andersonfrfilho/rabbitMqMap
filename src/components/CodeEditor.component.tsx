@@ -7,6 +7,7 @@ import { editor } from '@schemas/editor.schema';
 import { Exchange } from '@services/rabbitmq/interfaces/exchange.interface';
 import { Producer } from '@services/rabbitmq/interfaces/producer.interface';
 import { QueueBindingConsumerRegister } from '@services/rabbitmq/interfaces/queue.interface';
+import { isJsonString } from '@utils/isJsonString';
 
 interface SetComponents {
   setQueuesEditor: React.Dispatch<React.SetStateAction<QueueBindingConsumerRegister[]>>
@@ -20,18 +21,12 @@ interface JsonCode {
   producers: Producer[];
 }
 
-interface Props {
+export interface Props {
   jsonCode: JsonCode
   setComponents: SetComponents;
 }
-function isJsonString(str: string) {
-  try {
-    JSON.parse(str);
-  } catch (e) {
-    return false;
-  }
-  return true;
-}
+
+
 export default function CodeEditor(props: Props): JSX.Element {
   const [jsonTextArea, setJsonTextArea] = useState(`{ "json": "example" }`)
 
@@ -52,10 +47,12 @@ export default function CodeEditor(props: Props): JSX.Element {
   function editorOnBlur() {
     const objectValue = JSON.parse(jsonTextArea) as JsonCode
     const isVerify = validator.validate(objectValue, editor)
+
     const bindingVerify = objectValue.queues.every(queue => queue.bindings.every(binding => {
       return objectValue.exchanges.some(exchange => exchange.name === binding.source)
     }))
-    if (isVerify.errors.length > 0) {
+
+    if (isVerify.errors?.length > 0) {
       console.log("existem erros no json")
     } else if (!bindingVerify) {
       console.log("existe exchanges inexistente vinculados a fila")

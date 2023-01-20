@@ -6,7 +6,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "jest",
+    "test": "jest --clearCache && jest",
     "test:ci": "jest --ci",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
@@ -21,6 +21,7 @@
     "@juggle/resize-observer": "^3.4.0",
     "@react-three/drei": "^9.46.1",
     "@react-three/fiber": "^8.9.1",
+    "@react-three/test-renderer": "^8.1.0",
     "@svgr/webpack": "^6.5.1",
     "@types/node": "18.11.9",
     "@types/react": "18.0.25",

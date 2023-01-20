@@ -5,7 +5,7 @@ import { Producer } from "@services/rabbitmq/interfaces/producer.interface";
 import { Queue } from "@services/rabbitmq/interfaces/queue.interface";
 import { PositionComponents } from "../functions/definePositionsComponents";
 
-export function infoExchange({ name, type }: Exchange): ComponentInfo {
+export function infoExchange({ name, type }: Exchange): PositionComponents {
   return {
     name,
     type,
@@ -13,7 +13,7 @@ export function infoExchange({ name, type }: Exchange): ComponentInfo {
   }
 }
 
-export function infoProducer({ user, type }: Producer): ComponentInfo {
+export function infoProducer({ user, type }: Producer): PositionComponents {
   return {
     name: user,
     type,
@@ -21,7 +21,7 @@ export function infoProducer({ user, type }: Producer): ComponentInfo {
   }
 }
 
-export function infoConsumer({ channel_details: { user }, queue: { name } }: Consumer): ComponentInfo {
+export function infoConsumer({ channel_details: { user }, queue: { name } }: Consumer): PositionComponents {
   return {
     name,
     type: user,
@@ -29,7 +29,7 @@ export function infoConsumer({ channel_details: { user }, queue: { name } }: Con
   }
 }
 
-export function infoQueue({ name, type }: Queue): ComponentInfo {
+export function infoQueue({ name, type }: Queue): PositionComponents {
   return {
     name,
     type,
