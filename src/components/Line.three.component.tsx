@@ -2,12 +2,13 @@ import * as React from 'react'
 import * as THREE from 'three'
 import { useRef, useState } from 'react'
 import { Vector3 } from 'three'
-import { GetLinksLinesResult } from '@contexts/position/functions/definePositionsComponents'
 import { Line } from '@react-three/drei'
+import { Point } from '@contexts/interfaces/lines.interface'
 
-type Props = JSX.IntrinsicElements['line'] & GetLinksLinesResult & {
+export type Props = JSX.IntrinsicElements['line'] & Point & {
   visibleInfo: boolean;
 }
+
 export function LineThree(props: Props): JSX.Element {
   const points: Vector3[] = props.positions as unknown as Vector3[];
   const pointsConvertInVector3 = points.map(point => new Vector3(point[0], point[1], point[2]))

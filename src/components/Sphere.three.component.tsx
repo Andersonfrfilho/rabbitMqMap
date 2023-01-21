@@ -3,10 +3,10 @@ import * as THREE from 'three'
 import { useRef, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Html } from '@react-three/drei'
-import { MessageWithPositions } from '@services/rabbitmq/interfaces/producer.interface'
 import { INITIAL_POSITION } from '@constants/position.constant'
+import { MessagePositions } from '@services/rabbitmq/interfaces/message.interface'
 
-type Props = MessageWithPositions & JSX.IntrinsicElements['mesh'] & {
+export type Props = MessagePositions & JSX.IntrinsicElements['mesh'] & {
   visibleInfo: boolean;
 }
 

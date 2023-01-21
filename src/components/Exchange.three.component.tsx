@@ -3,10 +3,10 @@ import * as THREE from 'three'
 import { useRef, useState } from 'react'
 import { Html } from '@react-three/drei'
 import { QUEUE_DIMENSION } from '@constants/components.constant'
-import { ComponentInfo } from '@contexts/position/builder/info.builder'
+import { Info } from '@contexts/interfaces/positions.interface'
 
-type Props = JSX.IntrinsicElements['mesh'] & {
-  infoComponent: ComponentInfo
+export type Props = JSX.IntrinsicElements['mesh'] & {
+  infoComponent: Info
   visibleInfo: boolean;
 }
 
