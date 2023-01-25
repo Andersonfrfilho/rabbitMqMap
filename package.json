@@ -6,7 +6,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "jest --clearCache && jest",
+    "test": "jest --clearCache && jest --runInBand --logHeapUsage",
     "test:ci": "jest --ci",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"

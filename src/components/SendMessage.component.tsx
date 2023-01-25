@@ -4,10 +4,11 @@ import { Accordion, AccordionButton, AccordionIcon, AccordionItem, AccordionPane
 import { Exchange, Type } from "@services/rabbitmq/interfaces/exchange.interface";
 import { Producer } from "@services/rabbitmq/interfaces/producer.interface";
 import { useForm } from "react-hook-form";
-import { v4 as uuidV4 } from 'uuid';
+
 import { UNDEFINED } from "@constants/commons.constant";
 import { EXCHANGES_WITH_ROUTE_KEY } from "@constants/exchanges.constant";
 import { invertHex, randomColor } from "@utils/random-color";
+import { useComponent } from "@contexts/component/Component.context";
 
 interface Props {
   producers: Producer[];
@@ -23,7 +24,6 @@ interface MessageRemoveParams {
 interface MessageFormParam {
   exchange: string;
   routeKey: string;
-  time: string;
   payload: string;
   producerId: string;
 }
@@ -35,33 +35,20 @@ export function SendMessage(data: Props): JSX.Element {
     defaultValues: {
       exchange: UNDEFINED,
       routeKey: '',
-      time: UNDEFINED,
       payload: '',
     }
   });
 
+  const { addMessageInProducers, removeMessageInProducers } = useComponent();
+
   const stopMessage = ({ producerId, messageId }: MessageRemoveParams) => {
-    setMessage(producersCurrent => producersCurrent.map(producer => {
-      if (producer.id === producerId) {
-        return {
-          ...producer,
-          messages: producer.messages.filter(message => message.id !== messageId)
-        }
-      }
-      return producer
-    }))
+    const newProducersWithMessage = removeMessageInProducers({ messageId, producerId, producers })
+    setMessage(newProducersWithMessage)
   }
 
   const onSubmit = (formData: MessageFormParam) => {
-    setMessage(producersCurrent => producersCurrent.map(producer => {
-      if (producer.id === formData.producerId) {
-        return {
-          ...producer,
-          messages: [...producer.messages, { ...formData, time: Number(formData.time), producerId: undefined, id: uuidv4(), color: randomColor() }]
-        }
-      }
-      return producer
-    }))
+    const newProducersWithMessage = addMessageInProducers({ message: formData, producers })
+    setMessage(newProducersWithMessage)
   };
 
   const exchange = exchanges.find(exchange => exchange.name === watch('exchange')) || undefined
@@ -75,12 +62,12 @@ export function SendMessage(data: Props): JSX.Element {
   function handleSelectRouteKey(routeKey: string) {
     setValue('routeKey', routeKey)
   }
-
-  return (<Accordion allowMultiple>
+  return (<Accordion data-testid="accordion-send-message" allowMultiple>
     {producers.length > 0 && producers.map((producer, index) => {
+
       return (<AccordionItem key={producer.id}>
         <h2>
-          <AccordionButton>
+          <AccordionButton data-testid="accordion-send-message-button">
             <Box as="span" flex='1' textAlign='left'>
               {producer.user}
             </Box>
@@ -92,37 +79,38 @@ export function SendMessage(data: Props): JSX.Element {
             {({ isExpanded }) => (
               <>
                 <h2>
-                  <AccordionButton marginBottom={'5px'} >
+                  <AccordionButton marginBottom={'5px'} data-testid="accordion-send-message-button-expand">
                     <Box flex='1' textAlign='center'>
                       Adicionar Mensagem
                     </Box>
                     {isExpanded ? (
-                      <MinusIcon />
+                      <MinusIcon data-testid="accordion-send-message-button-minus-icon" />
                     ) : (
-                      <AddIcon />
+                      <AddIcon data-testid="accordion-send-message-button-icon" />
                     )}
                   </AccordionButton>
                 </h2>
                 <AccordionPanel pb={4}>
                   <Box flex='1' marginBottom={'5px'}>
                     {!!errors.exchange && <Text fontSize='xs' color={'red.600'}>{errors.exchange.message}</Text>}
-                    <Select {...register("exchange", {
+                    <Select data-testid="accordion-send-message-exchange-select" {...register("exchange", {
                       required: "Selecione uma exchange!", validate: (value) => value !== UNDEFINED ? undefined : 'Selecione uma exchange valida!'
                     })} isInvalid={!!errors.exchange}>
                       <option value={UNDEFINED} disabled>Exchanges</option>
-                      {exchanges.length > 0 && exchanges.map(exchange => <option key={exchange.name} value={exchange.name}>{exchange.name}</option>)}
+                      {exchanges.length > 0 && exchanges.map(exchange => <option data-testid="accordion-send-message-exchange-select-option" key={exchange.name} value={exchange.name}>{exchange.name}</option>)}
                     </Select>
                   </Box>
                   <Box flex='1' marginBottom={'5px'}>
                     {!!errors.routeKey && <Text fontSize='xs' color={'red.600'}>{errors.routeKey.message}</Text>}
-                    {!!exchange && !!exchange?.type && EXCHANGES_WITH_ROUTE_KEY.includes(exchange.type) && <Input placeholder='Route-key' {...register("routeKey", { required: configRouteKey })} isInvalid={!!errors.routeKey} marginBottom={'5px'} />}
-                    {!!exchange && !!exchange?.type && EXCHANGES_WITH_ROUTE_KEY.includes(exchange.type) && <ButtonGroup variant='outline' orientation={"vertical"}>
+                    {!!exchange && !!exchange?.type && EXCHANGES_WITH_ROUTE_KEY.includes(exchange.type) && <Input data-testid="accordion-send-message-route-key-input" placeholder='Route-key' {...register("routeKey", { required: configRouteKey })} isInvalid={!!errors.routeKey} marginBottom={'5px'} />}
+                    {!!exchange && !!exchange?.type && EXCHANGES_WITH_ROUTE_KEY.includes(exchange.type) && <ButtonGroup data-testid="accordion-send-message-route-key-buttonGroup" variant='outline' orientation={"vertical"}>
                       {exchange.bindings?.map(binding => (<Button
                         key={binding.routing_key}
                         size='xs'
                         border='2px'
                         borderColor='green.500'
                         onClick={() => handleSelectRouteKey(binding.routing_key)}
+                        data-testid="accordion-send-message-exchange-bindings-button"
                       >
                         {binding.routing_key}
                       </Button>))}
@@ -130,16 +118,10 @@ export function SendMessage(data: Props): JSX.Element {
                   </Box>
                   <Box flex='1' marginBottom={'5px'}>
                     {!!errors.payload && <Text fontSize='xs' color={'red.600'}>{errors.payload.message}</Text>}
-                    <Textarea placeholder='Payload da mensagem:' resize={"none"} isInvalid={!!errors.payload} {...register("payload", { required: "Digite um payload para mensagem!" })} />
-                  </Box>
-                  <Box flex='1' marginBottom={'5px'}>
-                    {!!errors.time && <Text fontSize='xs' color={'red.600'}>{errors.time.message}</Text>}
-                    <Select {...register("time", { required: "Selecione um período!" })} isInvalid={!!errors.time}>
-                      <option value={UNDEFINED} disabled>Tempo</option>
-                    </Select>
+                    <Textarea data-testid="accordion-send-message-text-area-payload-message" placeholder='Payload da mensagem:' resize={"none"} isInvalid={!!errors.payload} {...register("payload", { required: "Digite um payload para mensagem!" })} />
                   </Box>
                   <Box flex='1' backgroundColor={'red.400'}>
-                    <Button width={'100%'} rightIcon={<AddIcon />} colorScheme='teal' onClick={handleSubmit((data) => onSubmit({ ...data, producerId: producer.id }))}>
+                    <Button data-testid="accordion-send-message-button-add-message" width={'100%'} rightIcon={<AddIcon />} colorScheme='teal' onClick={handleSubmit((data) => onSubmit({ ...data, producerId: producer.id }))}>
                       Adicionar
                     </Button>
                   </Box>
@@ -156,7 +138,7 @@ export function SendMessage(data: Props): JSX.Element {
             {!!producer.messages && producer.messages.length > 0 && producer.messages.map((message, index) => (
               <ButtonGroup key={message.id} size='sm' isAttached variant='outline' marginBottom={'5px'} >
                 <Button backgroundColor={message.color} textColor={invertHex(message.color)}>Message - {index + 1}</Button>
-                <IconButton onClick={() => stopMessage({ producerId: producer.id, messageId: message.id })} aria-label='Stop Message' icon={<GiStopSign />} color="red.600" />
+                <IconButton data-testid="icon-button-stop-message-button-expand" onClick={() => stopMessage({ producerId: producer.id, messageId: message.id })} aria-label='Stop Message' icon={<GiStopSign />} color="red.600" />
               </ButtonGroup>
             ))}
           </AccordionItem>}

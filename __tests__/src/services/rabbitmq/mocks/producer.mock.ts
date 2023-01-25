@@ -1,3 +1,6 @@
+import { MessagePositions } from "@services/rabbitmq/interfaces/message.interface"
+import { ProducerPositionLinesMessagePosition } from "@services/rabbitmq/interfaces/producer.interface"
+
 export const producers = [
   {
     "id": "a9b5afc7-6bea-4e87-956a-57352031a462",
@@ -183,7 +186,7 @@ export const positions = [
   }
 ]
 
-export const producersPositionMessagesPosition = [
+export const producersPositionMessagesPosition: ProducerPositionLinesMessagePosition[] = [
   {
     "id": "79a3fb8f-916d-4f21-b7cb-65e50e39f187",
     "host": "172.18.0.2",
@@ -11346,3 +11349,4 @@ export const linesPositions = [
 ]
 
 
+export const messagesPositions: MessagePositions[] = producersPositionMessagesPosition.reduce((accumulator: MessagePositions[], current: ProducerPositionLinesMessagePosition): MessagePositions[] => [...accumulator, ...current.messages], [])

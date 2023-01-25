@@ -34,14 +34,15 @@ export function SphereThree({ positions, id, color, ...props }: Props): JSX.Elem
     } else if (firstStep) {
       firstStep = false
       secondStep = true
+      thirdStep = false
       indexPositionMessageProducerToExchange = 0
     }
-
     if (secondStep && indexPositionMessageExchangeToQueue < positions.exchangeBetweenQueue.length) {
       const [x, y, z] = positions.exchangeBetweenQueue[indexPositionMessageExchangeToQueue].position
       sphereRef.current.position.set(x, y, z)
       indexPositionMessageExchangeToQueue += 1;
     } else if (secondStep) {
+      firstStep = false
       secondStep = false
       thirdStep = true
       indexPositionMessageExchangeToQueue = 0
@@ -54,6 +55,7 @@ export function SphereThree({ positions, id, color, ...props }: Props): JSX.Elem
     } else if (thirdStep) {
       thirdStep = false
       firstStep = true
+      secondStep = false
       indexPositionMessageQueueToConsumer = 0
     }
   })

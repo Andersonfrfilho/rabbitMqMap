@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { ResizeObserver } from '@juggle/resize-observer';
 import { Exchange } from "@services/rabbitmq/interfaces/exchange.interface";
-import { ChangeAxiosConfig, changeAxiosConfig, getExchanges, getProducers, getQueues, rabbitMqApiService } from '@services/rabbitmq/rabbitmq.service'
+import { ChangeAxiosConfig, changeAxiosConfig, getExchanges, getProducers, getQueues } from '@services/rabbitmq/rabbitmq.service'
 import { GetStaticProps, GetStaticPropsResult, InferGetStaticPropsType } from "next";
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
@@ -153,7 +153,6 @@ export default function App(
 
   return (
     <>
-      {/* <ModalBackdrop modalOpen={modalOpen} onClose={() => { setModalOpen(false) }} connections={connections} /> */}
       <Grid
         data-testid="container"
         templateAreas={`"header header header"
