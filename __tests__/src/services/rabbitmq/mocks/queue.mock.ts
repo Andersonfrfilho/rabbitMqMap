@@ -1,3 +1,4 @@
+import { activity_status } from "@services/rabbitmq/interfaces/consumer.interface"
 import { QueueBindingConsumerRegister } from "@services/rabbitmq/interfaces/queue.interface"
 
 export const queues: QueueBindingConsumerRegister[] = [
@@ -36,7 +37,7 @@ export const queues: QueueBindingConsumerRegister[] = [
         "arguments": {},
         "ack_required": true,
         "active": true,
-        "activity_status": "up",
+        "activity_status": activity_status.up,
         "channel_details": {
           "connection_name": "172.18.0.1:42732 -> 172.18.0.2:5672",
           "name": "172.18.0.1:42732 -> 172.18.0.2:5672 (1)",

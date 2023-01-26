@@ -1,7 +1,7 @@
 import { PropertyLines } from "@contexts/interfaces/lines.interface";
 import { PropertyPosition } from "@contexts/interfaces/positions.interface";
 
-enum activity_status {
+export enum activity_status {
   up = "up"
 }
 

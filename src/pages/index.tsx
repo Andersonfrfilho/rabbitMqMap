@@ -28,6 +28,7 @@ import { SendMessage } from '@components/SendMessage.component';
 import { useForm } from 'react-hook-form';
 import { useSchema } from '@contexts/schema/Schema.context';
 import { isValidUrl } from '@utils/isValidUrl';
+import { useComponent } from '@contexts/component/Component.context';
 
 interface AppGetStaticInterface {
   queues: QueueBindingConsumerRegister[]
@@ -52,10 +53,9 @@ export default function App(
   const [visibleInfos, setVisibleInfos] = useState<boolean>(false)
 
   const { verifyDiffContent } = useSchema()
-
+  const { getConsumers,
+    createComponents, } = useComponent()
   const {
-    getConsumers,
-    createComponents,
     getQueuePositionsCoordinates,
     createPositionsComponents,
     definePositionsComponents,
@@ -63,6 +63,7 @@ export default function App(
     getLinksLinesCoordinates,
     defineMessagePositions,
   } = usePosition()
+
   const dataTest = useForm({
     defaultValues: {
       baseUrl: '',

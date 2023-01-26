@@ -1,4 +1,8 @@
-export const components = {
+import { Components } from "@contexts/interfaces/components.interface"
+import { activity_status } from "@services/rabbitmq/interfaces/consumer.interface"
+import { Type } from "@services/rabbitmq/interfaces/exchange.interface"
+
+export const components: Components = {
   "consumer": {
     "depth": 9,
     "dimension": {
@@ -12,7 +16,7 @@ export const components = {
         "arguments": {},
         "ack_required": true,
         "active": true,
-        "activity_status": "up",
+        "activity_status": activity_status.up,
         "channel_details": {
           "connection_name": "172.18.0.1:42732 -> 172.18.0.2:5672",
           "name": "172.18.0.1:42732 -> 172.18.0.2:5672 (1)",
@@ -47,7 +51,7 @@ export const components = {
         "durable": true,
         "internal": false,
         "name": "",
-        "type": "direct",
+        "type": Type.direct,
         "user_who_performed_action": "rmq-internal",
         "vhost": "/",
         "bindings": [
@@ -104,7 +108,7 @@ export const components = {
         "durable": true,
         "internal": false,
         "name": "amq.direct",
-        "type": "direct",
+        "type": Type.direct,
         "user_who_performed_action": "rmq-internal",
         "vhost": "/",
         "bindings": []
@@ -115,7 +119,7 @@ export const components = {
         "durable": true,
         "internal": false,
         "name": "amq.fanout",
-        "type": "fanout",
+        "type": Type.fanout,
         "user_who_performed_action": "rmq-internal",
         "vhost": "/",
         "bindings": []
@@ -126,7 +130,7 @@ export const components = {
         "durable": true,
         "internal": false,
         "name": "amq.headers",
-        "type": "headers",
+        "type": Type.headers,
         "user_who_performed_action": "rmq-internal",
         "vhost": "/",
         "bindings": []
@@ -137,7 +141,7 @@ export const components = {
         "durable": true,
         "internal": false,
         "name": "amq.match",
-        "type": "headers",
+        "type": Type.headers,
         "user_who_performed_action": "rmq-internal",
         "vhost": "/",
         "bindings": []
@@ -148,7 +152,7 @@ export const components = {
         "durable": true,
         "internal": true,
         "name": "amq.rabbitmq.trace",
-        "type": "topic",
+        "type": Type.topic,
         "user_who_performed_action": "rmq-internal",
         "vhost": "/",
         "bindings": []
@@ -159,7 +163,7 @@ export const components = {
         "durable": true,
         "internal": false,
         "name": "amq.topic",
-        "type": "topic",
+        "type": Type.topic,
         "user_who_performed_action": "rmq-internal",
         "vhost": "/",
         "bindings": []
@@ -170,7 +174,7 @@ export const components = {
         "durable": true,
         "internal": false,
         "name": "dead-letter-exchange-queue-1",
-        "type": "direct",
+        "type": Type.direct,
         "user_who_performed_action": "guest",
         "vhost": "/",
         "bindings": [
@@ -191,7 +195,7 @@ export const components = {
         "durable": true,
         "internal": false,
         "name": "exchange-queue-1-topic",
-        "type": "topic",
+        "type": Type.topic,
         "user_who_performed_action": "guest",
         "vhost": "/",
         "bindings": [
@@ -263,7 +267,7 @@ export const components = {
             "arguments": {},
             "ack_required": true,
             "active": true,
-            "activity_status": "up",
+            "activity_status": activity_status.up,
             "channel_details": {
               "connection_name": "172.18.0.1:42732 -> 172.18.0.2:5672",
               "name": "172.18.0.1:42732 -> 172.18.0.2:5672 (1)",
@@ -424,7 +428,7 @@ export const components = {
           {
             "exchange": "amq.direct",
             "routeKey": "",
-            "time": 1,
+
             "payload": "{\n\"fila\":\"direct\"\n}",
             "id": "284d1cbc-b9c7-4d9e-baf9-1827dc1daae4",
             "color": "#7a2d16"
@@ -432,7 +436,7 @@ export const components = {
           {
             "exchange": "amq.fanout",
             "routeKey": "",
-            "time": 1,
+
             "payload": "{\n\"fila\":\"fanout\"\n}",
             "id": "e570d66e-5526-4013-9354-65a764e35d1d",
             "color": "#59b651"
@@ -440,7 +444,6 @@ export const components = {
           {
             "exchange": "amq.headers",
             "routeKey": "",
-            "time": 1,
             "payload": "{\n\"fila\":\"headers\"\n}",
             "id": "cf73c63e-8eb1-4d4e-b077-b07333ba810d",
             "color": "#1cc0c2"
@@ -448,7 +451,7 @@ export const components = {
           {
             "exchange": "amq.match",
             "routeKey": "",
-            "time": 1,
+
             "payload": "{\n\"fila\":\"match\"\n}",
             "id": "b1ebcb65-d165-4a39-b975-299f0706a146",
             "color": "#6e1e9d"
@@ -456,7 +459,7 @@ export const components = {
           {
             "exchange": "amq.topic",
             "routeKey": "route-key-topic",
-            "time": 1,
+
             "payload": "{\n\"fila\":\"route-key-topic\"\n}",
             "id": "063bb02b-dc70-443e-b9c7-76ab50d05404",
             "color": "#1ad1a6"
@@ -464,7 +467,7 @@ export const components = {
           {
             "exchange": "exchange-queue-1-topic",
             "routeKey": "many.queue-3",
-            "time": 1,
+
             "payload": "{\n\"fila\":\"route-key-topic\"\n}",
             "id": "063bb02b-dc70-443e-b9c7-76ab50d05674",
             "color": "#361c34"
@@ -501,7 +504,7 @@ export const componentsPositions = [
           ],
           "info": {
             "name": "",
-            "type": "direct",
+            "type": Type.direct,
             "componentType": "exchange"
           },
           "id": "4e08b399-71cb-4592-8a3b-5d87e5aa5bb3"
@@ -526,7 +529,7 @@ export const componentsPositions = [
           ],
           "info": {
             "name": "exchange-queue-1-topic",
-            "type": "topic",
+            "type": Type.topic,
             "componentType": "exchange"
           },
           "id": "90eb440a-769c-4eb9-904a-2da0001df7da"
@@ -539,7 +542,7 @@ export const componentsPositions = [
         "arguments": {},
         "ack_required": true,
         "active": true,
-        "activity_status": "up",
+        "activity_status": activity_status.up,
         "channel_details": {
           "connection_name": "172.18.0.1:43834 -> 172.18.0.2:5672",
           "name": "172.18.0.1:43834 -> 172.18.0.2:5672 (1)",
@@ -612,7 +615,7 @@ export const componentsPositions = [
           ],
           "info": {
             "name": "",
-            "type": "direct",
+            "type": Type.direct,
             "componentType": "exchange"
           },
           "id": "4e08b399-71cb-4592-8a3b-5d87e5aa5bb3"
@@ -635,7 +638,7 @@ export const componentsPositions = [
           ],
           "info": {
             "name": "dead-letter-exchange-queue-1",
-            "type": "direct",
+            "type": Type.direct,
             "componentType": "exchange"
           },
           "id": "2cb4e399-f325-4118-a788-de159b7dccb1"
@@ -684,7 +687,7 @@ export const componentsPositions = [
           ],
           "info": {
             "name": "",
-            "type": "direct",
+            "type": Type.direct,
             "componentType": "exchange"
           },
           "id": "4e08b399-71cb-4592-8a3b-5d87e5aa5bb3"
@@ -707,7 +710,7 @@ export const componentsPositions = [
           ],
           "info": {
             "name": "exchange-queue-1-topic",
-            "type": "topic",
+            "type": Type.topic,
             "componentType": "exchange"
           },
           "id": "90eb440a-769c-4eb9-904a-2da0001df7da"
@@ -756,7 +759,7 @@ export const componentsPositions = [
           ],
           "info": {
             "name": "",
-            "type": "direct",
+            "type": Type.direct,
             "componentType": "exchange"
           },
           "id": "4e08b399-71cb-4592-8a3b-5d87e5aa5bb3"
@@ -805,7 +808,7 @@ export const componentsPositions = [
           ],
           "info": {
             "name": "",
-            "type": "direct",
+            "type": Type.direct,
             "componentType": "exchange"
           },
           "id": "4e08b399-71cb-4592-8a3b-5d87e5aa5bb3"
@@ -857,7 +860,7 @@ export const componentsLines = [
           ],
           "info": {
             "name": "",
-            "type": "direct",
+            "type": Type.direct,
             "componentType": "exchange"
           },
           "id": "6502915e-cb66-458e-84ab-d80673c16c37"
@@ -901,7 +904,7 @@ export const componentsLines = [
           ],
           "info": {
             "name": "exchange-queue-1-topic",
-            "type": "topic",
+            "type": Type.topic,
             "componentType": "exchange"
           },
           "id": "819581f2-fd17-4d48-8f2e-c58a9db773ad"
@@ -933,7 +936,7 @@ export const componentsLines = [
         "arguments": {},
         "ack_required": true,
         "active": true,
-        "activity_status": "up",
+        "activity_status": activity_status.up,
         "channel_details": {
           "connection_name": "172.18.0.1:44474 -> 172.18.0.2:5672",
           "name": "172.18.0.1:44474 -> 172.18.0.2:5672 (1)",
@@ -1025,7 +1028,7 @@ export const componentsLines = [
           ],
           "info": {
             "name": "",
-            "type": "direct",
+            "type": Type.direct,
             "componentType": "exchange"
           },
           "id": "6502915e-cb66-458e-84ab-d80673c16c37"
@@ -1067,7 +1070,7 @@ export const componentsLines = [
           ],
           "info": {
             "name": "dead-letter-exchange-queue-1",
-            "type": "direct",
+            "type": Type.direct,
             "componentType": "exchange"
           },
           "id": "856a7a79-062e-45d1-8cfb-d27fc055d10c"
@@ -1135,7 +1138,7 @@ export const componentsLines = [
           ],
           "info": {
             "name": "",
-            "type": "direct",
+            "type": Type.direct,
             "componentType": "exchange"
           },
           "id": "6502915e-cb66-458e-84ab-d80673c16c37"
@@ -1177,7 +1180,7 @@ export const componentsLines = [
           ],
           "info": {
             "name": "exchange-queue-1-topic",
-            "type": "topic",
+            "type": Type.topic,
             "componentType": "exchange"
           },
           "id": "819581f2-fd17-4d48-8f2e-c58a9db773ad"
@@ -1245,7 +1248,7 @@ export const componentsLines = [
           ],
           "info": {
             "name": "",
-            "type": "direct",
+            "type": Type.direct,
             "componentType": "exchange"
           },
           "id": "6502915e-cb66-458e-84ab-d80673c16c37"
@@ -1313,7 +1316,7 @@ export const componentsLines = [
           ],
           "info": {
             "name": "",
-            "type": "direct",
+            "type": Type.direct,
             "componentType": "exchange"
           },
           "id": "6502915e-cb66-458e-84ab-d80673c16c37"

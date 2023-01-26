@@ -1,5 +1,3 @@
-export const getConsumerMock = jest.fn()
-export const createComponentsMock = jest.fn()
 export const getQueuePositionsCoordinatesMock = jest.fn()
 export const createPositionsComponentsMock = jest.fn()
 export const definePositionsComponentsMock = jest.fn()
@@ -8,14 +6,13 @@ export const getLinksLinesCoordinatesMock = jest.fn()
 export const defineMessagePositionsMock = jest.fn()
 
 export const usePositionMock = {
-  getConsumers: () => getConsumerMock(),
   getQueuePositionsCoordinates: () => getQueuePositionsCoordinatesMock(),
   createPositionsComponents: () => createPositionsComponentsMock(),
   definePositionsComponents: () => definePositionsComponentsMock(),
   defineLinesQueuesBetweenExchangesConsumers: () => defineLinesQueuesBetweenExchangesConsumersMock(),
   getLinksLinesCoordinates: () => getLinksLinesCoordinatesMock(),
   defineMessagePositions: () => defineMessagePositionsMock(),
-  createComponents: () => createComponentsMock()
+
 }
 
 export const positions = {

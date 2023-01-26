@@ -2,7 +2,7 @@ import React from 'react'
 import { fireEvent, render, waitFor, act, } from '@testing-library/react'
 import Home, { getStaticProps } from '@pages/index'
 import { InferGetStaticPropsType } from 'next'
-import { createComponentsMock, createPositionsComponentsMock, defineLinesQueuesBetweenExchangesConsumersMock, defineMessagePositionsMock, definePositionsComponentsMock, getConsumerMock, getLinksLinesCoordinatesMock, getQueuePositionsCoordinatesMock, usePositionMock } from '../contexts/position/mocks/position.context.mocks'
+import { createPositionsComponentsMock, defineLinesQueuesBetweenExchangesConsumersMock, defineMessagePositionsMock, definePositionsComponentsMock, getLinksLinesCoordinatesMock, getQueuePositionsCoordinatesMock, usePositionMock } from '../contexts/position/mocks/position.context.mocks'
 import { queues } from '../services/rabbitmq/mocks/queue.mock'
 import { exchanges, exchangesPosition } from '../services/rabbitmq/mocks/exchange.mock'
 import { producerPositionMessage, producers, producersPositionMessagesPosition } from '../services/rabbitmq/mocks/producer.mock'
@@ -13,10 +13,17 @@ import { useSchemaMock, verifyDiffContentMock } from '../contexts/schema/mocks/p
 import { changeAxiosConfigMock } from '../services/rabbitmq/rabbitmq.service.mock'
 import * as RabbitMqService from '@services/rabbitmq/rabbitmq.service'
 import { faker } from '@faker-js/faker'
+import { createComponentsMock, getConsumersMock, useComponentMock } from '../contexts/component/mocks/component.context.mock'
 
 jest.mock('@contexts/position/Position.context', () => {
   return {
     usePosition: () => usePositionMock
+  }
+})
+
+jest.mock('@contexts/component/Component.context', () => {
+  return {
+    useComponent: () => useComponentMock
   }
 })
 
@@ -37,7 +44,7 @@ describe('Home', () => {
 
 
   beforeEach(() => {
-    getConsumerMock.mockReturnValue(consumers)
+    getConsumersMock.mockReturnValue(consumers)
     createComponentsMock.mockReturnValue(components)
     createPositionsComponentsMock.mockReturnValue(componentsPositions)
     definePositionsComponentsMock.mockReturnValue({ queues: componentsPositions, exchanges: exchangesPosition, producers: producerPositionMessage })
@@ -49,8 +56,8 @@ describe('Home', () => {
 
   it('should renders a index start page before useEffect page', () => {
     // ARRANGE
-    const spyGetConsumers = jest.spyOn(usePositionMock, 'getConsumers')
-    const spyCreateComponents = jest.spyOn(usePositionMock, 'createComponents')
+    const spyGetConsumers = jest.spyOn(useComponentMock, 'getConsumers')
+    const spyCreateComponents = jest.spyOn(useComponentMock, 'createComponents')
     const spyCreatePositionsComponents = jest.spyOn(usePositionMock, 'createPositionsComponents')
     const spyDefinePositionsComponents = jest.spyOn(usePositionMock, 'definePositionsComponents')
     const spyGetQueuePositionsCoordinates = jest.spyOn(usePositionMock, 'getQueuePositionsCoordinates')
@@ -115,8 +122,8 @@ describe('Home', () => {
 
   it('should define changes editor input code', () => {
     // ARRANGE
-    const spyGetConsumers = jest.spyOn(usePositionMock, 'getConsumers')
-    const spyCreateComponents = jest.spyOn(usePositionMock, 'createComponents')
+    const spyGetConsumers = jest.spyOn(useComponentMock, 'getConsumers')
+    const spyCreateComponents = jest.spyOn(useComponentMock, 'createComponents')
     const spyCreatePositionsComponents = jest.spyOn(usePositionMock, 'createPositionsComponents')
     const spyDefinePositionsComponents = jest.spyOn(usePositionMock, 'definePositionsComponents')
     const spyGetQueuePositionsCoordinates = jest.spyOn(usePositionMock, 'getQueuePositionsCoordinates')
@@ -188,8 +195,8 @@ describe('Home', () => {
 
   it('should define changes editor input code when change only !queueIsEqual', () => {
     // ARRANGE
-    const spyGetConsumers = jest.spyOn(usePositionMock, 'getConsumers')
-    const spyCreateComponents = jest.spyOn(usePositionMock, 'createComponents')
+    const spyGetConsumers = jest.spyOn(useComponentMock, 'getConsumers')
+    const spyCreateComponents = jest.spyOn(useComponentMock, 'createComponents')
     const spyCreatePositionsComponents = jest.spyOn(usePositionMock, 'createPositionsComponents')
     const spyDefinePositionsComponents = jest.spyOn(usePositionMock, 'definePositionsComponents')
     const spyGetQueuePositionsCoordinates = jest.spyOn(usePositionMock, 'getQueuePositionsCoordinates')
@@ -261,8 +268,8 @@ describe('Home', () => {
 
   it('should define changes editor input code when change only !exchangeIsEqual', () => {
     // ARRANGE
-    const spyGetConsumers = jest.spyOn(usePositionMock, 'getConsumers')
-    const spyCreateComponents = jest.spyOn(usePositionMock, 'createComponents')
+    const spyGetConsumers = jest.spyOn(useComponentMock, 'getConsumers')
+    const spyCreateComponents = jest.spyOn(useComponentMock, 'createComponents')
     const spyCreatePositionsComponents = jest.spyOn(usePositionMock, 'createPositionsComponents')
     const spyDefinePositionsComponents = jest.spyOn(usePositionMock, 'definePositionsComponents')
     const spyGetQueuePositionsCoordinates = jest.spyOn(usePositionMock, 'getQueuePositionsCoordinates')
@@ -335,8 +342,8 @@ describe('Home', () => {
 
   it('should define changes editor input code when change only !exchangeIsEqual', () => {
     // ARRANGE
-    const spyGetConsumers = jest.spyOn(usePositionMock, 'getConsumers')
-    const spyCreateComponents = jest.spyOn(usePositionMock, 'createComponents')
+    const spyGetConsumers = jest.spyOn(useComponentMock, 'getConsumers')
+    const spyCreateComponents = jest.spyOn(useComponentMock, 'createComponents')
     const spyCreatePositionsComponents = jest.spyOn(usePositionMock, 'createPositionsComponents')
     const spyDefinePositionsComponents = jest.spyOn(usePositionMock, 'definePositionsComponents')
     const spyGetQueuePositionsCoordinates = jest.spyOn(usePositionMock, 'getQueuePositionsCoordinates')

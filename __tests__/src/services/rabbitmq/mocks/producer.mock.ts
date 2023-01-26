@@ -1,5 +1,8 @@
 import { MessagePositions } from "@services/rabbitmq/interfaces/message.interface"
 import { ProducerPositionLinesMessagePosition } from "@services/rabbitmq/interfaces/producer.interface"
+import { exchanges } from "./exchange.mock"
+import { faker } from "@faker-js/faker"
+import { MessageFormParam } from "@contexts/component/functions/addMessageInProducers"
 
 export const producers = [
   {
@@ -11350,3 +11353,82 @@ export const linesPositions = [
 
 
 export const messagesPositions: MessagePositions[] = producersPositionMessagesPosition.reduce((accumulator: MessagePositions[], current: ProducerPositionLinesMessagePosition): MessagePositions[] => [...accumulator, ...current.messages], [])
+
+export const moreOneProducers = [
+  ...producers,
+  {
+    "id": "a9b5afc7-6bea-4e87-956a-57352031a463",
+    "host": "172.18.0.2",
+    "name": "172.18.0.1:42740 -> 172.18.0.2:5672",
+    "node": "rabbit@rabbit-mapper-host",
+    "user": "project-nextjs-producer",
+    "client_properties": {
+      "capabilities": {
+        "authentication_failure_close": true,
+        "basic.nack": true,
+        "connection.blocked": true,
+        "consumer_cancel_notify": true,
+        "exchange_exchange_bindings": true,
+        "publisher_confirms": true
+      },
+      "information": "http://squaremo.github.io/amqp.node",
+      "platform": "Node.JS v18.12.0",
+      "product": "amqplib",
+      "version": "0.8.0"
+    },
+    "user_who_performed_action": "project-nextjs-producer",
+    "vhost": "/",
+    "port": 5672,
+    "type": "network",
+    "messages": [
+      {
+        "exchange": "amq.direct",
+        "routeKey": "",
+        "time": 1,
+        "payload": "{\n\"fila\":\"direct\"\n}",
+        "id": "284d1cbc-b9c7-4d9e-baf9-1827dc1daae4",
+        "color": "#7a2d16"
+      },
+      {
+        "exchange": "amq.fanout",
+        "routeKey": "",
+        "time": 1,
+        "payload": "{\n\"fila\":\"fanout\"\n}",
+        "id": "e570d66e-5526-4013-9354-65a764e35d1d",
+        "color": "#59b651"
+      },
+      {
+        "exchange": "amq.headers",
+        "routeKey": "",
+        "time": 1,
+        "payload": "{\n\"fila\":\"headers\"\n}",
+        "id": "cf73c63e-8eb1-4d4e-b077-b07333ba810d",
+        "color": "#1cc0c2"
+      },
+      {
+        "exchange": "amq.match",
+        "routeKey": "",
+        "time": 1,
+        "payload": "{\n\"fila\":\"match\"\n}",
+        "id": "b1ebcb65-d165-4a39-b975-299f0706a146",
+        "color": "#6e1e9d"
+      },
+      {
+        "exchange": "amq.topic",
+        "routeKey": "route-key-topic",
+        "time": 1,
+        "payload": "{\n\"fila\":\"route-key-topic\"\n}",
+        "id": "063bb02b-dc70-443e-b9c7-76ab50d05404",
+        "color": "#1ad1a6"
+      },
+      {
+        "exchange": "exchange-queue-1-topic",
+        "routeKey": "many.queue-3",
+        "time": 1,
+        "payload": "{\n\"fila\":\"route-key-topic\"\n}",
+        "id": "063bb02b-dc70-443e-b9c7-76ab50d05674",
+        "color": "#361c34"
+      }
+    ]
+  }
+]

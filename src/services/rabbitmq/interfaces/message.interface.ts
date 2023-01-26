@@ -15,7 +15,7 @@ export interface MessagePoint {
 interface Message {
   exchange: string;
   routeKey?: string;
-  messagePayload?: string;
+  payload?: string;
   id: string;
   color: string;
 }
