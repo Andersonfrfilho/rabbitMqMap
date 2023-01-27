@@ -416,7 +416,7 @@ describe('Home', () => {
   it('should info places, when click infos to change icons', async () => {
     // ARRANGE
     // ACT
-    const { getByTestId, queryByTestId } = render(<Home {...dataGetStaticProps} />)
+    const { getByTestId } = render(<Home {...dataGetStaticProps} />)
 
     const buttonInfo = getByTestId("button-infos")
     fireEvent(buttonInfo, new MouseEvent('click', {
