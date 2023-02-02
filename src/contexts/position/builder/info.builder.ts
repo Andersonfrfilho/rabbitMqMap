@@ -1,11 +1,12 @@
+import { ComponentsPositions } from "@contexts/interfaces/components.interface";
+import { Info } from "@contexts/interfaces/positions.interface";
 import { COMPONENT_INFO_TYPE } from "@enums/components.enum";
 import { Consumer } from "@services/rabbitmq/interfaces/consumer.interface";
 import { Exchange } from "@services/rabbitmq/interfaces/exchange.interface";
 import { Producer } from "@services/rabbitmq/interfaces/producer.interface";
 import { Queue } from "@services/rabbitmq/interfaces/queue.interface";
-import { PositionComponents } from "../functions/definePositionsComponents";
 
-export function infoExchange({ name, type }: Exchange): PositionComponents {
+export function infoExchange({ name, type }: Exchange): Info {
   return {
     name,
     type,
@@ -13,7 +14,7 @@ export function infoExchange({ name, type }: Exchange): PositionComponents {
   }
 }
 
-export function infoProducer({ user, type }: Producer): PositionComponents {
+export function infoProducer({ user, type }: Producer): Info {
   return {
     name: user,
     type,
@@ -21,7 +22,7 @@ export function infoProducer({ user, type }: Producer): PositionComponents {
   }
 }
 
-export function infoConsumer({ channel_details: { user }, queue: { name } }: Consumer): PositionComponents {
+export function infoConsumer({ channel_details: { user }, queue: { name } }: Consumer): Info {
   return {
     name,
     type: user,
@@ -29,7 +30,7 @@ export function infoConsumer({ channel_details: { user }, queue: { name } }: Con
   }
 }
 
-export function infoQueue({ name, type }: Queue): PositionComponents {
+export function infoQueue({ name, type }: Queue): Info {
   return {
     name,
     type,
@@ -38,11 +39,11 @@ export function infoQueue({ name, type }: Queue): PositionComponents {
 }
 
 interface BuilderComponentParams {
-  componentName: keyof PositionComponents;
+  componentName: keyof ComponentsPositions & COMPONENT_INFO_TYPE;
   data: Queue & Producer & Exchange & Consumer;
 }
 
-export function builderInfoComponent({ componentName, data }: BuilderComponentParams): ComponentInfo {
+export function builderInfoComponent({ componentName, data }: BuilderComponentParams): Info {
   switch (componentName) {
     case COMPONENT_INFO_TYPE.PRODUCER:
       return infoProducer(data)

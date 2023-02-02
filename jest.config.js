@@ -45,7 +45,8 @@ const customJestConfig = {
     '!**/assets/**',
     "!<rootDir>/src/**/_app.tsx",
     "!**/config/**",
-    "!**/interfaces/**"
+    "!**/interfaces/**",
+    "!**/styles/**"
   ],
   clearMocks: true,
   moduleFileExtensions: ["js", "jsx", "json", "ts", "tsx"],

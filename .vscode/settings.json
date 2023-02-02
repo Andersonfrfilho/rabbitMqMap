@@ -28,4 +28,6 @@
     "**/public":true,
     "package-lock.json":true,
   },
+  "thunder-client.httpLibrary": "axios",
+  "thunder-client.saveToWorkspace": true,
 }

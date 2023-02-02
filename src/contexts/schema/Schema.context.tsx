@@ -1,6 +1,5 @@
 import React, { useContext } from 'react'
-import { VerifyDiffContentParams, verifyDiffContent } from './utils/verifyDiffContent';
-
+import { VerifyDiffContentParams, verifyDiffContent } from './functions/verifyDiffContent';
 
 type SchemaStateProps = {
   children: React.ReactNode;

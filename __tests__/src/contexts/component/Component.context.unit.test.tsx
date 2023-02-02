@@ -21,6 +21,7 @@ describe('<ComponentProvider />', () => {
         <TestingComponent />
       </ComponentState>,
     );
+
     expect(addMessageInProducers).toBeDefined()
     expect(createComponents).toBeDefined()
     expect(getConsumers).toBeDefined()

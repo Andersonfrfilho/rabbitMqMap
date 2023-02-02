@@ -10,7 +10,7 @@ export interface VerifyDiffContentParams {
 }
 
 export function verifyDiffContent({ components, componentsEditor, type }: VerifyDiffContentParams): boolean {
-  if (type === COMPONENT_INFO_TYPE.QUEUE || COMPONENT_INFO_TYPE.EXCHANGE) {
+  if ([COMPONENT_INFO_TYPE.QUEUE, COMPONENT_INFO_TYPE.EXCHANGE, COMPONENT_INFO_TYPE.CONSUMER].includes(type)) {
     return components.length >= 0 && componentsEditor.length >= 0 && componentsEditor.every((componentEditor: QueueBindingConsumerRegister | Exchange) => components.some((component: QueueBindingConsumerRegister | Exchange) => component.name === componentEditor.name))
   }
 

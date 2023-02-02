@@ -8,7 +8,7 @@ export const configs = {
   STG: stg,
   PROD: prod
 }
-console.log(process.env.ENVIRONMENT)
+
 const environment = process.env.ENVIRONMENT || ENVIRONMENTS.DEV
 
 export const config: typeof dev & typeof stg & typeof prod = configs[environment]

@@ -4,7 +4,6 @@ import { Queue, QueueBindingConsumerRegister, } from '@services/rabbitmq/interfa
 import { Binding } from './interfaces/binding.interface'
 import { Consumer } from './interfaces/consumer.interface'
 import { Connection, Producer } from './interfaces/producer.interface'
-import { Overview } from './interfaces/overview.interfaces'
 import axios from 'axios'
 import { v4 as uuidV4 } from 'uuid';
 
@@ -42,7 +41,7 @@ export const getExchanges = async (): Promise<Exchange[]> => {
 
   const exchangesWithRouteKeys = exchanges.map(exchange => ({
     ...exchange,
-    bindings: bindings.filter(binding => binding.source === exchange.name) || []
+    bindings: bindings.filter(binding => binding.source === exchange.name)
   }))
 
   return exchangesWithRouteKeys
@@ -56,6 +55,7 @@ export const getBindings = async (queueName: string): Promise<Binding[]> => {
 
 export const getConsumers = async (queueName: string): Promise<Consumer[]> => {
   const { data: consumers } = await rabbitMqApiService.get<Consumer[]>(`/api/consumers/${encodeURIComponent(config.rabbitMq.vhost)}`)
+
   const consumersFilter = consumers.filter(consumer => consumer.queue.name === queueName)
   return consumersFilter
 }
@@ -118,11 +118,6 @@ export const getProducers = async (): Promise<Producer[]> => {
   return connectionsFormat
 }
 
-export const getOverview = async (): Promise<Overview> => {
-  const { data } = await rabbitMqApiService.get<Overview>('/api/overview')
-  return data
-}
-
 export interface ChangeAxiosConfig {
   baseUrl: string;
   username: string;
@@ -138,10 +133,9 @@ export const changeAxiosConfig = async ({ baseUrl, username, password, vHost }: 
     password
   }
 
-  const queues = await getQueues() || [];
-  const exchanges = await getExchanges() || []
-  const producers = await getProducers() || []
-
+  const queues = await getQueues();
+  const exchanges = await getExchanges()
+  const producers = await getProducers()
 
   return {
     queues,
