@@ -6,6 +6,14 @@ import { Exchange } from "@services/rabbitmq/interfaces/exchange.interface";
 import { Producer } from "@services/rabbitmq/interfaces/producer.interface";
 import { Queue } from "@services/rabbitmq/interfaces/queue.interface";
 
+export function infoProducer({ user, type }: Producer): Info {
+  return {
+    name: user,
+    type,
+    componentType: COMPONENT_INFO_TYPE.PRODUCER,
+  }
+}
+
 export function infoExchange({ name, type }: Exchange): Info {
   return {
     name,
@@ -14,11 +22,11 @@ export function infoExchange({ name, type }: Exchange): Info {
   }
 }
 
-export function infoProducer({ user, type }: Producer): Info {
+export function infoQueue({ name, type }: Queue): Info {
   return {
-    name: user,
+    name,
     type,
-    componentType: COMPONENT_INFO_TYPE.PRODUCER,
+    componentType: COMPONENT_INFO_TYPE.QUEUE,
   }
 }
 
@@ -30,13 +38,6 @@ export function infoConsumer({ channel_details: { user }, queue: { name } }: Con
   }
 }
 
-export function infoQueue({ name, type }: Queue): Info {
-  return {
-    name,
-    type,
-    componentType: COMPONENT_INFO_TYPE.QUEUE,
-  }
-}
 
 interface BuilderComponentParams {
   componentName: keyof ComponentsPositions & COMPONENT_INFO_TYPE;

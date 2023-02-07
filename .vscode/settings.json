@@ -30,4 +30,6 @@
   },
   "thunder-client.httpLibrary": "axios",
   "thunder-client.saveToWorkspace": true,
+  "thunder-client.workspaceRelativePath": ".http",
+  "thunder-client.customLocation": ".http",
 }

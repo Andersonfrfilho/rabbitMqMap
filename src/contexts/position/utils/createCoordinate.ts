@@ -1,5 +1,5 @@
 import { Position } from "@constants/position.constant";
-import { Component } from "@contexts/components/components.interface";
+import { Component } from "@contexts/interfaces/components.interface";
 import { Consumer } from "@services/rabbitmq/interfaces/consumer.interface";
 import { Exchange } from "@services/rabbitmq/interfaces/exchange.interface";
 import { Producer } from "@services/rabbitmq/interfaces/producer.interface";
