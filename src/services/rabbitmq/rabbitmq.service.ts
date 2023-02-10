@@ -19,7 +19,6 @@ export const rabbitMqApiService = function () {
 
 export const getQueues = async (): Promise<QueueBindingConsumerRegister[]> => {
   const { data: queues } = await rabbitMqApiService.get<Queue[]>(`/api/queues/${encodeURIComponent(config.rabbitMq.vhost)}`);
-
   const queuesFormat = queues.map(({ arguments: argumentsQueue, name, node, vhost, type }) => ({ arguments: argumentsQueue, name, node, vhost, type }))
   const queuesWithConsumersBindings = await Promise.all(queuesFormat.map(async queue => {
     const bindings = await getBindings(queue.name)
@@ -48,7 +47,7 @@ export const getExchanges = async (): Promise<Exchange[]> => {
 }
 
 export const getBindings = async (queueName: string): Promise<Binding[]> => {
-  const { data: bindings } = await rabbitMqApiService.get<Binding[]>(`/api/queues/${encodeURIComponent(config.rabbitMq.vhost)}/${queueName}/bindings`);
+  const { data: bindings } = await rabbitMqApiService.get<Binding[]>(`/api/queues/${encodeURIComponent(config.rabbitMq.vhost)}/${encodeURIComponent(queueName)}/bindings`);
 
   return bindings
 }
