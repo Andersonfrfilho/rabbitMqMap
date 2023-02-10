@@ -3,10 +3,10 @@ import * as THREE from 'three'
 import { useRef, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Html } from '@react-three/drei'
-import { MessageWithPositions } from '@services/rabbitmq/interfaces/producer.interface'
 import { INITIAL_POSITION } from '@constants/position.constant'
+import { MessagePositions } from '@services/rabbitmq/interfaces/message.interface'
 
-type Props = MessageWithPositions & JSX.IntrinsicElements['mesh'] & {
+export type Props = MessagePositions & JSX.IntrinsicElements['mesh'] & {
   visibleInfo: boolean;
 }
 
@@ -34,14 +34,15 @@ export function SphereThree({ positions, id, color, ...props }: Props): JSX.Elem
     } else if (firstStep) {
       firstStep = false
       secondStep = true
+      thirdStep = false
       indexPositionMessageProducerToExchange = 0
     }
-
     if (secondStep && indexPositionMessageExchangeToQueue < positions.exchangeBetweenQueue.length) {
       const [x, y, z] = positions.exchangeBetweenQueue[indexPositionMessageExchangeToQueue].position
       sphereRef.current.position.set(x, y, z)
       indexPositionMessageExchangeToQueue += 1;
     } else if (secondStep) {
+      firstStep = false
       secondStep = false
       thirdStep = true
       indexPositionMessageExchangeToQueue = 0
@@ -54,11 +55,10 @@ export function SphereThree({ positions, id, color, ...props }: Props): JSX.Elem
     } else if (thirdStep) {
       thirdStep = false
       firstStep = true
+      secondStep = false
       indexPositionMessageQueueToConsumer = 0
     }
   })
-
-  console.log(color)
 
   return (
     <mesh

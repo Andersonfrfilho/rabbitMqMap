@@ -1,9 +1,9 @@
 import { PropertyPosition } from "@contexts/interfaces/positions.interface"
-import { Binding, BindingPosition, BindingPositionLines, PropertyBindings } from "./binding.interface"
+import { BindingPosition, BindingPositionLines, PropertyBindings } from "./binding.interface"
 import { ConsumerPosition, ConsumerPositionLines, PropertyConsumersRegister } from "./consumer.interface"
 
 type ArgumentsQueue = {
-  "x-queue-type": string
+  "x-queue-type"?: string
 }
 
 export type Queue = {

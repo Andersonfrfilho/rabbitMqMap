@@ -1,6 +1,6 @@
 import { PropertyPosition } from "@contexts/interfaces/positions.interface";
-import { MessagePositions, PropertyMessage, PropertyMessagePositions } from "./message.interface";
-import { PropertyLines, PropertyManyLines } from "@contexts/interfaces/lines.interface";
+import { PropertyMessage, PropertyMessagePositions } from "./message.interface";
+import { PropertyManyLines } from "@contexts/interfaces/lines.interface";
 
 interface Capabilities {
   authentication_failure_close: boolean;

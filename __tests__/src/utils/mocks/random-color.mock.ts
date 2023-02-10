@@ -1,0 +1,1 @@
+export const colorFake = '#000'

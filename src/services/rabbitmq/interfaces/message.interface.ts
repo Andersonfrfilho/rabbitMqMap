@@ -15,8 +15,7 @@ export interface MessagePoint {
 interface Message {
   exchange: string;
   routeKey?: string;
-  messagePayload?: string;
-  time: number;
+  payload?: string;
   id: string;
   color: string;
 }
@@ -24,16 +23,6 @@ interface Message {
 export interface PropertyMessage {
   messages: Message[]
 }
-
-// export interface ProducerBetweenExchange {
-//   initial: GetLinksLinesResult;
-//   last: GetLinksLinesResult;
-// }
-
-// export interface Lines {
-//   producerBetweenExchange: ProducerBetweenExchange
-// }
-
 
 export interface MessagePositions extends Message {
   positions: {

@@ -27,7 +27,7 @@
       "@utils/*": ["src/utils/*"],
       "@enums/*": ["src/enums/*"],
       "@dtos/*": ["src/dtos/*"],
-
+      "@schemas/*": ["src/schemas/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "custom.d.ts"],

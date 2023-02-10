@@ -5,7 +5,7 @@ import { Exchange } from "@services/rabbitmq/interfaces/exchange.interface";
 import { Queue } from "@services/rabbitmq/interfaces/queue.interface";
 import { Consumer } from "@services/rabbitmq/interfaces/consumer.interface";
 import { builderInfoComponent } from "../builder/info.builder";
-import { verifyFourDirectionHasElement } from "../utils/veirfyFourDirectionHasElement";
+import { verifyFourDirectionHasElement } from "../utils/verifyFourDirectionHasElement";
 import { createCoordinate } from "../utils/createCoordinate";
 import { verifyAlreadyExistComponentInPositionIndex } from "../utils/verifyAlreadyExistComponentInPositionIndex";
 import { Components, ComponentsPositions } from '@contexts/interfaces/components.interface';

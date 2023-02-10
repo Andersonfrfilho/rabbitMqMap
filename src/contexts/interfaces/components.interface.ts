@@ -31,3 +31,4 @@ export interface ComponentsPositions {
   queue: Position[];
   consumer: Position[];
 }
+
