@@ -114,7 +114,83 @@ export const getProducers = async (): Promise<Producer[]> => {
         "color": "#361c34"
       }]
   }))
-  return connectionsFormat
+
+  return [...connectionsFormat, {
+    id: '56c24477-6d36-4a8e-98e8-07fbfd9cc2d4',
+    host: '10.142.15.205-2',
+    name: '10.184.22.51:53168 -> 10.142.15.205:5672-2',
+    node: 'rabbit@magalupay-rabbitmq',
+    user: 'usr_pochete-2',
+    client_properties: {
+      capabilities: {
+        authentication_failure_close: true,
+        'basic.nack': true,
+        'connection.blocked': true,
+        consumer_cancel_notify: true,
+        exchange_exchange_bindings: true,
+        publisher_confirms: true
+      },
+      information: 'http://squaremo.github.io/amqp.node',
+      platform: 'Node.JS v16.14.0',
+      product: 'amqplib',
+      version: '0.10.0'
+    },
+    user_who_performed_action: 'usr_pochete-2',
+    vhost: 'nelson-rubens',
+    port: 5672,
+    type: 'network',
+    messages: [
+      {
+        exchange: 'amq.direct',
+        routeKey: '',
+        time: 1,
+        payload: '{\n"fila":"direct"\n}',
+        id: '284d1cbc-b9c7-4d9e-baf9-1827dc1daae4',
+        color: '#7a2d16'
+      },
+      {
+        exchange: 'amq.fanout',
+        routeKey: '',
+        time: 1,
+        payload: '{\n"fila":"fanout"\n}',
+        id: 'e570d66e-5526-4013-9354-65a764e35d1d',
+        color: '#59b651'
+      },
+      {
+        exchange: 'amq.headers',
+        routeKey: '',
+        time: 1,
+        payload: '{\n"fila":"headers"\n}',
+        id: 'cf73c63e-8eb1-4d4e-b077-b07333ba810d',
+        color: '#1cc0c2'
+      },
+      {
+        exchange: 'amq.match',
+        routeKey: '',
+        time: 1,
+        payload: '{\n"fila":"match"\n}',
+        id: 'b1ebcb65-d165-4a39-b975-299f0706a146',
+        color: '#6e1e9d'
+      },
+      {
+        exchange: 'amq.topic',
+        routeKey: 'route-key-topic',
+        time: 1,
+        payload: '{\n"fila":"route-key-topic"\n}',
+        id: '063bb02b-dc70-443e-b9c7-76ab50d05404',
+        color: '#1ad1a6'
+      },
+      {
+        exchange: 'exchange-queue-1-topic',
+        routeKey: 'many.queue-3',
+        time: 1,
+        payload: '{\n"fila":"route-key-topic"\n}',
+        id: '063bb02b-dc70-443e-b9c7-76ab50d05674',
+        color: '#361c34'
+      }
+    ]
+  }
+  ]
 }
 
 export interface ChangeAxiosConfig {

@@ -40,20 +40,20 @@ export function infoConsumer({ channel_details: { user }, queue: { name } }: Con
 
 
 interface BuilderComponentParams {
-  componentName: keyof ComponentsPositions & COMPONENT_INFO_TYPE;
-  data: Queue & Producer & Exchange & Consumer;
+  componentName: COMPONENT_INFO_TYPE;
+  data: Queue | Producer | Exchange | Consumer;
 }
 
 export function builderInfoComponent({ componentName, data }: BuilderComponentParams): Info {
   switch (componentName) {
     case COMPONENT_INFO_TYPE.PRODUCER:
-      return infoProducer(data)
+      return infoProducer(data as Producer)
     case COMPONENT_INFO_TYPE.EXCHANGE:
-      return infoExchange(data)
+      return infoExchange(data as Exchange)
     case COMPONENT_INFO_TYPE.QUEUE:
-      return infoQueue(data)
+      return infoQueue(data as Queue)
     case COMPONENT_INFO_TYPE.CONSUMER:
-      return infoConsumer(data)
+      return infoConsumer(data as Consumer)
     default:
       throw new Error("not component info type define found!");
   }
