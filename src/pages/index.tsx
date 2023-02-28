@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react'
+import * as THREE from 'three'
 import { ResizeObserver } from '@juggle/resize-observer';
 import { Exchange } from "@services/rabbitmq/interfaces/exchange.interface";
 import { ChangeAxiosConfig, changeAxiosConfig, getExchanges, getProducers, getQueues } from '@services/rabbitmq/rabbitmq.service'
 import { GetStaticProps, GetStaticPropsResult, InferGetStaticPropsType } from "next";
-import { Canvas } from '@react-three/fiber'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import { Box, Button, Flex, Grid, GridItem, IconButton, Image, Input, InputGroup, InputLeftElement, InputRightAddon, Spacer, Stack, Text } from '@chakra-ui/react';
 import { QueueThree } from '@components/Queue.three.component';
@@ -18,7 +19,7 @@ import { MdHttp, MdInfo, MdInfoOutline } from 'react-icons/md'
 import { AiOutlineLock, AiOutlineUser } from 'react-icons/ai'
 import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa';
 import CodeEditor from '@components/CodeEditor.component';
-import { Components } from '@contexts/interfaces/components.interface';
+import { Components, ComponentsPositions } from '@contexts/interfaces/components.interface';
 import { COMPONENT_INFO_TYPE, COMPONENT_TYPE } from '@enums/components.enum';
 import { QueueBindingConsumerRegister } from '@services/rabbitmq/interfaces/queue.interface';
 import { Position } from '@contexts/interfaces/positions.interface';
@@ -29,6 +30,9 @@ import { useForm } from 'react-hook-form';
 import { useSchema } from '@contexts/schema/Schema.context';
 import { isValidUrl } from '@utils/isValidUrl';
 import { useComponent } from '@contexts/component/Component.context';
+import { DefinePositionsComponentsParams } from '@contexts/position/functions/definePositionsComponents';
+import { FORMATIONS_TYPE } from '@contexts/position/enum/position.enum';
+import { getCoordinatesMajor } from '@contexts/position/utils/quadrilateralFormation';
 
 interface AppGetStaticInterface {
   queues: QueueBindingConsumerRegister[]
@@ -39,6 +43,7 @@ interface AppGetStaticInterface {
 export default function App(
   { queues, exchanges, producers }: InferGetStaticPropsType<typeof getStaticProps>
 ) {
+  const [positionCamera, setPositionCamera] = useState({ position: [0, -10, 80], fov: 50 })
   const [visibleFieldPassword, setVisibleFieldPassword] = useState<boolean>(false)
   const [queuePositions, setQueuePositions] = useState([] as Position[])
   const [exchangePositions, setExchangePositions] = useState([] as Position[])
@@ -57,7 +62,7 @@ export default function App(
     createComponents, } = useComponent()
   const {
     getQueuePositionsCoordinates,
-    createPositionsComponents,
+    createPositionsComponent,
     definePositionsComponents,
     defineLinesQueuesBetweenExchangesConsumers,
     getLinksLinesCoordinates,
@@ -81,7 +86,27 @@ export default function App(
       setExchangesEditor(exchanges);
       setProducersEditor(producers);
       const components: Components = createComponents({ queues, exchanges, producers, consumers })
-      const positions = createPositionsComponents(components)
+      const quantities = {
+        producers: components.producer.quantity,
+        exchanges: components.exchange.quantity,
+        queues: components.queue.quantity,
+        consumers: components.consumer.quantity,
+      }
+      console.log("quantidades", quantities)
+      const greatestCoordinates = getCoordinatesMajor({ quantities })
+      const positionCameraInitial = { position: [greatestCoordinates.x / 2, greatestCoordinates.y / 2, greatestCoordinates.z], fov: 50 }
+      setPositionCamera(positionCameraInitial)
+      const producersPositions = createPositionsComponent({ component: components.producer, typeFormation: FORMATIONS_TYPE.SQUARE, componentType: COMPONENT_INFO_TYPE.PRODUCER, greatestCoordinates })
+
+      const exchangesPositions = createPositionsComponent({ component: components.exchange, typeFormation: FORMATIONS_TYPE.SQUARE, componentType: COMPONENT_INFO_TYPE.EXCHANGE, greatestCoordinates })
+      const queuesPositions = createPositionsComponent({ component: components.queue, typeFormation: FORMATIONS_TYPE.SQUARE, componentType: COMPONENT_INFO_TYPE.QUEUE, greatestCoordinates })
+      const consumersPositions = createPositionsComponent({ component: components.consumer, typeFormation: FORMATIONS_TYPE.SQUARE, componentType: COMPONENT_INFO_TYPE.PRODUCER, greatestCoordinates })
+      const positions: ComponentsPositions = {
+        producer: producersPositions,
+        exchange: exchangesPositions,
+        queue: queuesPositions,
+        consumer: consumersPositions,
+      }
 
       const { queues: componentsPositions, exchanges: exchangesWithPosition, producers: producersWithPosition } = definePositionsComponents({ positions, queues, producers, exchanges })
 
@@ -114,7 +139,27 @@ export default function App(
 
     if (queueIsEqual || exchangeIsEqual || producerIsEqual) {
       const components: Components = createComponents({ queues: queuesEditor, exchanges: exchangesEditor, producers: producersEditor, consumers })
-      const positions = createPositionsComponents(components)
+
+      const quantities = {
+        producers: components.producer.quantity,
+        exchanges: components.exchange.quantity,
+        queues: components.queue.quantity,
+        consumers: components.consumer.quantity,
+      }
+      const greatestCoordinates = getCoordinatesMajor({ quantities })
+      const positionCameraInitial = { position: [greatestCoordinates.x / 2, greatestCoordinates.y / 2, greatestCoordinates.z], fov: 50 }
+      setPositionCamera(positionCameraInitial)
+
+      const producersPositions = createPositionsComponent({ greatestCoordinates, component: components.producer, typeFormation: FORMATIONS_TYPE.SQUARE, componentType: COMPONENT_INFO_TYPE.PRODUCER })
+      const exchangesPositions = createPositionsComponent({ greatestCoordinates, component: components.exchange, typeFormation: FORMATIONS_TYPE.SQUARE, componentType: COMPONENT_INFO_TYPE.EXCHANGE })
+      const queuesPositions = createPositionsComponent({ greatestCoordinates, component: components.queue, typeFormation: FORMATIONS_TYPE.SQUARE, componentType: COMPONENT_INFO_TYPE.QUEUE })
+      const consumersPositions = createPositionsComponent({ greatestCoordinates, component: components.consumer, typeFormation: FORMATIONS_TYPE.SQUARE, componentType: COMPONENT_INFO_TYPE.PRODUCER })
+      const positions: ComponentsPositions = {
+        producer: producersPositions,
+        exchange: exchangesPositions,
+        queue: queuesPositions,
+        consumer: consumersPositions,
+      }
 
       const { queues: componentsPositions, exchanges: exchangesPosition, producers: producerPositions } = definePositionsComponents({ positions, queues: queuesEditor, producers: producersEditor, exchanges: exchangesEditor })
 
@@ -280,11 +325,15 @@ export default function App(
           </Flex>
         </GridItem>
         <GridItem data-testid="content-components" pl='2' bg='green.300' area={'main'} display={"flex"} height={'100vh'}>
-          <Canvas resize={{ polyfill: ResizeObserver }} style={{ width: '100%', height: '100%' }}>
+          <Canvas
+            camera={positionCamera}
+            resize={{ polyfill: ResizeObserver }} style={{ width: '100%', height: '100%' }}>
+            <gridHelper args={[1000, 1000]} />
             <ambientLight intensity={0.5} />
             <spotLight position={[10, 10, 10]}
               penumbra={1}
             />
+
             <pointLight position={[-10, -10, -10]} />
             {producerPositions.length > 0 && producerPositions.map((position, index) => {
               return <ProducerThree key={position.id} infoComponent={position.info} position={position.position} visibleInfo={visibleInfos} />

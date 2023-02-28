@@ -1,0 +1,5 @@
+export enum FORMATIONS_TYPE {
+  SQUARE = 'SQUARE',
+  CIRCLE = 'CIRCLE',
+  POLYGON = 'POLYGON'
+}

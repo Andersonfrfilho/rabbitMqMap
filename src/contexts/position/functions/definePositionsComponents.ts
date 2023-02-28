@@ -16,7 +16,6 @@ export interface DefinePositionsComponentsResult { queues: QueueBindingConsumerR
 
 export const definePositionsComponents = ({ queues, positions, producers, exchanges }: DefinePositionsComponentsParams): DefinePositionsComponentsResult => {
   const producerPositions = positions.producer
-
   const exchangePositions = positions.exchange
   const consumerPositions = positions.consumer
 
@@ -52,8 +51,6 @@ export const definePositionsComponents = ({ queues, positions, producers, exchan
       }
     })
   }))
-
-
 
   const producerWithPositions = producers.map((producer) => {
     const position = producerPositions[0]
