@@ -3,7 +3,7 @@ import * as THREE from 'three'
 import { useRef, useState } from 'react'
 import { Html } from '@react-three/drei'
 import { Info } from '@contexts/interfaces/positions.interface'
-import { QUEUE_DIMENSION } from '@constants/components.constant'
+import { DIMENSION_SPHERE, QUEUE_DIMENSION } from '@constants/components.constant'
 
 export type Props = JSX.IntrinsicElements['mesh'] & {
   infoComponent: Info
@@ -22,7 +22,7 @@ export function ConsumerThree(props: Props): JSX.Element {
       onClick={(event) => click(!clicked)}
       onPointerOver={(event) => hover(true)}
       onPointerOut={(event) => hover(false)}>
-      <boxGeometry args={QUEUE_DIMENSION} />
+      <sphereGeometry args={DIMENSION_SPHERE} />
       <meshStandardMaterial color={hovered ? 'hotpink' : 'orange'} />
       {(clicked || hovered || props.visibleInfo) && <Html distanceFactor={10}>
         <div className="content">

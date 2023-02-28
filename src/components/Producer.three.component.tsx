@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as THREE from 'three'
 import { useRef, useState } from 'react'
-import { QUEUE_DIMENSION } from '@constants/components.constant'
+import { PRODUCER_DIMENSION } from '@constants/components.constant'
 import { Html } from '@react-three/drei'
 import { Info } from '@contexts/interfaces/positions.interface'
 
@@ -25,7 +25,7 @@ export function ProducerThree(props: Props): JSX.Element {
       onClick={(event) => click(!clicked)}
       onPointerOver={(event) => hover(true)}
       onPointerOut={(event) => hover(false)}>
-      <boxGeometry args={QUEUE_DIMENSION} />
+      <boxGeometry args={PRODUCER_DIMENSION} />
       <meshStandardMaterial color={hovered ? 'purple' : '#FFC0CB'} />
       {(clicked || hovered || props.visibleInfo) && <Html distanceFactor={10}>
         <div className="content">
