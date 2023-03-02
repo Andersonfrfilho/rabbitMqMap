@@ -92,7 +92,7 @@ export default function App(
         queues: components.queue.quantity,
         consumers: components.consumer.quantity,
       }
-      console.log("quantidades", quantities)
+
       const greatestCoordinates = getCoordinatesMajor({ quantities })
       const positionCameraInitial = { position: [greatestCoordinates.x / 2, greatestCoordinates.y / 2, greatestCoordinates.z], fov: 50 }
       setPositionCamera(positionCameraInitial)
@@ -100,7 +100,7 @@ export default function App(
 
       const exchangesPositions = createPositionsComponent({ component: components.exchange, typeFormation: FORMATIONS_TYPE.SQUARE, componentType: COMPONENT_INFO_TYPE.EXCHANGE, greatestCoordinates })
       const queuesPositions = createPositionsComponent({ component: components.queue, typeFormation: FORMATIONS_TYPE.SQUARE, componentType: COMPONENT_INFO_TYPE.QUEUE, greatestCoordinates })
-      const consumersPositions = createPositionsComponent({ component: components.consumer, typeFormation: FORMATIONS_TYPE.SQUARE, componentType: COMPONENT_INFO_TYPE.PRODUCER, greatestCoordinates })
+      const consumersPositions = createPositionsComponent({ component: components.consumer, typeFormation: FORMATIONS_TYPE.SQUARE, componentType: COMPONENT_INFO_TYPE.CONSUMER, greatestCoordinates })
       const positions: ComponentsPositions = {
         producer: producersPositions,
         exchange: exchangesPositions,
@@ -153,7 +153,7 @@ export default function App(
       const producersPositions = createPositionsComponent({ greatestCoordinates, component: components.producer, typeFormation: FORMATIONS_TYPE.SQUARE, componentType: COMPONENT_INFO_TYPE.PRODUCER })
       const exchangesPositions = createPositionsComponent({ greatestCoordinates, component: components.exchange, typeFormation: FORMATIONS_TYPE.SQUARE, componentType: COMPONENT_INFO_TYPE.EXCHANGE })
       const queuesPositions = createPositionsComponent({ greatestCoordinates, component: components.queue, typeFormation: FORMATIONS_TYPE.SQUARE, componentType: COMPONENT_INFO_TYPE.QUEUE })
-      const consumersPositions = createPositionsComponent({ greatestCoordinates, component: components.consumer, typeFormation: FORMATIONS_TYPE.SQUARE, componentType: COMPONENT_INFO_TYPE.PRODUCER })
+      const consumersPositions = createPositionsComponent({ greatestCoordinates, component: components.consumer, typeFormation: FORMATIONS_TYPE.SQUARE, componentType: COMPONENT_INFO_TYPE.CONSUMER })
       const positions: ComponentsPositions = {
         producer: producersPositions,
         exchange: exchangesPositions,

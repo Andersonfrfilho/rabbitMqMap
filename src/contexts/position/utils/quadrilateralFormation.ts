@@ -18,7 +18,7 @@ export interface QuadrilLateralFormationParams {
 
 export const quadrilateralFormation = ({ component, componentType, greatestCoordinates }: QuadrilLateralFormationParams): Position[] => {
   const square = Math.sqrt(component.quantity)
-  console.log("##########", componentType, square, component.quantity, isPerfectSquare({ square, value: component.quantity }))
+
   if (isPerfectSquare({ square, value: component.quantity })) {
     return squareFormation({ greatestCoordinates, depth: component.depth, quantity: component.quantity, square, items: component.items, type: componentType })
   }

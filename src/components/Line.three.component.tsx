@@ -25,7 +25,7 @@ export function LineThree(props: Props): JSX.Element {
     <Line
       points={pointsConvertInVector3}       // Array of points, Array<Vector3 | Vector2 | [number, number, number] | [number, number] | number>
       color="black"                   // Default
-      lineWidth={5}                   // In pixels (default)
+      lineWidth={1}                   // In pixels (default)
       dashed={false}                  // Default
       vertexColors={[[0, 0, 0]]} // Optional array of RGB values for each point
     />
