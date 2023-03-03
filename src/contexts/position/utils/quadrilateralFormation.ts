@@ -115,7 +115,7 @@ function rectangleFormation({ depth, quantity, square, items, type, greatestCoor
   })
 }
 
-interface Components {
+export interface Components {
   producers: number,
   exchanges: number,
   queues: number,
