@@ -10,19 +10,19 @@ import { builderInfoComponent } from '../builder/info.builder';
 import { Position as PositionCoordinates } from '@constants/position.constant';
 import { Position } from '@contexts/interfaces/positions.interface';
 
-export interface QuadrilLateralFormationParams {
+export interface QuadrilLateralFormationThreeDimensionParams {
   component: Component<Producer | Exchange | Queue | Consumer>;
   componentType: COMPONENT_INFO_TYPE;
   greatestCoordinates: Coordinates
 }
 
-export const quadrilateralFormation = ({ component, componentType, greatestCoordinates }: QuadrilLateralFormationParams): Position[] => {
+export const quadrilateralFormationThreeDimension = ({ component, componentType, greatestCoordinates }: QuadrilLateralFormationThreeDimensionParams): Position[] => {
   const square = Math.sqrt(component.quantity)
 
   if (isPerfectSquare({ square, value: component.quantity })) {
-    return squareFormation({ greatestCoordinates, depth: component.depth, quantity: component.quantity, square, items: component.items, type: componentType })
+    return squareFormationThreeDimension({ greatestCoordinates, depth: component.depth, quantity: component.quantity, square, items: component.items, type: componentType })
   }
-  return rectangleFormation({ greatestCoordinates, depth: component.depth, quantity: component.quantity, square, items: component.items, type: componentType })
+  return rectangleFormationThreeDimension({ greatestCoordinates, depth: component.depth, quantity: component.quantity, square, items: component.items, type: componentType })
 
 }
 
@@ -47,9 +47,9 @@ interface FormationsParams {
   greatestCoordinates: Coordinates
 }
 
-interface SquareFormationsParams extends FormationsParams { }
+interface SquareFormationsThreeDimensionParams extends FormationsParams { }
 
-function squareFormation({ depth, quantity, square, items, type, greatestCoordinates }: SquareFormationsParams): Position[] {
+function squareFormationThreeDimension({ depth, quantity, square, items, type, greatestCoordinates }: SquareFormationsThreeDimensionParams): Position[] {
   const coordinates: PositionCoordinates[] = []
 
   const greatestCoordinatesLocals = {
@@ -80,9 +80,9 @@ function squareFormation({ depth, quantity, square, items, type, greatestCoordin
   })
 }
 
-interface RectangleFormationsParams extends FormationsParams { }
+interface RectangleFormationThreeDimensionParams extends FormationsParams { }
 
-function rectangleFormation({ depth, quantity, square, items, type, greatestCoordinates }: RectangleFormationsParams): Position[] {
+function rectangleFormationThreeDimension({ depth, quantity, square, items, type, greatestCoordinates }: RectangleFormationThreeDimensionParams): Position[] {
   const squareIntRoundDown = Math.floor(square)
   const amountRows = squareIntRoundDown
   const amountColumns = Math.ceil(quantity / squareIntRoundDown)
@@ -115,7 +115,7 @@ function rectangleFormation({ depth, quantity, square, items, type, greatestCoor
   })
 }
 
-interface Components {
+export interface Components {
   producers: number,
   exchanges: number,
   queues: number,
@@ -132,9 +132,15 @@ export interface Coordinates {
   z: number,
 }
 
-interface GetCoordinatesMajorResponse extends Coordinates { }
+interface GetCoordinatesMajorThreeDimensionsResponse extends Coordinates { }
 
-export function getCoordinatesMajor({ quantities }: SquareCoordinatesParams): GetCoordinatesMajorResponse {
+interface SquareCoordinatesParams {
+  quantities: Components
+}
+
+interface GetCoordinatesMajorThreeDimensions extends SquareCoordinatesParams { }
+
+export function getCoordinatesMajorThreeDimensions({ quantities }: GetCoordinatesMajorThreeDimensions): GetCoordinatesMajorThreeDimensionsResponse {
   const componentsValues = Object.values(quantities)
   const componentsProperties = Object.keys(quantities)
   const greatestValueIndex = componentsValues.reduce((previousIndex, value, i, arr) => arr[previousIndex] > value ? previousIndex : i, 0)
