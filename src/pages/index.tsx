@@ -30,7 +30,7 @@ import { useForm } from 'react-hook-form';
 import { useSchema } from '@contexts/schema/Schema.context';
 import { isValidUrl } from '@utils/isValidUrl';
 import { useComponent } from '@contexts/component/Component.context';
-import { FORMATIONS_TYPE } from '@contexts/position/enum/position.enum';
+import { FORMATIONS_TYPE_THREE_DIMENSION } from '@contexts/position/enum/position.enum';
 import { getCoordinatesMajor } from '@contexts/position/utils/quadrilateralFormation';
 import { Dimension } from '@enums/dimensions.enum';
 
@@ -45,7 +45,7 @@ export default function App(
 ) {
   const [positionCamera, setPositionCamera] = useState({ position: [0, -10, 80], fov: 50 })
   const [visibleFieldPassword, setVisibleFieldPassword] = useState<boolean>(false)
-  const [dimension, setDimension] = useState<Dimension>(Dimension.three)
+  const [dimension, setDimension] = useState<Dimension>(Dimension.two)
   const [queuePositions, setQueuePositions] = useState([] as Position[])
   const [exchangePositions, setExchangePositions] = useState([] as Position[])
   const [consumerPositions, setConsumerPositions] = useState([] as Position[])
@@ -90,7 +90,7 @@ export default function App(
 
 
       const { positions, cameraInitialPosition } = getPositionByDimension({ components, dimension })
-      console.log("######## - 21", positions)
+
       setPositionCamera(cameraInitialPosition)
 
       const { queues: componentsPositions, exchanges: exchangesWithPosition, producers: producersWithPosition } = definePositionsComponents({ positions, queues, producers, exchanges })

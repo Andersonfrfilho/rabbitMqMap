@@ -31,7 +31,6 @@ export function infoQueue({ name, type }: Queue): Info {
 }
 
 export function infoConsumer({ channel_details: { user }, queue: { name } }: Consumer): Info {
-  console.log(user, name)
   return {
     name,
     type: user,

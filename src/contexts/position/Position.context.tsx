@@ -1,7 +1,7 @@
 import React, { useContext } from 'react'
 import { GetQueuePositionsParams, getQueuePositionsCoordinates } from './utils/getQueuePositionsCoordinates';
 import { Position } from '@contexts/interfaces/positions.interface';
-import { CreatePositionsComponentParams, createPositionsComponent } from './functions/createPositionComponents';
+import { createPositionsComponentThreeDimension, CreatePositionsComponentThreeDimensionParams } from './functions/createPositionComponentsThreeDimension';
 import { DefinePositionsComponentsResult, DefinePositionsComponentsParams, definePositionsComponents } from './functions/definePositionsComponents';
 import { QueueBindingConsumerRegisterPosition, QueueBindingConsumerRegisterPositionLines } from '@services/rabbitmq/interfaces/queue.interface';
 import { defineLinesQueuesBetweenExchangesConsumers } from './functions/defineLinesQueuesBetweenExchangesConsumers';
@@ -17,7 +17,7 @@ type PositionStateProps = {
 
 interface UsePosition {
   getQueuePositionsCoordinates(data: GetQueuePositionsParams): Position[]
-  createPositionsComponent(components: CreatePositionsComponentParams): Position[]
+  createPositionsComponentThreeDimension(components: CreatePositionsComponentThreeDimensionParams): Position[]
   definePositionsComponents(data: DefinePositionsComponentsParams): DefinePositionsComponentsResult
   defineLinesQueuesBetweenExchangesConsumers(queues: QueueBindingConsumerRegisterPosition[]): QueueBindingConsumerRegisterPositionLines[]
   getLinksLinesCoordinates(data: GetLinksLinesCoordinatesDTO): Point[]
@@ -31,7 +31,7 @@ export function PositionState({ children }: PositionStateProps) {
   return (
     <PositionContext.Provider value={{
       getQueuePositionsCoordinates,
-      createPositionsComponent,
+      createPositionsComponentThreeDimension,
       definePositionsComponents,
       defineLinesQueuesBetweenExchangesConsumers,
       getLinksLinesCoordinates,

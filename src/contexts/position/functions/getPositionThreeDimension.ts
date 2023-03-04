@@ -1,7 +1,7 @@
 import { ComponentsPositions, Components } from "@contexts/interfaces/components.interface"
-import { getCoordinatesMajor } from "../utils/quadrilateralFormation"
-import { createPositionsComponent } from "./createPositionComponents";
-import { FORMATIONS_TYPE } from "../enum/position.enum";
+import { getCoordinatesMajorThreeDimensions } from "../utils/quadrilateralFormationThreeDimension"
+import { createPositionsComponentThreeDimension } from "./createPositionComponentsThreeDimension";
+import { FORMATIONS_TYPE_THREE_DIMENSION } from "../enum/position.enum";
 import { COMPONENT_INFO_TYPE } from "@enums/components.enum";
 import { GetPositionByDimensionResponse } from "./getPositionByDimension";
 
@@ -19,13 +19,13 @@ export function getPositionThreeDimension({ components }: GetPositionThreeDimens
     consumers: components.consumer.quantity,
   }
 
-  const greatestCoordinates = getCoordinatesMajor({ quantities })
+  const greatestCoordinates = getCoordinatesMajorThreeDimensions({ quantities })
   const positionCameraInitial = { position: [greatestCoordinates.x / 2, greatestCoordinates.y / 2, greatestCoordinates.z], fov: 50 }
 
-  const producersPositions = createPositionsComponent({ component: components.producer, typeFormation: FORMATIONS_TYPE.SQUARE, componentType: COMPONENT_INFO_TYPE.PRODUCER, greatestCoordinates })
-  const exchangesPositions = createPositionsComponent({ component: components.exchange, typeFormation: FORMATIONS_TYPE.SQUARE, componentType: COMPONENT_INFO_TYPE.EXCHANGE, greatestCoordinates })
-  const queuesPositions = createPositionsComponent({ component: components.queue, typeFormation: FORMATIONS_TYPE.SQUARE, componentType: COMPONENT_INFO_TYPE.QUEUE, greatestCoordinates })
-  const consumersPositions = createPositionsComponent({ component: components.consumer, typeFormation: FORMATIONS_TYPE.SQUARE, componentType: COMPONENT_INFO_TYPE.CONSUMER, greatestCoordinates })
+  const producersPositions = createPositionsComponentThreeDimension({ component: components.producer, typeFormation: FORMATIONS_TYPE_THREE_DIMENSION.SQUARE, componentType: COMPONENT_INFO_TYPE.PRODUCER, greatestCoordinates })
+  const exchangesPositions = createPositionsComponentThreeDimension({ component: components.exchange, typeFormation: FORMATIONS_TYPE_THREE_DIMENSION.SQUARE, componentType: COMPONENT_INFO_TYPE.EXCHANGE, greatestCoordinates })
+  const queuesPositions = createPositionsComponentThreeDimension({ component: components.queue, typeFormation: FORMATIONS_TYPE_THREE_DIMENSION.SQUARE, componentType: COMPONENT_INFO_TYPE.QUEUE, greatestCoordinates })
+  const consumersPositions = createPositionsComponentThreeDimension({ component: components.consumer, typeFormation: FORMATIONS_TYPE_THREE_DIMENSION.SQUARE, componentType: COMPONENT_INFO_TYPE.CONSUMER, greatestCoordinates })
   const positions: ComponentsPositions = {
     producer: producersPositions,
     exchange: exchangesPositions,

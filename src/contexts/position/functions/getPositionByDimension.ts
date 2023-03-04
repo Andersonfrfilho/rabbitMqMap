@@ -20,8 +20,7 @@ export function getPositionByDimension({ dimension, components }: GetPositionByD
   switch (dimension) {
     case Dimension.three:
       return getPositionThreeDimension({ components });
-    case Dimension.two:
     default:
-      return getPositionTwoDimension();
+      return getPositionTwoDimension({ components });
   }
 }
